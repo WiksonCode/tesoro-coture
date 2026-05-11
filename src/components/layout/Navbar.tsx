@@ -10,6 +10,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
+import { useKorpa } from '@/store/korpa'
 
 const navLinks = [
   { href: '/', label: 'Početna' },
@@ -21,7 +22,12 @@ const navLinks = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const pathname = usePathname()
+  const isHero = pathname === '/' && !scrolled
+  const korpaCount = useKorpa((s) => s.artikli.length)
+
+  useEffect(() => setMounted(true), [])
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 30)
@@ -43,7 +49,10 @@ export default function Navbar() {
         {/* Logo */}
         <Link href="/" className="flex flex-col leading-none">
           <span
-            className="text-[22px] lg:text-[26px] tracking-[0.3em] font-light text-[#1a1a1a] uppercase"
+            className={cn(
+              'text-[22px] lg:text-[26px] tracking-[0.3em] font-light uppercase transition-colors duration-500',
+              isHero ? 'text-white' : 'text-[#1a1a1a]'
+            )}
             style={{ fontFamily: 'var(--font-serif)' }}
           >
             TESORO
@@ -66,7 +75,9 @@ export default function Navbar() {
                   'text-[10px] tracking-[0.25em] uppercase transition-colors duration-300',
                   pathname === link.href
                     ? 'text-[#c9a96e]'
-                    : 'text-[#1a1a1a] hover:text-[#c9a96e]'
+                    : isHero
+                      ? 'text-white/80 hover:text-white'
+                      : 'text-[#1a1a1a] hover:text-[#c9a96e]'
                 )}
                 style={{ fontFamily: 'var(--font-sans)' }}
               >
@@ -80,7 +91,10 @@ export default function Navbar() {
         <div className="flex items-center gap-5">
           {/* Language switcher */}
           <div
-            className="hidden lg:flex items-center gap-2 text-[9px] tracking-[0.25em] text-[#8a8a8a]"
+            className={cn(
+              'hidden lg:flex items-center gap-2 text-[9px] tracking-[0.25em] transition-colors duration-500',
+              isHero ? 'text-white/50' : 'text-[#8a8a8a]'
+            )}
             style={{ fontFamily: 'var(--font-sans)' }}
           >
             <button className="hover:text-[#c9a96e] transition-colors uppercase">SR</button>
@@ -93,14 +107,22 @@ export default function Navbar() {
             <ShoppingBag
               size={18}
               strokeWidth={1.5}
-              className="text-[#1a1a1a] group-hover:text-[#c9a96e] transition-colors duration-300"
+              className={cn(
+                'group-hover:text-[#c9a96e] transition-colors duration-300',
+                isHero ? 'text-white' : 'text-[#1a1a1a]'
+              )}
             />
+            {mounted && korpaCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[#c9a96e] text-[#1a1a1a] text-[8px] font-medium flex items-center justify-center rounded-full leading-none">
+                {korpaCount > 9 ? '9+' : korpaCount}
+              </span>
+            )}
           </Link>
 
           {/* Mobile menu */}
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger className="lg:hidden p-1" aria-label="Otvori meni">
-              <Menu size={20} strokeWidth={1.5} className="text-[#1a1a1a]" />
+              <Menu size={20} strokeWidth={1.5} className={cn('transition-colors duration-500', isHero ? 'text-white' : 'text-[#1a1a1a]')} />
             </SheetTrigger>
             <SheetContent
               side="right"

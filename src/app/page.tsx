@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import HeroSection from '@/components/home/HeroSection'
+import CategorySection from '@/components/home/CategorySection'
 import FeaturedSection from '@/components/home/FeaturedSection'
 import AboutSection from '@/components/home/AboutSection'
 import CTASection from '@/components/home/CTASection'
@@ -21,6 +22,7 @@ export default async function HomePage() {
   return (
     <main>
       <HeroSection />
+      <CategorySection />
       <FeaturedSection haljine={haljine} />
       <AboutSection />
       <CTASection />

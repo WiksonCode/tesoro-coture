@@ -67,7 +67,7 @@ export default function VelicineSelector({
             )}
             style={{ fontFamily: 'var(--font-sans)' }}
           >
-            {v === 'po_mjeri' ? 'Po mjeri' : v}
+            {v === 'po_mjeri' ? 'Po meri' : v}
           </button>
         ))}
       </div>
@@ -83,7 +83,7 @@ export default function VelicineSelector({
               className="text-[10px] tracking-[0.25em] uppercase text-[#1a1a1a]"
               style={{ fontFamily: 'var(--font-sans)' }}
             >
-              Unesite vaše mjere (cm)
+              Unesite vaše mere (cm)
             </p>
             <ChevronDown
               size={14}

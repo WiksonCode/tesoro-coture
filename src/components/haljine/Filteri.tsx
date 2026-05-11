@@ -1,13 +1,15 @@
 'use client'
 
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useCallback } from 'react'
-import { Switch } from '@/components/ui/switch'
+import { ChevronDown, X, Check, SlidersHorizontal } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import type { Boja } from '@/types'
 
 const KATEGORIJE = [
-  { value: 'vjencana', label: 'Vjenčane' },
+  { value: '', label: 'Sve' },
+  { value: 'vjencana', label: 'Venčane' },
   { value: 'koktel', label: 'Koktel' },
   { value: 'svecana', label: 'Svečane' },
   { value: 'casual', label: 'Casual' },
@@ -16,8 +18,25 @@ const KATEGORIJE = [
 
 const SORTIRANJA = [
   { value: '', label: 'Najnovije' },
-  { value: 'cijena_rastuce', label: 'Cijena ↑' },
-  { value: 'cijena_opadajuce', label: 'Cijena ↓' },
+  { value: 'najstarije', label: 'Najstarije' },
+  { value: 'cijena_rastuce', label: 'Cena ↑' },
+  { value: 'cijena_opadajuce', label: 'Cena ↓' },
+  { value: 'po_dostupnosti', label: 'Dostupnost' },
+]
+
+const STANDARD_VELICINE = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'po_mjeri']
+
+const PRESET_BOJE: Boja[] = [
+  { naziv: 'Bela', hex: '#FAFAFA' },
+  { naziv: 'Krem', hex: '#F5E6D3' },
+  { naziv: 'Roze', hex: '#F2A7B3' },
+  { naziv: 'Crvena', hex: '#C41E3A' },
+  { naziv: 'Bordo', hex: '#800020' },
+  { naziv: 'Lavanda', hex: '#9B87C0' },
+  { naziv: 'Plava', hex: '#4A7FC1' },
+  { naziv: 'Zelena', hex: '#2D7D5A' },
+  { naziv: 'Crna', hex: '#1a1a1a' },
+  { naziv: 'Zlatna', hex: '#C9A96E' },
 ]
 
 interface FilteriProps {
@@ -33,204 +52,459 @@ interface FilteriProps {
   selectedVelicine: string[]
   onBojeChange: (boje: string[]) => void
   onVelicineChange: (velicine: string[]) => void
+  priceRange: [number, number]
+  priceBounds: { min: number; max: number }
+  onPriceChange: (range: [number, number]) => void
+  onReset: () => void
+  totalCount: number
+}
+
+function formatRSD(value: number) {
+  return new Intl.NumberFormat('sr-Latn-RS').format(Math.round(value / 1000) * 1000) + ' RSD'
+}
+
+function DualSlider({ min, max, value, step = 5000, onChange }: {
+  min: number; max: number; value: [number, number]; step?: number
+  onChange: (v: [number, number]) => void
+}) {
+  const range = max - min || 1
+  const leftPct = Math.min(100, Math.max(0, ((value[0] - min) / range) * 100))
+  const rightPct = Math.min(100, Math.max(0, ((value[1] - min) / range) * 100))
+  return (
+    <div className="relative h-10 flex items-center select-none">
+      <div className="absolute left-0 right-0 h-[3px] bg-[#e8e0d8] rounded-full">
+        <div className="absolute h-full bg-[#c9a96e] rounded-full" style={{ left: `${leftPct}%`, right: `${100 - rightPct}%` }} />
+      </div>
+      <div className="absolute w-5 h-5 rounded-full bg-white border-2 border-[#c9a96e] shadow-md pointer-events-none z-10" style={{ left: `calc(${leftPct}% - 10px)` }} />
+      <div className="absolute w-5 h-5 rounded-full bg-white border-2 border-[#c9a96e] shadow-md pointer-events-none z-10" style={{ left: `calc(${rightPct}% - 10px)` }} />
+      <input type="range" min={min} max={max} step={step} value={value[0]}
+        onChange={e => onChange([Math.min(Number(e.target.value), value[1] - step), value[1]])}
+        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+        style={{ zIndex: leftPct > 50 ? 5 : 3 }}
+      />
+      <input type="range" min={min} max={max} step={step} value={value[1]}
+        onChange={e => onChange([value[0], Math.max(Number(e.target.value), value[0] + step)])}
+        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+        style={{ zIndex: leftPct > 50 ? 3 : 5 }}
+      />
+    </div>
+  )
+}
+
+function Dropdown({ label, active, badge, children }: {
+  label: string; active?: boolean; badge?: number; children: React.ReactNode
+}) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (!open) return
+    function onOut(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', onOut)
+    return () => document.removeEventListener('mousedown', onOut)
+  }, [open])
+  return (
+    <div className="relative shrink-0" style={{ overflow: 'visible' }} ref={ref}>
+      <button type="button" onClick={() => setOpen(v => !v)}
+        className={cn(
+          'flex items-center gap-1.5 px-4 py-2.5 text-[10px] tracking-[0.2em] uppercase border transition-all duration-200 whitespace-nowrap',
+          active ? 'border-[#1a1a1a] bg-[#1a1a1a] text-[#faf7f4]' : 'border-[#e8e0d8] text-[#8a8a8a] hover:border-[#1a1a1a] hover:text-[#1a1a1a] bg-white'
+        )}
+        style={{ fontFamily: 'var(--font-sans)' }}
+      >
+        {label}
+        {badge
+          ? <span className="w-4 h-4 rounded-full bg-[#c9a96e] text-[#1a1a1a] text-[8px] flex items-center justify-center font-medium">{badge}</span>
+          : <ChevronDown size={10} className={cn('transition-transform duration-200', open && 'rotate-180')} />
+        }
+      </button>
+      {open && (
+        <div className="absolute top-full left-0 mt-2 bg-white border border-[#e8e0d8] shadow-[0_8px_30px_rgba(0,0,0,0.12)]" style={{ zIndex: 9999, minWidth: 220 }}>
+          {children}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── Mobile accordion section ────────────────────────────────────────────────
+
+function DrawerAccordion({ label, value, active, children }: {
+  label: string; value?: string; active?: boolean; children: React.ReactNode
+}) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="border-b border-[#e8e0d8]">
+      <button
+        type="button"
+        onClick={() => setOpen(v => !v)}
+        className="w-full flex items-center justify-between py-5 text-left"
+      >
+        <div className="flex items-center gap-3">
+          <p className="text-[9px] tracking-[0.35em] uppercase text-[#c9a96e]" style={{ fontFamily: 'var(--font-sans)' }}>
+            {label}
+          </p>
+          {active && value && (
+            <span className="text-[9px] text-[#1a1a1a]" style={{ fontFamily: 'var(--font-sans)' }}>
+              — {value}
+            </span>
+          )}
+        </div>
+        <ChevronDown
+          size={14}
+          strokeWidth={1.5}
+          className={cn('text-[#8a8a8a] transition-transform duration-200 shrink-0', open && 'rotate-180')}
+        />
+      </button>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
+            style={{ overflow: 'hidden' }}
+          >
+            <div className="pb-5">
+              {children}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
 }
 
 export default function Filteri({
-  activeParams,
-  sveBoje,
-  sveVelicine,
-  selectedBoje,
-  selectedVelicine,
-  onBojeChange,
-  onVelicineChange,
+  activeParams, sveBoje, sveVelicine, selectedBoje, selectedVelicine,
+  onBojeChange, onVelicineChange, priceRange, priceBounds, onPriceChange, onReset, totalCount,
 }: FilteriProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const [drawerOpen, setDrawerOpen] = useState(false)
 
-  const updateParam = useCallback(
-    (key: string, value: string | null) => {
-      const params = new URLSearchParams(searchParams.toString())
-      if (value === null || value === '') {
-        params.delete(key)
-      } else {
-        params.set(key, value)
-      }
-      router.push(`/katalog?${params.toString()}`)
-    },
-    [router, searchParams]
-  )
+  const updateParam = useCallback((key: string, value: string | null) => {
+    const params = new URLSearchParams(searchParams.toString())
+    if (value === null || value === '') params.delete(key)
+    else params.set(key, value)
+    router.push(`/katalog?${params.toString()}`)
+  }, [router, searchParams])
 
-  const labelClass = 'text-[9px] tracking-[0.4em] uppercase text-[#c9a96e] mb-4 block'
-  const sectionClass = 'mb-8'
+  useEffect(() => {
+    document.body.style.overflow = drawerOpen ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [drawerOpen])
 
-  return (
-    <div>
-      <p
-        className="text-[11px] tracking-[0.3em] uppercase text-[#1a1a1a] mb-8 font-medium"
-        style={{ fontFamily: 'var(--font-sans)' }}
-      >
-        Filteri
-      </p>
+  const displayVelicine = sveVelicine.length > 0 ? sveVelicine : STANDARD_VELICINE
+  const displayBoje = sveBoje.length > 0 ? sveBoje : PRESET_BOJE
+  const priceActive = priceRange[0] > priceBounds.min || priceRange[1] < priceBounds.max
+  const activeCount = [selectedBoje.length > 0, selectedVelicine.length > 0, priceActive, !!activeParams.naPopustu, !!activeParams.sort].filter(Boolean).length
+  const hasActive = activeCount > 0 || !!activeParams.kategorija
+  const handleReset = () => { onReset(); router.push('/katalog') }
 
-      {/* Kategorija */}
-      <div className={sectionClass}>
-        <span className={labelClass} style={{ fontFamily: 'var(--font-sans)' }}>
-          Kategorija
-        </span>
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => updateParam('kategorija', null)}
-            className={cn(
-              'px-3 py-1.5 text-[9px] tracking-[0.2em] uppercase border transition-all duration-200',
-              !activeParams.kategorija
-                ? 'bg-[#1a1a1a] text-[#faf7f4] border-[#1a1a1a]'
-                : 'border-[#e8e0d8] text-[#8a8a8a] hover:border-[#1a1a1a] hover:text-[#1a1a1a]'
+  const SizePills = () => (
+    <div className="flex flex-wrap gap-2">
+      {displayVelicine.map(v => {
+        const sel = selectedVelicine.includes(v)
+        return (
+          <button key={v} type="button"
+            onClick={() => onVelicineChange(sel ? selectedVelicine.filter(x => x !== v) : [...selectedVelicine, v])}
+            className={cn('px-3 py-2 text-[10px] tracking-wide border transition-all duration-150',
+              sel ? 'bg-[#1a1a1a] text-[#faf7f4] border-[#1a1a1a]' : 'border-[#e8e0d8] text-[#8a8a8a] hover:border-[#1a1a1a] hover:text-[#1a1a1a]'
             )}
             style={{ fontFamily: 'var(--font-sans)' }}
           >
-            Sve
+            {v === 'po_mjeri' ? 'Po meri' : v}
           </button>
-          {KATEGORIJE.map((k) => (
-            <button
-              key={k.value}
-              onClick={() =>
-                updateParam(
-                  'kategorija',
-                  activeParams.kategorija === k.value ? null : k.value
-                )
-              }
-              className={cn(
-                'px-3 py-1.5 text-[9px] tracking-[0.2em] uppercase border transition-all duration-200',
-                activeParams.kategorija === k.value
-                  ? 'bg-[#1a1a1a] text-[#faf7f4] border-[#1a1a1a]'
-                  : 'border-[#e8e0d8] text-[#8a8a8a] hover:border-[#1a1a1a] hover:text-[#1a1a1a]'
-              )}
-              style={{ fontFamily: 'var(--font-sans)' }}
-            >
-              {k.label}
-            </button>
-          ))}
-        </div>
-      </div>
+        )
+      })}
+    </div>
+  )
 
-      {/* Sortiranje */}
-      <div className={sectionClass}>
-        <span className={labelClass} style={{ fontFamily: 'var(--font-sans)' }}>
-          Sortiranje
-        </span>
-        <div className="flex flex-col gap-2">
-          {SORTIRANJA.map((s) => (
-            <button
-              key={s.value}
-              onClick={() => updateParam('sort', s.value || null)}
-              className={cn(
-                'text-left text-[10px] tracking-wide transition-colors duration-200',
-                (activeParams.sort || '') === s.value
-                  ? 'text-[#c9a96e]'
-                  : 'text-[#8a8a8a] hover:text-[#1a1a1a]'
-              )}
-              style={{ fontFamily: 'var(--font-sans)' }}
-            >
-              {s.label}
-            </button>
-          ))}
-        </div>
-      </div>
+  const ColorGrid = () => (
+    <div className="grid grid-cols-5 gap-3">
+      {displayBoje.map(boja => {
+        const sel = selectedBoje.includes(boja.naziv)
+        const isLight = ['Bela', 'Krem'].includes(boja.naziv)
+        return (
+          <button key={boja.naziv} type="button" title={boja.naziv}
+            onClick={() => onBojeChange(sel ? selectedBoje.filter(b => b !== boja.naziv) : [...selectedBoje, boja.naziv])}
+            className="flex flex-col items-center gap-1.5"
+          >
+            <div className={cn('w-9 h-9 rounded-full border-2 transition-all duration-150 flex items-center justify-center',
+              sel ? 'border-[#c9a96e] scale-110 shadow-md' : isLight ? 'border-[#e8e0d8] hover:border-[#8a8a8a]' : 'border-transparent hover:border-[#8a8a8a]'
+            )} style={{ backgroundColor: boja.hex }}>
+              {sel && <Check size={12} strokeWidth={2.5} className={isLight ? 'text-[#1a1a1a]' : 'text-white'} />}
+            </div>
+            <span className="text-[8px] text-[#8a8a8a] text-center leading-tight" style={{ fontFamily: 'var(--font-sans)' }}>
+              {boja.naziv}
+            </span>
+          </button>
+        )
+      })}
+    </div>
+  )
 
-      {/* Na popustu */}
-      <div className={sectionClass}>
-        <div className="flex items-center justify-between">
-          <span className={labelClass} style={{ fontFamily: 'var(--font-sans)' }}>
-            Na popustu
-          </span>
-          <Switch
-            checked={activeParams.naPopustu === 'true'}
-            onCheckedChange={(checked) =>
-              updateParam('naPopustu', checked ? 'true' : null)
-            }
-          />
-        </div>
-      </div>
+  return (
+    <>
+      {/* ── Sticky filter bar ──────────────────────────────────────────────── */}
+      <div className="sticky top-16 lg:top-20 z-30 bg-[#faf7f4]/95 backdrop-blur-sm border-b border-[#e8e0d8]" style={{ overflow: 'visible' }}>
+        <div className="max-w-7xl mx-auto px-4 lg:px-10" style={{ overflow: 'visible' }}>
 
-      {/* Boje */}
-      {sveBoje.length > 0 && (
-        <div className={sectionClass}>
-          <span className={labelClass} style={{ fontFamily: 'var(--font-sans)' }}>
-            Boja
-          </span>
-          <div className="flex flex-wrap gap-2">
-            {sveBoje.map((boja) => (
-              <button
-                key={boja.naziv}
-                onClick={() => {
-                  const next = selectedBoje.includes(boja.naziv)
-                    ? selectedBoje.filter((b) => b !== boja.naziv)
-                    : [...selectedBoje, boja.naziv]
-                  onBojeChange(next)
-                }}
-                title={boja.naziv}
+          {/* Category tabs — all screens */}
+          <div className="flex items-center overflow-x-auto scrollbar-hide py-3 border-b border-[#e8e0d8]/60">
+            {KATEGORIJE.map(k => (
+              <button key={k.value} type="button"
+                onClick={() => updateParam('kategorija', k.value || null)}
                 className={cn(
-                  'w-7 h-7 rounded-full border-2 transition-all duration-200',
-                  selectedBoje.includes(boja.naziv)
-                    ? 'border-[#c9a96e] scale-110'
-                    : 'border-transparent hover:border-[#8a8a8a]'
-                )}
-                style={{ backgroundColor: boja.hex }}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Veličine */}
-      {sveVelicine.length > 0 && (
-        <div className={sectionClass}>
-          <span className={labelClass} style={{ fontFamily: 'var(--font-sans)' }}>
-            Veličina
-          </span>
-          <div className="flex flex-wrap gap-2">
-            {sveVelicine.map((v) => (
-              <button
-                key={v}
-                onClick={() => {
-                  const next = selectedVelicine.includes(v)
-                    ? selectedVelicine.filter((x) => x !== v)
-                    : [...selectedVelicine, v]
-                  onVelicineChange(next)
-                }}
-                className={cn(
-                  'px-3 py-1.5 text-[9px] tracking-[0.15em] uppercase border transition-all duration-200',
-                  selectedVelicine.includes(v)
-                    ? 'bg-[#1a1a1a] text-[#faf7f4] border-[#1a1a1a]'
-                    : 'border-[#e8e0d8] text-[#8a8a8a] hover:border-[#1a1a1a] hover:text-[#1a1a1a]'
+                  'px-4 py-2 text-[10px] tracking-[0.25em] uppercase whitespace-nowrap transition-all duration-200 shrink-0',
+                  (activeParams.kategorija || '') === k.value ? 'bg-[#1a1a1a] text-[#faf7f4]' : 'text-[#8a8a8a] hover:text-[#1a1a1a]'
                 )}
                 style={{ fontFamily: 'var(--font-sans)' }}
               >
-                {v === 'po_mjeri' ? 'Po mjeri' : v}
+                {k.label}
               </button>
             ))}
           </div>
-        </div>
-      )}
 
-      {/* Reset */}
-      {(activeParams.kategorija ||
-        activeParams.sort ||
-        activeParams.naPopustu ||
-        selectedBoje.length > 0 ||
-        selectedVelicine.length > 0) && (
-        <button
-          onClick={() => {
-            onBojeChange([])
-            onVelicineChange([])
-            router.push('/katalog')
-          }}
-          className="text-[9px] tracking-[0.3em] uppercase text-[#8a8a8a] hover:text-[#c9a96e] transition-colors underline underline-offset-4"
-          style={{ fontFamily: 'var(--font-sans)' }}
-        >
-          Resetuj filtere
-        </button>
-      )}
-    </div>
+          {/* Desktop filter row */}
+          <div className="hidden lg:flex items-center justify-between gap-4 py-3" style={{ overflow: 'visible' }}>
+            <div className="flex items-center gap-2" style={{ overflow: 'visible' }}>
+              <Dropdown label="Veličina" active={selectedVelicine.length > 0} badge={selectedVelicine.length || undefined}>
+                <div className="p-4">
+                  <p className="text-[9px] tracking-[0.3em] uppercase text-[#c9a96e] mb-3" style={{ fontFamily: 'var(--font-sans)' }}>Odaberite veličinu</p>
+                  <SizePills />
+                </div>
+              </Dropdown>
+              <Dropdown label="Cena" active={priceActive}>
+                <div className="p-4" style={{ width: 280 }}>
+                  <p className="text-[9px] tracking-[0.3em] uppercase text-[#c9a96e] mb-5" style={{ fontFamily: 'var(--font-sans)' }}>Cenovni opseg</p>
+                  <DualSlider min={priceBounds.min} max={priceBounds.max} value={priceRange} onChange={onPriceChange} />
+                  <div className="flex items-center gap-2 mt-4">
+                    <div className="flex-1 border border-[#e8e0d8] px-3 py-2 text-center">
+                      <p className="text-[10px] text-[#1a1a1a]" style={{ fontFamily: 'var(--font-sans)' }}>{formatRSD(priceRange[0])}</p>
+                    </div>
+                    <div className="w-4 h-px bg-[#e8e0d8] shrink-0" />
+                    <div className="flex-1 border border-[#e8e0d8] px-3 py-2 text-center">
+                      <p className="text-[10px] text-[#1a1a1a]" style={{ fontFamily: 'var(--font-sans)' }}>{formatRSD(priceRange[1])}</p>
+                    </div>
+                  </div>
+                </div>
+              </Dropdown>
+              <Dropdown label="Boja" active={selectedBoje.length > 0} badge={selectedBoje.length || undefined}>
+                <div className="p-4">
+                  <p className="text-[9px] tracking-[0.3em] uppercase text-[#c9a96e] mb-3" style={{ fontFamily: 'var(--font-sans)' }}>Odaberite boju</p>
+                  <ColorGrid />
+                </div>
+              </Dropdown>
+              <button type="button"
+                onClick={() => updateParam('naPopustu', activeParams.naPopustu === 'true' ? null : 'true')}
+                className={cn('flex items-center gap-2 px-4 py-2.5 text-[10px] tracking-[0.2em] uppercase border transition-all duration-200 whitespace-nowrap shrink-0',
+                  activeParams.naPopustu === 'true' ? 'border-[#c9a96e] bg-[#c9a96e]/10 text-[#1a1a1a]' : 'border-[#e8e0d8] text-[#8a8a8a] hover:border-[#1a1a1a] hover:text-[#1a1a1a] bg-white'
+                )}
+                style={{ fontFamily: 'var(--font-sans)' }}
+              >
+                Na popustu
+              </button>
+              <AnimatePresence>
+                {hasActive && (
+                  <motion.button type="button"
+                    initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -6 }}
+                    transition={{ duration: 0.15 }}
+                    onClick={handleReset}
+                    className="flex items-center gap-1.5 px-3 py-2.5 text-[10px] tracking-[0.2em] uppercase text-[#8a8a8a] hover:text-[#1a1a1a] transition-colors shrink-0"
+                    style={{ fontFamily: 'var(--font-sans)' }}
+                  >
+                    <X size={11} /> Poništi
+                  </motion.button>
+                )}
+              </AnimatePresence>
+            </div>
+            <div className="flex items-center gap-4 shrink-0" style={{ overflow: 'visible' }}>
+              <p className="text-[10px] text-[#8a8a8a]" style={{ fontFamily: 'var(--font-sans)' }}>
+                {totalCount} {totalCount === 1 ? 'haljina' : 'haljine'}
+              </p>
+              <Dropdown label={SORTIRANJA.find(s => (s.value || '') === (activeParams.sort || ''))?.label ?? 'Sortiranje'} active={!!activeParams.sort}>
+                <div className="py-1" style={{ minWidth: 180 }}>
+                  {SORTIRANJA.map(s => (
+                    <button key={s.value} type="button"
+                      onClick={() => updateParam('sort', s.value || null)}
+                      className={cn('w-full text-left px-4 py-2.5 text-[10px] tracking-wide transition-colors duration-150',
+                        (activeParams.sort || '') === s.value ? 'text-[#c9a96e] bg-[#faf7f4]' : 'text-[#8a8a8a] hover:text-[#1a1a1a] hover:bg-[#faf7f4]'
+                      )}
+                      style={{ fontFamily: 'var(--font-sans)' }}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
+              </Dropdown>
+            </div>
+          </div>
+
+          {/* Mobile row — count + filter button */}
+          <div className="flex lg:hidden items-center justify-between py-3">
+            <p className="text-[10px] text-[#8a8a8a]" style={{ fontFamily: 'var(--font-sans)' }}>
+              {totalCount} {totalCount === 1 ? 'haljina' : 'haljine'}
+            </p>
+            <button type="button" onClick={() => setDrawerOpen(true)}
+              className={cn(
+                'flex items-center gap-2 px-4 py-2 text-[10px] tracking-[0.2em] uppercase border transition-all duration-200',
+                activeCount > 0 ? 'border-[#1a1a1a] bg-[#1a1a1a] text-[#faf7f4]' : 'border-[#e8e0d8] text-[#8a8a8a] bg-white'
+              )}
+              style={{ fontFamily: 'var(--font-sans)' }}
+            >
+              <SlidersHorizontal size={12} strokeWidth={1.5} />
+              Filteri
+              {activeCount > 0 && (
+                <span className="w-4 h-4 rounded-full bg-[#c9a96e] text-[#1a1a1a] text-[8px] flex items-center justify-center font-medium">
+                  {activeCount}
+                </span>
+              )}
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      {/* ── Mobile side drawer ─────────────────────────────────────────────── */}
+      <AnimatePresence>
+        {drawerOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="fixed inset-0 bg-black/50 z-[100] lg:hidden"
+              onClick={() => setDrawerOpen(false)}
+            />
+
+            {/* Drawer — slides in from left */}
+            <motion.div
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', damping: 28, stiffness: 260 }}
+              className="fixed top-0 left-0 bottom-0 z-[101] lg:hidden bg-[#faf7f4] flex flex-col shadow-2xl"
+              style={{ width: 'min(320px, 88vw)' }}
+            >
+              {/* Drawer header */}
+              <div className="flex items-center justify-between px-6 py-5 border-b border-[#e8e0d8] shrink-0">
+                <p className="text-[11px] tracking-[0.35em] uppercase text-[#1a1a1a]" style={{ fontFamily: 'var(--font-sans)' }}>
+                  Filteri
+                </p>
+                <button type="button" onClick={() => setDrawerOpen(false)} className="p-1 -mr-1 text-[#8a8a8a] hover:text-[#1a1a1a] transition-colors">
+                  <X size={20} strokeWidth={1.5} />
+                </button>
+              </div>
+
+              {/* Scrollable filter content */}
+              <div className="flex-1 overflow-y-auto px-6">
+
+                {/* Veličina */}
+                <div className="py-5 border-b border-[#e8e0d8]">
+                  <p className="text-[9px] tracking-[0.35em] uppercase text-[#c9a96e] mb-4" style={{ fontFamily: 'var(--font-sans)' }}>Veličina</p>
+                  <SizePills />
+                </div>
+
+                {/* Cena */}
+                <div className="py-5 border-b border-[#e8e0d8]">
+                  <p className="text-[9px] tracking-[0.35em] uppercase text-[#c9a96e] mb-4" style={{ fontFamily: 'var(--font-sans)' }}>Cena</p>
+                  <DualSlider min={priceBounds.min} max={priceBounds.max} value={priceRange} onChange={onPriceChange} />
+                  <div className="flex items-center gap-2 mt-4">
+                    <div className="flex-1 border border-[#e8e0d8] px-3 py-2.5 text-center">
+                      <p className="text-[10px] text-[#1a1a1a]" style={{ fontFamily: 'var(--font-sans)' }}>{formatRSD(priceRange[0])}</p>
+                    </div>
+                    <div className="w-4 h-px bg-[#e8e0d8] shrink-0" />
+                    <div className="flex-1 border border-[#e8e0d8] px-3 py-2.5 text-center">
+                      <p className="text-[10px] text-[#1a1a1a]" style={{ fontFamily: 'var(--font-sans)' }}>{formatRSD(priceRange[1])}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Sortiranje — collapsible */}
+                <DrawerAccordion
+                  label="Sortiranje"
+                  value={SORTIRANJA.find(s => (s.value || '') === (activeParams.sort || ''))?.label}
+                  active={!!activeParams.sort}
+                >
+                  <div className="flex flex-col gap-1 pb-1">
+                    {SORTIRANJA.map(s => {
+                      const isSel = (activeParams.sort || '') === s.value
+                      return (
+                        <button key={s.value} type="button"
+                          onClick={() => updateParam('sort', s.value || null)}
+                          className={cn('w-full text-left px-4 py-3 text-[10px] tracking-wide border transition-all duration-150',
+                            isSel ? 'bg-[#1a1a1a] text-[#faf7f4] border-[#1a1a1a]' : 'border-[#e8e0d8] text-[#8a8a8a]'
+                          )}
+                          style={{ fontFamily: 'var(--font-sans)' }}
+                        >
+                          {s.label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </DrawerAccordion>
+
+                {/* Boja — collapsible */}
+                <DrawerAccordion
+                  label="Boja"
+                  value={selectedBoje.length > 0 ? `${selectedBoje.length} odabrano` : undefined}
+                  active={selectedBoje.length > 0}
+                >
+                  <div className="pb-1">
+                    <ColorGrid />
+                  </div>
+                </DrawerAccordion>
+
+                {/* Na popustu */}
+                <div className="py-5 border-b border-[#e8e0d8]">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[10px] tracking-[0.2em] uppercase text-[#1a1a1a]" style={{ fontFamily: 'var(--font-sans)' }}>Na popustu</p>
+                    <button type="button"
+                      onClick={() => updateParam('naPopustu', activeParams.naPopustu === 'true' ? null : 'true')}
+                      className={cn('relative w-12 h-6 rounded-full transition-colors duration-200 shrink-0',
+                        activeParams.naPopustu === 'true' ? 'bg-[#c9a96e]' : 'bg-[#e8e0d8]'
+                      )}
+                    >
+                      <span className={cn('absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200',
+                        activeParams.naPopustu === 'true' ? 'translate-x-7' : 'translate-x-1'
+                      )} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* bottom spacing */}
+                <div className="py-2" />
+
+              </div>
+
+              {/* Drawer footer */}
+              <div className="px-6 pt-4 pb-8 border-t border-[#e8e0d8] shrink-0 flex gap-3">
+                {hasActive && (
+                  <button type="button"
+                    onClick={() => { handleReset(); setDrawerOpen(false) }}
+                    className="flex-1 py-3.5 text-[10px] tracking-[0.2em] uppercase border border-[#e8e0d8] text-[#8a8a8a] hover:border-[#1a1a1a] hover:text-[#1a1a1a] transition-colors"
+                    style={{ fontFamily: 'var(--font-sans)' }}
+                  >
+                    Poništi
+                  </button>
+                )}
+                <button type="button"
+                  onClick={() => setDrawerOpen(false)}
+                  className="flex-1 py-3.5 text-[10px] tracking-[0.2em] uppercase bg-[#1a1a1a] text-[#faf7f4] hover:bg-[#333] transition-colors"
+                  style={{ fontFamily: 'var(--font-sans)' }}
+                >
+                  Prikaži {totalCount} {totalCount === 1 ? 'haljinu' : 'haljine'}
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   )
 }

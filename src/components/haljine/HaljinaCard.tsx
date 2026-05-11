@@ -22,6 +22,7 @@ export function formatCijena(cijena: number): string {
 
 export default function HaljinaCard({ haljina, className }: HaljinaCardProps) {
   const slika = haljina.slike?.[0]
+  const slika2 = haljina.slike?.[1]
   const cijena = haljina.na_popustu
     ? haljina.cijena_rsd * (1 - haljina.popust_procenat / 100)
     : haljina.cijena_rsd
@@ -32,13 +33,27 @@ export default function HaljinaCard({ haljina, className }: HaljinaCardProps) {
       <div className="relative overflow-hidden bg-[#f0ebe5]" style={{ aspectRatio: '3/4' }}>
 
         {slika ? (
-          <Image
-            src={slika}
-            alt={haljina.naziv_sr}
-            fill
-            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-            className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-          />
+          <>
+            <Image
+              src={slika}
+              alt={haljina.naziv_sr}
+              fill
+              sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+              className={cn(
+                'object-cover object-center transition-all duration-700 ease-out',
+                slika2 ? 'group-hover:opacity-0' : 'group-hover:scale-[1.03]'
+              )}
+            />
+            {slika2 && (
+              <Image
+                src={slika2}
+                alt={`${haljina.naziv_sr} — drugi ugao`}
+                fill
+                sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                className="object-cover object-center opacity-0 group-hover:opacity-100 transition-opacity duration-700 ease-out"
+              />
+            )}
+          </>
         ) : (
           /* Placeholder */
           <div className="absolute inset-0 flex flex-col items-center justify-center">

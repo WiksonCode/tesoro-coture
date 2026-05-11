@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Vodič za veličine',
-  description: 'Saznajte kako izmjeriti sebe i odabrati pravu veličinu haljine u TESORO Couture salonu.',
+  description: 'Saznajte kako izmeriti sebe i odabrati pravu veličinu haljine u TESORO Couture salonu.',
 }
 
 const TABELA_VELICINA = [
@@ -15,17 +15,17 @@ const TABELA_VELICINA = [
 ]
 
 const SAVJETI = [
-  'Mjerite se u donjem vešu, bez odjeće koja bi mogla poremetiti mjerenje.',
+  'Merite se u donjem vešu, bez odeće koja bi mogla poremetiti merenje.',
   'Koristite mekani metar, ne čelični.',
   'Stojte uspravno, prirodno — ne uvlačite stomak.',
-  'Grudi: mjerite na najširem dijelu, metar horizontalno.',
-  'Struk: mjerite na najtanjem dijelu, obično 2–3 cm iznad pupka.',
-  'Bokovi: mjerite na najširem dijelu bokova i stražnjice.',
+  'Grudi: merite na najširem delu, metar horizontalno.',
+  'Struk: merite na najtanjem delu, obično 2–3 cm iznad pupka.',
+  'Bokovi: merite na najširem delu bokova i zadnjice.',
 ]
 
 export default function VodicZaVelicine() {
   return (
-    <main className="min-h-screen bg-[#faf7f4] pt-20">
+    <main className="min-h-screen bg-[#faf7f4] pt-16 lg:pt-20">
       {/* Header */}
       <div className="border-b border-[#e8e0d8]">
         <div className="max-w-4xl mx-auto px-6 lg:px-10 py-12 lg:py-16">
@@ -93,7 +93,7 @@ export default function VodicZaVelicine() {
               className="text-2xl font-light text-[#1a1a1a] mb-2"
               style={{ fontFamily: 'var(--font-serif)' }}
             >
-              Kako se mjeri?
+              Kako se meri?
             </h2>
             <div className="w-8 h-px bg-[#c9a96e] mb-6" />
 
@@ -181,7 +181,7 @@ export default function VodicZaVelicine() {
               className="text-sm text-[#faf7f4]/70 leading-relaxed"
               style={{ fontFamily: 'var(--font-sans)' }}
             >
-              Uvijek možete odabrati opciju <strong className="text-[#faf7f4]">Po mjeri</strong> — unesete vaše tačne mjere i mi ćemo haljinu prilagoditi vama. Ili nas jednostavno kontaktirajte za savjet.
+              Uvek možete odabrati opciju <strong className="text-[#faf7f4]">Po meri</strong> — unesete vaše tačne mere i mi ćemo haljinu prilagoditi vama. Ili nas jednostavno kontaktirajte za savet.
             </p>
           </div>
         </div>

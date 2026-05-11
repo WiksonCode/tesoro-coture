@@ -5,7 +5,7 @@ import type { Haljina } from '@/types'
 
 export const metadata: Metadata = {
   title: 'Katalog',
-  description: 'Pregledajte našu ekskluzivnu kolekciju elegantnih haljina — vjenčane, koktel, svečane i maturske.',
+  description: 'Pregledajte našu ekskluzivnu kolekciju elegantnih haljina — venčane, koktel, svečane i maturske.',
 }
 
 interface SearchParams {
@@ -42,6 +42,12 @@ export default async function KatalogPage({
     case 'cijena_opadajuce':
       query = query.order('cijena_rsd', { ascending: false })
       break
+    case 'najstarije':
+      query = query.order('created_at', { ascending: true })
+      break
+    case 'po_dostupnosti':
+      query = query.order('kolicina_na_lageru', { ascending: false })
+      break
     default:
       query = query.order('created_at', { ascending: false })
   }
@@ -50,7 +56,7 @@ export default async function KatalogPage({
   const haljine = (data as Haljina[]) || []
 
   return (
-    <main className="min-h-screen bg-[#faf7f4] pt-20">
+    <main className="min-h-screen bg-[#faf7f4] pt-16 lg:pt-20">
       {/* Page header */}
       <div className="border-b border-[#e8e0d8] bg-[#faf7f4]">
         <div className="max-w-7xl mx-auto px-6 lg:px-10 py-12 lg:py-16">

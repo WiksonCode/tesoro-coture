@@ -1,8 +1,7 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import { SlidersHorizontal } from 'lucide-react'
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { useState, useMemo, useCallback, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import HaljinaCard from '@/components/haljine/HaljinaCard'
 import Filteri from '@/components/haljine/Filteri'
 import type { Haljina, Boja } from '@/types'
@@ -22,7 +21,23 @@ interface KatalogClientProps {
 export default function KatalogClient({ haljine, activeParams }: KatalogClientProps) {
   const [selectedBoje, setSelectedBoje] = useState<string[]>([])
   const [selectedVelicine, setSelectedVelicine] = useState<string[]>([])
-  const [filterOpen, setFilterOpen] = useState(false)
+
+  const priceBounds = useMemo(() => {
+    if (haljine.length === 0) return { min: 0, max: 200000 }
+    const prices = haljine.map(h => h.cijena_rsd)
+    return { min: Math.min(...prices), max: Math.max(...prices) }
+  }, [haljine])
+
+  const [priceRange, setPriceRange] = useState<[number, number]>(() => {
+    if (haljine.length === 0) return [0, 200000]
+    const prices = haljine.map(h => h.cijena_rsd)
+    return [Math.min(...prices), Math.max(...prices)]
+  })
+
+  // Resetuj slider kada se kategorija promeni (novi haljine = novi opseg cena)
+  useEffect(() => {
+    setPriceRange([priceBounds.min, priceBounds.max])
+  }, [priceBounds.min, priceBounds.max])
 
   // Collect all unique colors and sizes from all dresses
   const sveBoje = useMemo(() => {
@@ -44,72 +59,61 @@ export default function KatalogClient({ haljine, activeParams }: KatalogClientPr
     return order.filter((v) => set.has(v))
   }, [haljine])
 
-  // Client-side filtering for colors and sizes
+  // Client-side filtering for colors, sizes and price
   const filtrirane = useMemo(() => {
     return haljine.filter((h) => {
       if (selectedBoje.length > 0) {
         const imenaBoja = h.dostupne_boje?.map((b) => b.naziv) || []
-        if (!selectedBoje.some((b) => imenaBoja.includes(b))) return false
+        // Only filter if this dress has color data; skip filter if data is missing
+        if (imenaBoja.length > 0 && !selectedBoje.some((b) => imenaBoja.includes(b))) return false
       }
       if (selectedVelicine.length > 0) {
-        if (!selectedVelicine.some((v) => h.dostupne_velicine?.includes(v))) return false
+        const velicine = h.dostupne_velicine || []
+        // Only filter if this dress has size data; skip filter if data is missing
+        if (velicine.length > 0 && !selectedVelicine.some((v) => velicine.includes(v))) return false
       }
+      const efektivnaCijena = h.na_popustu
+        ? h.cijena_rsd * (1 - h.popust_procenat / 100)
+        : h.cijena_rsd
+      if (efektivnaCijena < priceRange[0] || efektivnaCijena > priceRange[1]) return false
       return true
     })
-  }, [haljine, selectedBoje, selectedVelicine])
+  }, [haljine, selectedBoje, selectedVelicine, priceRange])
 
-  const filteri = (
-    <Filteri
-      activeParams={activeParams}
-      sveBoje={sveBoje}
-      sveVelicine={sveVelicine}
-      selectedBoje={selectedBoje}
-      selectedVelicine={selectedVelicine}
-      onBojeChange={setSelectedBoje}
-      onVelicineChange={setSelectedVelicine}
-    />
-  )
+  const handleReset = useCallback(() => {
+    setSelectedBoje([])
+    setSelectedVelicine([])
+    setPriceRange([priceBounds.min, priceBounds.max])
+  }, [priceBounds])
 
   return (
-    <div className="max-w-7xl mx-auto px-6 lg:px-10 py-10">
-      <div className="flex gap-10">
+    <>
+      <Filteri
+        activeParams={activeParams}
+        sveBoje={sveBoje}
+        sveVelicine={sveVelicine}
+        selectedBoje={selectedBoje}
+        selectedVelicine={selectedVelicine}
+        onBojeChange={setSelectedBoje}
+        onVelicineChange={setSelectedVelicine}
+        priceRange={priceRange}
+        priceBounds={priceBounds}
+        onPriceChange={setPriceRange}
+        onReset={handleReset}
+        totalCount={filtrirane.length}
+      />
 
-        {/* Desktop sidebar */}
-        <aside className="hidden lg:block w-56 shrink-0">
-          {filteri}
-        </aside>
-
-        {/* Main content */}
-        <div className="flex-1 min-w-0">
-          {/* Toolbar */}
-          <div className="flex items-center justify-between mb-8">
-            <p
-              className="text-[11px] tracking-[0.2em] text-[#8a8a8a] uppercase"
-              style={{ fontFamily: 'var(--font-sans)' }}
-            >
-              {filtrirane.length} {filtrirane.length === 1 ? 'haljina' : 'haljina'}
-            </p>
-
-            {/* Mobile filter button */}
-            <Sheet open={filterOpen} onOpenChange={setFilterOpen}>
-              <SheetTrigger className="lg:hidden flex items-center gap-2 border border-[#e8e0d8] px-4 py-2">
-                <SlidersHorizontal size={13} strokeWidth={1.5} className="text-[#8a8a8a]" />
-                <span
-                  className="text-[10px] tracking-[0.2em] uppercase text-[#8a8a8a]"
-                  style={{ fontFamily: 'var(--font-sans)' }}
-                >
-                  Filteri
-                </span>
-              </SheetTrigger>
-              <SheetContent side="left" className="bg-[#faf7f4] border-r border-[#e8e0d8] w-72 p-6">
-                {filteri}
-              </SheetContent>
-            </Sheet>
-          </div>
-
-          {/* Grid */}
+      <div className="max-w-7xl mx-auto px-6 lg:px-10 py-10">
+        <AnimatePresence mode="wait">
           {filtrirane.length === 0 ? (
-            <div className="py-24 text-center">
+            <motion.div
+              key="empty"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="py-24 text-center"
+            >
               <p
                 className="text-2xl font-light italic text-[#8a8a8a] mb-3"
                 style={{ fontFamily: 'var(--font-serif)' }}
@@ -122,16 +126,31 @@ export default function KatalogClient({ haljine, activeParams }: KatalogClientPr
               >
                 Pokušajte s drugačijim filterima
               </p>
-            </div>
+            </motion.div>
           ) : (
-            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-5 gap-y-10">
-              {filtrirane.map((haljina) => (
-                <HaljinaCard key={haljina.id} haljina={haljina} />
-              ))}
-            </div>
+            <motion.div
+              key="grid"
+              className="grid grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12"
+              layout
+            >
+              <AnimatePresence mode="popLayout">
+                {filtrirane.map((haljina, i) => (
+                  <motion.div
+                    key={haljina.id}
+                    layout
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.96 }}
+                    transition={{ duration: 0.25, delay: i < 6 ? i * 0.04 : 0, ease: 'easeOut' }}
+                  >
+                    <HaljinaCard haljina={haljina} />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
           )}
-        </div>
+        </AnimatePresence>
       </div>
-    </div>
+    </>
   )
 }

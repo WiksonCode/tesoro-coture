@@ -7,6 +7,7 @@ import HaljinaGalerija from '@/components/haljine/HaljinaGalerija'
 import BojeSelector from '@/components/haljine/BojeSelector'
 import VelicineSelector from '@/components/haljine/VelicineSelector'
 import { cn } from '@/lib/utils'
+import { useKorpa } from '@/store/korpa'
 import type { Haljina, Mjere } from '@/types'
 
 const KURS = 117
@@ -37,13 +38,14 @@ export default function HaljinaDetalji({ haljina }: HaljinaDetaljiProps) {
   const [odabranaVelicina, setOdabranaVelicina] = useState('')
   const [mjere, setMjere] = useState<Mjere | null>(null)
   const [dodano, setDodano] = useState(false)
+  const dodajArtikl = useKorpa((s) => s.dodajArtikl)
 
   const cijena = haljina.na_popustu
     ? haljina.cijena_rsd * (1 - haljina.popust_procenat / 100)
     : haljina.cijena_rsd
 
   const kategorijeLabelMap: Record<string, string> = {
-    vjencana: 'Vjenčana',
+    vjencana: 'Venčana',
     koktel: 'Koktel',
     svecana: 'Svečana',
     casual: 'Casual',
@@ -52,7 +54,17 @@ export default function HaljinaDetalji({ haljina }: HaljinaDetaljiProps) {
 
   const handleDodajUKorpu = () => {
     if (!odabranaVelicina) return
-    // TODO: Faza 4 — connect to Zustand korpa store
+    dodajArtikl({
+      haljina_id: haljina.id,
+      slug: haljina.slug,
+      naziv: haljina.naziv_sr,
+      slika: haljina.slike?.[0] || '',
+      boja: odabranaBoja,
+      boja_hex: odabranaBojaHex,
+      velicina: odabranaVelicina,
+      mjere: mjere ?? undefined,
+      cijena_rsd: cijena,
+    })
     setDodano(true)
     setTimeout(() => setDodano(false), 2000)
   }
@@ -100,7 +112,7 @@ export default function HaljinaDetalji({ haljina }: HaljinaDetaljiProps) {
                 className="border border-[#e8e0d8] text-[8px] tracking-[0.2em] uppercase px-2 py-0.5 text-[#8a8a8a]"
                 style={{ fontFamily: 'var(--font-sans)' }}
               >
-                Po mjeri
+                Po meri
               </span>
             )}
           </div>
