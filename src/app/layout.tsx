@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, DM_Sans } from "next/font/google";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
 import "./globals.css";
 
 const cormorantGaramond = Cormorant_Garamond({
@@ -21,8 +23,8 @@ export const metadata: Metadata = {
     template: "%s | TESORO Couture",
   },
   description:
-    "Elegantne ženske haljine za svaku priiliku. Vjencane, koktel, svecane i maturske haljine. Rezervišite termin u našem salonu u Beogradu.",
-  keywords: ["haljine", "salon haljina", "Beograd", "vjencane haljine", "maturske haljine"],
+    "Elegantne ženske haljine za svaku priliku. Vjenčane, koktel, svečane i maturske haljine. Rezervišite termin u našem salonu u Beogradu.",
+  keywords: ["haljine", "salon haljina", "Beograd", "vjenčane haljine", "maturske haljine"],
   openGraph: {
     type: "website",
     locale: "sr_RS",
@@ -40,7 +42,11 @@ export default function RootLayout({
       lang="sr"
       className={`${cormorantGaramond.variable} ${dmSans.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-[#faf7f4]">{children}</body>
+      <body className="min-h-full flex flex-col bg-[#faf7f4]">
+        <Navbar />
+        <div className="flex-1">{children}</div>
+        <Footer />
+      </body>
     </html>
   );
 }
