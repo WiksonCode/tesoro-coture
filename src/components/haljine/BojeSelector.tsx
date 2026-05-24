@@ -37,7 +37,7 @@ export default function BojeSelector({ boje, odabrana, onChange }: BojeSelectorP
             title={boja.naziv}
             onClick={() => onChange(boja.naziv, boja.hex)}
             className={cn(
-              'w-8 h-8 rounded-full border-2 transition-all duration-200',
+              'w-10 h-10 rounded-full border-2 transition-all duration-200 cursor-pointer',
               odabrana === boja.naziv
                 ? 'border-[#c9a96e] scale-110 shadow-sm'
                 : 'border-transparent hover:border-[#8a8a8a] hover:scale-105'

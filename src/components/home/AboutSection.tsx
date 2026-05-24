@@ -1,19 +1,20 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 
 export default function AboutSection() {
   return (
-    <section className="py-24 lg:py-32 px-6 bg-white">
+    <section className="py-14 lg:py-32 px-6 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
 
           {/* Tekst */}
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: 'easeOut' }}
           >
@@ -57,33 +58,27 @@ export default function AboutSection() {
             </Link>
           </motion.div>
 
-          {/* Slika placeholder */}
+          {/* Slika */}
           <motion.div
             className="relative"
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: 'easeOut', delay: 0.15 }}
           >
-            <div className="relative aspect-[4/5] bg-[#f0ebe5] overflow-hidden">
+            <div className="relative aspect-[3/2] sm:aspect-[4/5] overflow-hidden">
+              <Image
+                src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&q=85&fit=crop&auto=format"
+                alt="TESORO Couture salon — elegantna haljina"
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover object-top"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
               <span className="absolute top-4 left-4 w-6 h-6 border-t border-l border-[#c9a96e]" />
               <span className="absolute top-4 right-4 w-6 h-6 border-t border-r border-[#c9a96e]" />
               <span className="absolute bottom-4 left-4 w-6 h-6 border-b border-l border-[#c9a96e]" />
               <span className="absolute bottom-4 right-4 w-6 h-6 border-b border-r border-[#c9a96e]" />
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span
-                  className="text-[100px] font-light italic text-[#1a1a1a]/10 leading-none"
-                  style={{ fontFamily: 'var(--font-serif)' }}
-                >
-                  T
-                </span>
-                <p
-                  className="text-[8px] tracking-[0.5em] uppercase text-[#8a8a8a]/50 mt-2"
-                  style={{ fontFamily: 'var(--font-sans)' }}
-                >
-                  Tesoro Couture
-                </p>
-              </div>
             </div>
 
             <div className="absolute -bottom-6 -left-6 bg-[#1a1a1a] px-8 py-6 hidden lg:block">

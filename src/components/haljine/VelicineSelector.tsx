@@ -1,8 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, Ruler } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Mjere } from '@/types'
 
@@ -12,6 +11,7 @@ interface VelicineSelectorProps {
   mjere: Mjere | null
   onChange: (velicina: string) => void
   onMjereChange: (mjere: Mjere | null) => void
+  onVodicOpen?: () => void
 }
 
 export default function VelicineSelector({
@@ -20,11 +20,15 @@ export default function VelicineSelector({
   mjere,
   onChange,
   onMjereChange,
+  onVodicOpen,
 }: VelicineSelectorProps) {
   const [mjereOpen, setMjereOpen] = useState(false)
   const poMjeri = odabrana === 'po_mjeri'
 
   if (!velicine || velicine.length === 0) return null
+
+  const standardneVelicine = velicine.filter(v => v !== 'po_mjeri')
+  const imaPoMjeri = velicine.includes('po_mjeri')
 
   const handleChange = (v: string) => {
     onChange(v)
@@ -45,39 +49,70 @@ export default function VelicineSelector({
         >
           Veličina
         </p>
-        <Link
-          href="/vodic-za-velicine"
-          className="text-[9px] tracking-[0.2em] text-[#c9a96e] hover:underline underline-offset-2"
-          style={{ fontFamily: 'var(--font-sans)' }}
-        >
-          Vodič za veličine
-        </Link>
-      </div>
-
-      <div className="flex flex-wrap gap-2 mb-4">
-        {velicine.map((v) => (
+        {onVodicOpen && (
           <button
-            key={v}
-            onClick={() => handleChange(v)}
-            className={cn(
-              'px-4 py-2 text-[10px] tracking-[0.15em] uppercase border transition-all duration-200',
-              odabrana === v
-                ? 'bg-[#1a1a1a] text-[#faf7f4] border-[#1a1a1a]'
-                : 'border-[#e8e0d8] text-[#8a8a8a] hover:border-[#1a1a1a] hover:text-[#1a1a1a]'
-            )}
+            type="button"
+            onClick={onVodicOpen}
+            className="flex items-center gap-1.5 text-[10px] tracking-[0.18em] text-[#c9a96e] border-b border-[#c9a96e]/40 hover:border-[#c9a96e] pb-0.5 transition-colors duration-200 cursor-pointer"
             style={{ fontFamily: 'var(--font-sans)' }}
           >
-            {v === 'po_mjeri' ? 'Po meri' : v}
+            <Ruler size={11} strokeWidth={1.5} />
+            Vodič za veličine
           </button>
-        ))}
+        )}
       </div>
+
+      {/* Standard sizes */}
+      {standardneVelicine.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-2">
+          {standardneVelicine.map((v) => (
+            <button
+              key={v}
+              onClick={() => handleChange(v)}
+              className={cn(
+                'px-5 py-2.5 text-[11px] tracking-[0.15em] uppercase border transition-all duration-200 cursor-pointer',
+                odabrana === v
+                  ? 'bg-[#1a1a1a] text-[#faf7f4] border-[#1a1a1a]'
+                  : 'border-[#e8e0d8] text-[#8a8a8a] hover:border-[#1a1a1a] hover:text-[#1a1a1a]'
+              )}
+              style={{ fontFamily: 'var(--font-sans)' }}
+            >
+              {v}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Po meri — full width, visually equal */}
+      {imaPoMjeri && (
+        <button
+          onClick={() => handleChange('po_mjeri')}
+          className={cn(
+            'w-full mt-2 py-3 text-[11px] tracking-[0.2em] uppercase border transition-all duration-200 cursor-pointer flex items-center justify-center gap-2',
+            odabrana === 'po_mjeri'
+              ? 'bg-[#1a1a1a] text-[#faf7f4] border-[#1a1a1a]'
+              : 'border-[#e8e0d8] text-[#8a8a8a] hover:border-[#1a1a1a] hover:text-[#1a1a1a]'
+          )}
+          style={{ fontFamily: 'var(--font-sans)' }}
+        >
+          <span>Po meri</span>
+          <span
+            className={cn(
+              'text-[8px] tracking-[0.15em]',
+              odabrana === 'po_mjeri' ? 'text-[#c9a96e]' : 'text-[#c9a96e]/70'
+            )}
+          >
+            — unesite vaše mere
+          </span>
+        </button>
+      )}
 
       {/* Mjere form — expands when "po_mjeri" is selected */}
       {poMjeri && (
-        <div className="border border-[#e8e0d8] p-5 bg-white">
+        <div className="mt-3 border border-[#e8e0d8] p-5 bg-white">
           <button
             onClick={() => setMjereOpen(!mjereOpen)}
-            className="flex items-center justify-between w-full mb-4"
+            className="flex items-center justify-between w-full mb-4 cursor-pointer"
           >
             <p
               className="text-[10px] tracking-[0.25em] uppercase text-[#1a1a1a]"

@@ -39,7 +39,7 @@ export default function CategorySection() {
 
         {/* Header */}
         <motion.div
-          className="flex items-end justify-between mb-10"
+          className="flex items-end justify-between mb-7"
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -89,7 +89,7 @@ export default function CategorySection() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
 
                 {/* Tekst */}
-                <div className="absolute bottom-0 left-0 right-0 p-5 lg:p-6">
+                <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-5 lg:p-6">
                   <p
                     className="text-[8px] tracking-[0.4em] uppercase text-[#c9a96e] mb-1.5"
                     style={{ fontFamily: 'var(--font-sans)' }}

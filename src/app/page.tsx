@@ -1,7 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import HeroSection from '@/components/home/HeroSection'
+import MarqueeStrip from '@/components/home/MarqueeStrip'
 import CategorySection from '@/components/home/CategorySection'
 import FeaturedSection from '@/components/home/FeaturedSection'
+import StatsStrip from '@/components/home/StatsStrip'
 import AboutSection from '@/components/home/AboutSection'
 import CTASection from '@/components/home/CTASection'
 import type { Haljina } from '@/types'
@@ -20,10 +22,12 @@ export default async function HomePage() {
   const haljine = (data as Haljina[]) || []
 
   return (
-    <main>
+    <main className="w-full overflow-x-hidden">
       <HeroSection />
-      <CategorySection />
+      <MarqueeStrip />
       <FeaturedSection haljine={haljine} />
+      <StatsStrip />
+      <CategorySection />
       <AboutSection />
       <CTASection />
     </main>

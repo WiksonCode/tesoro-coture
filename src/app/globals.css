@@ -94,12 +94,79 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    overflow-x: clip;
+    max-width: 100%;
+  }
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-sans), sans-serif;
+    overflow-x: clip;
+    max-width: 100%;
+    width: 100%;
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-serif), serif;
     letter-spacing: -0.02em;
   }
+}
+
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 28s linear infinite;
+}
+
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes scan-beam {
+  0%   { top: -2px; opacity: 0; }
+  5%   { opacity: 1; }
+  92%  { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+.animate-scan-beam {
+  animation: scan-beam 3.2s ease-in-out infinite;
+}
+
+@keyframes sonar-ring {
+  0%   { transform: scale(1); opacity: 0.7; }
+  100% { transform: scale(2.8); opacity: 0; }
+}
+.animate-sonar {
+  animation: sonar-ring 1.8s ease-out infinite;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up {
+  animation: fade-up 0.4s ease-out forwards;
+}
+
+@keyframes blink-cursor {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+.animate-blink {
+  animation: blink-cursor 1s step-end infinite;
+}
+
+@keyframes ken-burns {
+  from { transform: scale(1);    }
+  to   { transform: scale(1.07); }
+}
+.animate-ken-burns {
+  animation: ken-burns 12s ease-out forwards;
 }

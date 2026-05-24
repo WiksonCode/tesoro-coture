@@ -24,7 +24,7 @@ export default function FeaturedSection({ haljine }: FeaturedSectionProps) {
   if (!haljine.length) return null
 
   return (
-    <section className="py-24 lg:py-32 px-6 bg-[#faf7f4]">
+    <section className="py-14 lg:py-32 px-6 bg-[#faf7f4]">
       <div className="max-w-7xl mx-auto">
 
         <motion.div

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import ScrollToTop from "@/components/ui/ScrollToTop";
 import "./globals.css";
 
 const cormorantGaramond = Cormorant_Garamond({
@@ -43,6 +44,7 @@ export default function RootLayout({
       className={`${cormorantGaramond.variable} ${dmSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[#faf7f4]">
+        <ScrollToTop />
         <Navbar />
         <div className="flex-1">{children}</div>
         <Footer />

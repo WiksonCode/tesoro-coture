@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import HaljinaDetalji from '@/components/haljine/HaljinaDetalji'
+import SrodneHaljine from '@/components/haljine/SrodneHaljine'
 import type { Haljina } from '@/types'
 
 interface Props {
@@ -40,9 +41,38 @@ export default async function HaljinaPage({ params }: Props) {
 
   if (!data) notFound()
 
+  const haljina = data as Haljina
+
+  const { data: srodneData } = await supabase
+    .from('haljine')
+    .select('*')
+    .eq('dostupna', true)
+    .eq('kategorija', haljina.kategorija)
+    .neq('id', haljina.id)
+    .order('created_at', { ascending: false })
+    .limit(4)
+
+  let srodneHaljine = (srodneData as Haljina[]) || []
+
+  if (srodneHaljine.length === 0) {
+    const { data: ostalePodaci } = await supabase
+      .from('haljine')
+      .select('*')
+      .eq('dostupna', true)
+      .neq('id', haljina.id)
+      .order('created_at', { ascending: false })
+      .limit(4)
+    srodneHaljine = (ostalePodaci as Haljina[]) || []
+  }
+
   return (
     <main className="min-h-screen bg-[#faf7f4] pt-16 lg:pt-20">
-      <HaljinaDetalji haljina={data as Haljina} />
+      <HaljinaDetalji haljina={haljina} />
+      <SrodneHaljine
+        haljine={srodneHaljine}
+        kategorija={haljina.kategorija}
+        istaKategorija={srodneData != null && (srodneData as Haljina[]).length > 0}
+      />
     </main>
   )
 }

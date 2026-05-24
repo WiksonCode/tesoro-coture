@@ -1,16 +1,13 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { motion } from 'framer-motion'
-import { Eye } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Eye, ShoppingBag, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { Haljina } from '@/types'
-
-interface HaljinaCardProps {
-  haljina: Haljina
-  className?: string
-}
+import { useKorpa } from '@/store/korpa'
+import type { Haljina, Boja } from '@/types'
 
 export function formatCijena(cijena: number): string {
   return new Intl.NumberFormat('sr-Latn-RS', {
@@ -20,18 +17,74 @@ export function formatCijena(cijena: number): string {
   }).format(cijena) + ' RSD'
 }
 
-export default function HaljinaCard({ haljina, className }: HaljinaCardProps) {
-  const slika = haljina.slike?.[0]
-  const slika2 = haljina.slike?.[1]
+export default function HaljinaCard({ haljina, className }: { haljina: Haljina; className?: string }) {
+  const slika = haljina.slike?.[0]?.replace(/\s+/g, '') || null
+  const slika2 = haljina.slike?.[1]?.replace(/\s+/g, '') || null
   const cijena = haljina.na_popustu
     ? haljina.cijena_rsd * (1 - haljina.popust_procenat / 100)
     : haljina.cijena_rsd
 
-  return (
-    <Link href={`/haljina/${haljina.slug}`} className={cn('group block', className)}>
-      {/* Image container — 3:4 aspect ratio */}
-      <div className="relative overflow-hidden bg-[#f0ebe5]" style={{ aspectRatio: '3/4' }}>
+  const isRasprodato = haljina.kolicina_na_lageru === 0
+  const isNovo = !isRasprodato &&
+    (Date.now() - new Date(haljina.created_at).getTime()) / 86400000 <= 30
 
+  const hasBoje = (haljina.dostupne_boje?.length ?? 0) > 0
+  const hasVelicine = (haljina.dostupne_velicine?.length ?? 0) > 0
+
+  const [quickOpen, setQuickOpen] = useState(false)
+  const [selBoja, setSelBoja] = useState<Boja | null>(haljina.dostupne_boje?.[0] ?? null)
+  const [selVelicina, setSelVelicina] = useState<string | null>(haljina.dostupne_velicine?.[0] ?? null)
+  const [added, setAdded] = useState(false)
+
+  const { dodajArtikl } = useKorpa()
+
+  const swatchBoje = haljina.dostupne_boje?.slice(0, 5) ?? []
+  const ostalo = (haljina.dostupne_boje?.length ?? 0) - swatchBoje.length
+
+  function dodaj() {
+    dodajArtikl({
+      haljina_id: haljina.id,
+      slug: haljina.slug,
+      naziv: haljina.naziv_sr,
+      slika: slika || '',
+      boja: selBoja?.naziv ?? '',
+      boja_hex: selBoja?.hex ?? '#000',
+      velicina: selVelicina ?? '',
+      cijena_rsd: cijena,
+    })
+    setQuickOpen(false)
+    setAdded(true)
+    setTimeout(() => setAdded(false), 2000)
+  }
+
+  function handleCartClick(e: React.MouseEvent) {
+    e.preventDefault()
+    e.stopPropagation()
+    if (isRasprodato) return
+    const jednaBoja = !hasBoje || haljina.dostupne_boje.length === 1
+    const jednaVelicina = !hasVelicine || haljina.dostupne_velicine.length === 1
+    if (jednaBoja && jednaVelicina) dodaj()
+    else setQuickOpen(v => !v)
+  }
+
+  function handleDodajClick(e: React.MouseEvent) {
+    e.preventDefault()
+    e.stopPropagation()
+    dodaj()
+  }
+
+  return (
+    <Link
+      href={`/haljina/${haljina.slug}`}
+      className={cn('group block', className)}
+      onClick={e => { if (quickOpen) { e.preventDefault(); setQuickOpen(false) } }}
+    >
+      {/* Image — 3:4 */}
+      <div
+        className="relative overflow-hidden bg-[#f0ebe5]"
+        style={{ aspectRatio: '3/4' }}
+        onMouseLeave={() => setQuickOpen(false)}
+      >
         {slika ? (
           <>
             <Image
@@ -41,10 +94,11 @@ export default function HaljinaCard({ haljina, className }: HaljinaCardProps) {
               sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
               className={cn(
                 'object-cover object-center transition-all duration-700 ease-out',
+                isRasprodato && 'brightness-[0.65]',
                 slika2 ? 'group-hover:opacity-0' : 'group-hover:scale-[1.03]'
               )}
             />
-            {slika2 && (
+            {slika2 && !isRasprodato && (
               <Image
                 src={slika2}
                 alt={`${haljina.naziv_sr} — drugi ugao`}
@@ -55,73 +109,176 @@ export default function HaljinaCard({ haljina, className }: HaljinaCardProps) {
             )}
           </>
         ) : (
-          /* Placeholder */
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <span className="absolute top-3 left-3 w-5 h-5 border-t border-l border-[#c9a96e]/40" />
             <span className="absolute top-3 right-3 w-5 h-5 border-t border-r border-[#c9a96e]/40" />
             <span className="absolute bottom-3 left-3 w-5 h-5 border-b border-l border-[#c9a96e]/40" />
             <span className="absolute bottom-3 right-3 w-5 h-5 border-b border-r border-[#c9a96e]/40" />
-            <span
-              className="text-[70px] font-light italic text-[#1a1a1a]/10 leading-none"
-              style={{ fontFamily: 'var(--font-serif)' }}
-            >
-              T
+            <span className="text-[70px] font-light italic text-[#1a1a1a]/10 leading-none" style={{ fontFamily: 'var(--font-serif)' }}>T</span>
+          </div>
+        )}
+
+        {/* Badges */}
+        {isNovo && (
+          <div className="absolute top-3 left-3 bg-[#c9a96e] px-2.5 py-1.5">
+            <span className="text-[11px] font-medium text-[#1a1a1a]" style={{ fontFamily: 'var(--font-sans)' }}>
+              Novo
             </span>
           </div>
         )}
 
-        {/* Discount badge */}
-        {haljina.na_popustu && haljina.popust_procenat > 0 && (
-          <div className="absolute top-3 left-3 bg-[#1a1a1a] px-2 py-1">
-            <span
-              className="text-[8px] tracking-[0.2em] uppercase text-[#c9a96e]"
-              style={{ fontFamily: 'var(--font-sans)' }}
-            >
-              -{haljina.popust_procenat}%
-            </span>
+        {/* Rasprodato overlay */}
+        {isRasprodato && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="border border-white/30 px-4 py-2 bg-black/20 backdrop-blur-[2px]">
+              <span className="text-[9px] tracking-[0.4em] uppercase text-white/70" style={{ fontFamily: 'var(--font-sans)' }}>
+                Rasprodato
+              </span>
+            </div>
           </div>
         )}
 
-        {/* Hover overlay */}
-        <div className="absolute inset-0 bg-[#1a1a1a]/0 group-hover:bg-[#1a1a1a]/30 transition-all duration-500 flex items-end justify-center pb-8">
-          <motion.div
-            className="flex items-center gap-2 bg-[#faf7f4] px-6 py-3 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-400"
-          >
-            <Eye size={12} strokeWidth={1.5} className="text-[#1a1a1a]" />
-            <span
-              className="text-[9px] tracking-[0.3em] uppercase text-[#1a1a1a]"
-              style={{ fontFamily: 'var(--font-sans)' }}
+        {/* Hover overlay + actions */}
+        {!isRasprodato && (
+          <div className="absolute inset-0 bg-[#1a1a1a]/0 group-hover:bg-[#1a1a1a]/25 transition-all duration-500 flex items-end justify-center pb-6 gap-2.5">
+            {/* Pogledaj */}
+            <div className="flex items-center gap-2 bg-[#faf7f4] px-5 py-2.5 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+              <Eye size={11} strokeWidth={1.5} className="text-[#1a1a1a]" />
+              <span className="text-[9px] tracking-[0.3em] uppercase text-[#1a1a1a]" style={{ fontFamily: 'var(--font-sans)' }}>
+                Pogledaj
+              </span>
+            </div>
+            {/* Cart button */}
+            <button
+              type="button"
+              onClick={handleCartClick}
+              className={cn(
+                'flex items-center justify-center w-10 h-10 border translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 cursor-pointer shrink-0',
+                added
+                  ? 'bg-[#c9a96e] border-[#c9a96e]'
+                  : 'bg-white/90 border-[#e8e0d8] hover:border-[#1a1a1a]'
+              )}
+              title="Dodaj u korpu"
             >
-              Pogledaj
-            </span>
-          </motion.div>
-        </div>
+              {added
+                ? <Check size={13} strokeWidth={2.5} className="text-[#1a1a1a]" />
+                : <ShoppingBag size={12} strokeWidth={1.5} className="text-[#1a1a1a]" />
+              }
+            </button>
+          </div>
+        )}
+
+        {/* Quick-add panel */}
+        <AnimatePresence>
+          {quickOpen && (
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ duration: 0.22, ease: 'easeOut' }}
+              className="absolute bottom-0 left-0 right-0 bg-[#faf7f4] p-3 z-20"
+              onClick={e => { e.preventDefault(); e.stopPropagation() }}
+            >
+              {hasBoje && (
+                <div className="mb-2.5">
+                  <p className="text-[7px] tracking-[0.3em] uppercase text-[#8a8a8a] mb-1.5" style={{ fontFamily: 'var(--font-sans)' }}>Boja</p>
+                  <div className="flex gap-1.5 flex-wrap">
+                    {haljina.dostupne_boje.map(boja => {
+                      const isLight = ['Bela', 'Krem'].includes(boja.naziv)
+                      return (
+                        <button
+                          key={boja.naziv}
+                          type="button"
+                          title={boja.naziv}
+                          onClick={e => { e.preventDefault(); e.stopPropagation(); setSelBoja(boja) }}
+                          className={cn(
+                            'w-6 h-6 rounded-full border-2 transition-all duration-150 cursor-pointer',
+                            selBoja?.naziv === boja.naziv
+                              ? 'border-[#1a1a1a] scale-110'
+                              : isLight ? 'border-[#e8e0d8]' : 'border-transparent hover:border-[#8a8a8a]'
+                          )}
+                          style={{ backgroundColor: boja.hex }}
+                        />
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+              {hasVelicine && (
+                <div className="mb-2.5">
+                  <p className="text-[7px] tracking-[0.3em] uppercase text-[#8a8a8a] mb-1.5" style={{ fontFamily: 'var(--font-sans)' }}>Veličina</p>
+                  <div className="flex gap-1 flex-wrap">
+                    {haljina.dostupne_velicine.map(v => (
+                      <button
+                        key={v}
+                        type="button"
+                        onClick={e => { e.preventDefault(); e.stopPropagation(); setSelVelicina(v) }}
+                        className={cn(
+                          'px-2 py-1 text-[8px] border transition-all duration-150 cursor-pointer',
+                          selVelicina === v
+                            ? 'bg-[#1a1a1a] text-[#faf7f4] border-[#1a1a1a]'
+                            : 'border-[#e8e0d8] text-[#8a8a8a] hover:border-[#1a1a1a]'
+                        )}
+                        style={{ fontFamily: 'var(--font-sans)' }}
+                      >
+                        {v === 'po_mjeri' ? 'PM' : v}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={handleDodajClick}
+                disabled={(hasBoje && !selBoja) || (hasVelicine && !selVelicina)}
+                className="w-full py-2 bg-[#1a1a1a] text-[#faf7f4] text-[8px] tracking-[0.3em] uppercase hover:bg-[#333] disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                style={{ fontFamily: 'var(--font-sans)' }}
+              >
+                Dodaj u korpu
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Info */}
       <div className="mt-4">
         <h3
-          className="text-base font-light text-[#1a1a1a] leading-tight mb-1 group-hover:text-[#c9a96e] transition-colors duration-300"
+          className="text-[20px] font-light text-[#1a1a1a] leading-tight mb-1.5 group-hover:text-[#c9a96e] transition-colors duration-300"
           style={{ fontFamily: 'var(--font-serif)' }}
         >
           {haljina.naziv_sr}
         </h3>
-        <div className="flex items-center gap-2">
-          <span
-            className="text-[11px] tracking-wide text-[#8a8a8a]"
-            style={{ fontFamily: 'var(--font-sans)' }}
-          >
+        <div className="flex items-center gap-2.5 mb-2 flex-wrap">
+          <span className="text-[15px] font-bold text-[#c9a96e] tracking-tight" style={{ fontFamily: 'var(--font-sans)' }}>
             {formatCijena(cijena)}
           </span>
-          {haljina.na_popustu && (
-            <span
-              className="text-[10px] line-through text-[#8a8a8a]/50"
-              style={{ fontFamily: 'var(--font-sans)' }}
-            >
+          {haljina.na_popustu && haljina.popust_procenat > 0 && (
+            <span className="text-[12px] line-through text-[#8a8a8a]" style={{ fontFamily: 'var(--font-sans)' }}>
               {formatCijena(haljina.cijena_rsd)}
             </span>
           )}
         </div>
+
+        {/* Color swatches */}
+        {swatchBoje.length > 0 && (
+          <div className="flex items-center gap-1.5">
+            {swatchBoje.map(boja => {
+              const isLight = ['Bela', 'Krem'].includes(boja.naziv)
+              return (
+                <span
+                  key={boja.naziv}
+                  title={boja.naziv}
+                  className={cn('w-3 h-3 rounded-full shrink-0', isLight && 'border border-[#e8e0d8]')}
+                  style={{ backgroundColor: boja.hex }}
+                />
+              )
+            })}
+            {ostalo > 0 && (
+              <span className="text-[8px] text-[#8a8a8a]" style={{ fontFamily: 'var(--font-sans)' }}>+{ostalo}</span>
+            )}
+          </div>
+        )}
       </div>
     </Link>
   )
