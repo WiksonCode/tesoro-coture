@@ -19,7 +19,6 @@ const navLinks = [
   { href: '/', label: 'Početna' },
   { href: '/katalog', label: 'Katalog' },
   { href: '/o-nama', label: 'O nama' },
-  { href: '/vodic-za-velicine', label: 'Vodič za veličine' },
 ]
 
 // Text shadow protects white text against variable hero images
@@ -35,6 +34,7 @@ export default function Navbar() {
   const userMenuRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
   const isHero = pathname === '/' && !scrolled
+  const isAuthPage = pathname === '/login' || pathname === '/registracija' || pathname.startsWith('/admin')
   const korpaCount = useKorpa((s) => s.artikli.length)
 
   useEffect(() => setMounted(true), [])
@@ -91,11 +91,13 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  if (isAuthPage) return null
+
   return (
     <header
       className={cn(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out',
-        scrolled
+        (scrolled || pathname !== '/')
           ? 'bg-[#faf7f4]/95 backdrop-blur-sm border-b border-[#e8e0d8] shadow-[0_1px_20px_rgba(0,0,0,0.04)]'
           : 'bg-transparent'
       )}
@@ -259,22 +261,7 @@ export default function Navbar() {
                     </div>
                   )}
                 </div>
-              ) : (
-                /* Login — bumped to 11px, hero protection */
-                <Link
-                  href="/login"
-                  className={cn(
-                    'text-[11px] tracking-[0.25em] uppercase transition-colors duration-300',
-                    isHero ? 'text-white/80 hover:text-white' : 'text-[#8a8a8a] hover:text-[#1a1a1a]'
-                  )}
-                  style={{
-                    fontFamily: 'var(--font-sans)',
-                    ...(isHero ? heroTextShadow : {}),
-                  }}
-                >
-                  Prijava
-                </Link>
-              )}
+              ) : null}
             </div>
           )}
 
@@ -411,16 +398,7 @@ export default function Navbar() {
                           Odjava
                         </button>
                       </div>
-                    ) : (
-                      <Link
-                        href="/login"
-                        onClick={() => setMobileOpen(false)}
-                        className="flex items-center min-h-[44px] text-[11px] tracking-[0.25em] uppercase text-[#1a1a1a] hover:text-[#c9a96e] transition-colors font-medium"
-                        style={{ fontFamily: 'var(--font-sans)' }}
-                      >
-                        Prijava
-                      </Link>
-                    )}
+                    ) : null}
                   </div>
                 )}
 

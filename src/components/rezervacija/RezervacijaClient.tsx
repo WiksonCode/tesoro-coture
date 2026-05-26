@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowLeft, Check, ArrowRight } from 'lucide-react'
+import { Check, ArrowRight } from 'lucide-react'
 import { useKorpa } from '@/store/korpa'
 import { rezervacijaSchema, type RezervacijaInput } from '@/lib/validations/rezervacija'
 import { formatCijena } from '@/components/haljine/HaljinaCard'
@@ -28,7 +28,7 @@ function FieldInput({
   return (
     <div className="group">
       <label
-        className="block text-[9px] tracking-[0.35em] uppercase text-[#8a8a8a] mb-2"
+        className="block text-[11px] tracking-[0.35em] uppercase text-[#8a8a8a] mb-2"
         style={{ fontFamily: 'var(--font-sans)' }}
       >
         {label}
@@ -69,7 +69,7 @@ function FieldTextarea({
   return (
     <div>
       <label
-        className="block text-[9px] tracking-[0.35em] uppercase text-[#8a8a8a] mb-2"
+        className="block text-[11px] tracking-[0.35em] uppercase text-[#8a8a8a] mb-2"
         style={{ fontFamily: 'var(--font-sans)' }}
       >
         {label}
@@ -179,17 +179,46 @@ export default function RezervacijaClient() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
-          className="text-[12px] text-[#8a8a8a] max-w-sm leading-relaxed mb-10"
+          className="text-[12px] text-[#8a8a8a] max-w-sm leading-relaxed mb-6"
           style={{ fontFamily: 'var(--font-sans)' }}
         >
-          Vaš zahtev za rezervaciju je primljen. Naš tim će vas kontaktirati u
-          najkraćem roku radi potvrde termina.
+          Vaš zahtev za rezervaciju je primljen. Naš tim će vas kontaktirati
+          radi potvrde termina.
         </motion.p>
 
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.7 }}
+          transition={{ delay: 0.65 }}
+          className="flex items-center gap-6 mb-10"
+        >
+          <div className="text-center">
+            <p
+              className="text-[11px] tracking-[0.3em] uppercase text-[#c9a96e] mb-1"
+              style={{ fontFamily: 'var(--font-sans)' }}
+            >
+              U roku od
+            </p>
+            <p
+              className="text-[clamp(22px,3vw,32px)] font-light text-[#1a1a1a]"
+              style={{ fontFamily: 'var(--font-serif)' }}
+            >
+              24h
+            </p>
+          </div>
+          <div className="w-px h-10 bg-[#e8e0d8]" />
+          <p
+            className="text-[11px] text-[#8a8a8a] leading-relaxed"
+            style={{ fontFamily: 'var(--font-sans)' }}
+          >
+            Kontaktiraćemo vas putem<br />telefona ili emaila.
+          </p>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.75 }}
         >
           <Link
             href="/katalog"
@@ -206,18 +235,6 @@ export default function RezervacijaClient() {
 
   return (
     <div className="max-w-7xl mx-auto px-6 lg:px-10 py-12">
-      {/* Breadcrumb */}
-      <div className="mb-10">
-        <Link
-          href="/korpa"
-          className="inline-flex items-center gap-2 text-[10px] tracking-[0.25em] uppercase text-[#8a8a8a] hover:text-[#c9a96e] transition-colors"
-          style={{ fontFamily: 'var(--font-sans)' }}
-        >
-          <ArrowLeft size={11} />
-          Nazad na korpu
-        </Link>
-      </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-12 lg:gap-20">
         {/* Form */}
         <motion.div
@@ -225,24 +242,11 @@ export default function RezervacijaClient() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45 }}
         >
-          <p
-            className="text-[9px] tracking-[0.5em] uppercase text-[#c9a96e] mb-3"
-            style={{ fontFamily: 'var(--font-sans)' }}
-          >
-            Rezervacija
-          </p>
-          <h1
-            className="text-[clamp(28px,4vw,44px)] font-light text-[#1a1a1a] mb-10"
-            style={{ fontFamily: 'var(--font-serif)' }}
-          >
-            Vaši podaci
-          </h1>
-
           <form onSubmit={handleSubmit(onSubmit)} noValidate>
             {/* Contact info */}
             <div className="mb-10">
               <p
-                className="text-[8px] tracking-[0.5em] uppercase text-[#c9a96e] mb-6 pb-3 border-b border-[#e8e0d8]"
+                className="text-[10px] tracking-[0.5em] uppercase text-[#c9a96e] mb-6 pb-3 border-b border-[#e8e0d8]"
                 style={{ fontFamily: 'var(--font-sans)' }}
               >
                 Kontakt informacije
@@ -292,7 +296,7 @@ export default function RezervacijaClient() {
             {/* Date & note */}
             <div className="mb-10">
               <p
-                className="text-[8px] tracking-[0.5em] uppercase text-[#c9a96e] mb-6 pb-3 border-b border-[#e8e0d8]"
+                className="text-[10px] tracking-[0.5em] uppercase text-[#c9a96e] mb-6 pb-3 border-b border-[#e8e0d8]"
                 style={{ fontFamily: 'var(--font-sans)' }}
               >
                 Termin i napomena
@@ -302,12 +306,13 @@ export default function RezervacijaClient() {
                 <FieldInput
                   label="Željeni datum termina"
                   type="date"
+                  required
                   min={getTomorrow()}
                   error={errors.datum_termina?.message}
                   {...register('datum_termina')}
                 />
                 <p
-                  className="mt-2 text-[9px] text-[#8a8a8a]"
+                  className="mt-2 text-[11px] text-[#8a8a8a]"
                   style={{ fontFamily: 'var(--font-sans)' }}
                 >
                   Datum je okvirni — naš tim će potvrditi dostupnost termina.
@@ -374,11 +379,20 @@ export default function RezervacijaClient() {
             </button>
 
             <p
-              className="mt-4 text-[9px] text-center text-[#8a8a8a]"
+              className="mt-3 text-[11px] text-center text-[#8a8a8a]"
+              style={{ fontFamily: 'var(--font-sans)' }}
+            >
+              Kontaktiraćemo vas u roku od 24 sata putem telefona ili emaila.
+            </p>
+
+            <p
+              className="mt-3 text-[9px] text-center text-[#8a8a8a]/70"
               style={{ fontFamily: 'var(--font-sans)' }}
             >
               Rezervacijom prihvatate naše{' '}
-              <span className="underline cursor-pointer">uslove poslovanja</span>.
+              <Link href="/politika-privatnosti" className="underline hover:text-[#c9a96e] transition-colors">
+                uslove poslovanja
+              </Link>.
             </p>
           </form>
         </motion.div>
@@ -409,19 +423,19 @@ export default function RezervacijaClient() {
               <div className="space-y-5 mb-6">
                 {artikli.map((a) => (
                   <div
-                    key={`${a.haljina_id}-${a.boja}-${a.velicina}`}
+                    key={a.inventar_id}
                     className="flex gap-3"
                   >
                     <div
                       className="flex-shrink-0 relative overflow-hidden bg-[#f0ebe5]"
-                      style={{ width: 56, aspectRatio: '3/4' }}
+                      style={{ width: 90, aspectRatio: '3/4' }}
                     >
                       {a.slika ? (
                         <Image
                           src={a.slika}
                           alt={a.naziv}
                           fill
-                          sizes="56px"
+                          sizes="90px"
                           className="object-cover object-center"
                         />
                       ) : (
@@ -446,7 +460,7 @@ export default function RezervacijaClient() {
                         className="text-[10px] text-[#8a8a8a]"
                         style={{ fontFamily: 'var(--font-sans)' }}
                       >
-                        {a.boja} · {a.velicina === 'po_mjeri' ? 'Po meri' : a.velicina}
+                        {a.boja_naziv} · {a.velicina === 'po_mjeri' ? 'Po meri' : a.velicina}
                       </p>
                       <p
                         className="text-[11px] text-[#1a1a1a] mt-1"
@@ -485,7 +499,7 @@ export default function RezervacijaClient() {
               </div>
 
               {/* Atelier note */}
-              <div className="mt-8 p-4 border border-[#e8e0d8]">
+              <div className="mt-8 p-4 bg-[#f5ede0]">
                 <p
                   className="text-[9px] tracking-[0.3em] uppercase text-[#c9a96e] mb-2"
                   style={{ fontFamily: 'var(--font-sans)' }}

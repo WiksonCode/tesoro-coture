@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, ArrowRight, ShoppingBag, Calendar } from 'lucide-react'
+import { X, ArrowRight, Calendar } from 'lucide-react'
 import { useKorpa } from '@/store/korpa'
 import { formatCijena } from '@/components/haljine/HaljinaCard'
 
@@ -16,6 +16,25 @@ function getVelicinaLabel(v: string) {
 
 function formatEUR(rsd: number) {
   return '≈ ' + Math.round(rsd / KURS) + ' €'
+}
+
+function StepBar() {
+  return (
+    <div
+      className="flex items-center gap-0 mb-8"
+      style={{ fontFamily: 'var(--font-sans)' }}
+    >
+      <div className="flex items-center gap-2">
+        <span className="w-5 h-5 flex items-center justify-center bg-[#1a1a1a] text-[#faf7f4] text-[8px] tracking-wide">1</span>
+        <span className="text-[8.5px] tracking-[0.25em] uppercase text-[#1a1a1a]">Korpa</span>
+      </div>
+      <div className="mx-3 flex-1 max-w-[48px] h-px bg-[#e8e0d8]" />
+      <div className="flex items-center gap-2">
+        <span className="w-5 h-5 flex items-center justify-center border border-[#e8e0d8] text-[8px] tracking-wide text-[#c8c0b8]">2</span>
+        <span className="text-[8.5px] tracking-[0.25em] uppercase text-[#c8c0b8]">Rezervacija</span>
+      </div>
+    </div>
+  )
 }
 
 export default function KorpaClient() {
@@ -34,7 +53,6 @@ export default function KorpaClient() {
     )
   }
 
-  // ── Empty state ──────────────────────────────────────────────────────────
   if (artikli.length === 0) {
     return (
       <motion.div
@@ -48,9 +66,12 @@ export default function KorpaClient() {
           <span className="absolute top-1.5 right-1.5 w-4 h-4 border-t border-r border-[#c9a96e]/40" />
           <span className="absolute bottom-1.5 left-1.5 w-4 h-4 border-b border-l border-[#c9a96e]/40" />
           <span className="absolute bottom-1.5 right-1.5 w-4 h-4 border-b border-r border-[#c9a96e]/40" />
-          <ShoppingBag size={24} strokeWidth={1} className="text-[#1a1a1a]/15" />
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-[#1a1a1a]/15">
+            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <path d="M16 10a4 4 0 01-8 0"/>
+          </svg>
         </div>
-
         <p
           className="text-[clamp(34px,5vw,58px)] font-light italic text-[#1a1a1a] leading-tight mb-4"
           style={{ fontFamily: 'var(--font-serif)' }}
@@ -76,11 +97,11 @@ export default function KorpaClient() {
     )
   }
 
-  // ── Filled state ─────────────────────────────────────────────────────────
   return (
     <div className="max-w-6xl mx-auto px-5 lg:px-10 py-10 lg:py-14">
 
-      {/* Item count */}
+      <StepBar />
+
       <motion.p
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -91,33 +112,32 @@ export default function KorpaClient() {
         {artikli.length} {artikli.length === 1 ? 'komad' : 'komada'}
       </motion.p>
 
-      {/* Two-column layout */}
       <div className="lg:grid lg:grid-cols-[1fr_300px] lg:gap-14 lg:items-start">
 
-        {/* ── LEFT — Item list ── */}
+        {/* LEFT — Item list */}
         <div className="border-t border-[#e8e0d8]">
           <AnimatePresence initial={false}>
             {artikli.map((artikl, i) => (
               <motion.div
-                key={`${artikl.haljina_id}-${artikl.boja}-${artikl.velicina}`}
+                key={artikl.inventar_id}
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, x: -24, transition: { duration: 0.22 } }}
                 transition={{ duration: 0.35, delay: i * 0.07 }}
-                className="flex gap-5 lg:gap-7 py-7 lg:py-8 border-b border-[#e8e0d8] group"
+                className="flex gap-5 lg:gap-8 py-8 lg:py-9 border-b border-[#e8e0d8] group"
               >
-                {/* Thumbnail */}
+                {/* Dress image — enlarged */}
                 <Link
                   href={`/haljina/${artikl.slug}`}
                   className="shrink-0 relative overflow-hidden bg-[#f0ebe5]"
-                  style={{ width: 100, aspectRatio: '3/4' }}
+                  style={{ width: 120, aspectRatio: '3/4' }}
                 >
                   {artikl.slika ? (
                     <Image
                       src={artikl.slika}
                       alt={artikl.naziv}
                       fill
-                      sizes="100px"
+                      sizes="(min-width: 1024px) 160px, 120px"
                       className="object-cover object-top group-hover:scale-[1.03] transition-transform duration-500"
                     />
                   ) : (
@@ -127,63 +147,61 @@ export default function KorpaClient() {
                   )}
                 </Link>
 
-                {/* Details */}
-                <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
+                <div className="flex-1 min-w-0 flex flex-col justify-between py-1">
                   <div>
                     <Link href={`/haljina/${artikl.slug}`}>
                       <h3
-                        className="text-[18px] font-light text-[#1a1a1a] leading-snug hover:text-[#c9a96e] transition-colors duration-300 mb-3"
+                        className="text-[19px] lg:text-[21px] font-light text-[#1a1a1a] leading-snug hover:text-[#c9a96e] transition-colors duration-300 mb-3"
                         style={{ fontFamily: 'var(--font-serif)' }}
                       >
                         {artikl.naziv}
                       </h3>
                     </Link>
 
-                    {/* Tags */}
-                    <div className="flex flex-wrap gap-1.5">
-                      {artikl.boja && (
+                    {/* Inline color + size — no pill borders */}
+                    <div
+                      className="flex items-center gap-2 text-[10px] tracking-[0.1em] text-[#8a8a8a]"
+                      style={{ fontFamily: 'var(--font-sans)' }}
+                    >
+                      {artikl.boja_hex && (
                         <span
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1 border border-[#e8e0d8] text-[8px] tracking-[0.15em] uppercase text-[#8a8a8a]"
-                          style={{ fontFamily: 'var(--font-sans)' }}
-                        >
-                          {artikl.boja_hex && (
-                            <span
-                              className="w-2 h-2 rounded-full shrink-0 border border-[#e8e0d8]"
-                              style={{ background: artikl.boja_hex }}
-                            />
-                          )}
-                          {artikl.boja}
-                        </span>
+                          className="w-2.5 h-2.5 rounded-full shrink-0 ring-1 ring-[#e8e0d8]"
+                          style={{ background: artikl.boja_hex }}
+                        />
+                      )}
+                      {artikl.boja_naziv && (
+                        <span>{artikl.boja_naziv}</span>
+                      )}
+                      {artikl.boja_naziv && artikl.velicina && (
+                        <span className="text-[#c8c0b8]">·</span>
                       )}
                       {artikl.velicina && (
-                        <span
-                          className="inline-flex items-center px-2.5 py-1 border border-[#e8e0d8] text-[8px] tracking-[0.15em] uppercase text-[#8a8a8a]"
-                          style={{ fontFamily: 'var(--font-sans)' }}
-                        >
-                          {getVelicinaLabel(artikl.velicina)}
-                        </span>
+                        <span>{getVelicinaLabel(artikl.velicina)}</span>
                       )}
                     </div>
                   </div>
 
                   {/* Price */}
-                  <div className="flex items-baseline gap-2 mt-4">
+                  <div className="flex items-baseline gap-2.5 mt-5">
                     <span
-                      className="text-[14px] font-light text-[#1a1a1a] tabular-nums"
+                      className="text-[17px] font-light text-[#1a1a1a] tabular-nums"
                       style={{ fontFamily: 'var(--font-sans)' }}
                     >
                       {formatCijena(artikl.cijena_rsd)}
                     </span>
-                    <span className="text-[10px] text-[#8a8a8a]" style={{ fontFamily: 'var(--font-sans)' }}>
+                    <span
+                      className="text-[11px] text-[#8a8a8a]"
+                      style={{ fontFamily: 'var(--font-sans)' }}
+                    >
                       {formatEUR(artikl.cijena_rsd)}
                     </span>
                   </div>
                 </div>
 
-                {/* Remove */}
+                {/* Remove button */}
                 <button
-                  onClick={() => ukloniArtikl(artikl.haljina_id, artikl.boja, artikl.velicina)}
-                  className="self-start mt-1 w-7 h-7 flex items-center justify-center text-[#c8c0b8] hover:text-[#1a1a1a] hover:bg-[#f0ebe5] transition-all duration-200 cursor-pointer"
+                  onClick={() => ukloniArtikl(artikl.inventar_id)}
+                  className="self-start mt-1.5 w-7 h-7 flex items-center justify-center text-[#6a6a6a] hover:text-[#c9a96e] hover:bg-[#f5ede0] transition-all duration-200 cursor-pointer"
                   aria-label="Ukloni iz korpe"
                 >
                   <X size={13} strokeWidth={1.5} />
@@ -192,8 +210,8 @@ export default function KorpaClient() {
             ))}
           </AnimatePresence>
 
-          {/* Mobile total (only shows on mobile, below items) */}
-          <div className="lg:hidden mt-8 border-t border-[#e8e0d8] pt-6">
+          {/* Mobile summary */}
+          <div className="lg:hidden mt-8 border-t border-[#e8e0d8] pt-7">
             <div className="flex items-baseline justify-between mb-6">
               <span
                 className="text-[9px] tracking-[0.35em] uppercase text-[#8a8a8a]"
@@ -202,17 +220,20 @@ export default function KorpaClient() {
                 Ukupno
               </span>
               <div className="text-right">
-                <p className="text-xl font-light text-[#1a1a1a]" style={{ fontFamily: 'var(--font-sans)' }}>
+                <p
+                  className="text-[20px] font-light text-[#1a1a1a]"
+                  style={{ fontFamily: 'var(--font-sans)' }}
+                >
                   {formatCijena(ukupno)}
                 </p>
-                <p className="text-[10px] text-[#8a8a8a] mt-0.5" style={{ fontFamily: 'var(--font-sans)' }}>
+                <p
+                  className="text-[11px] text-[#8a8a8a] mt-0.5"
+                  style={{ fontFamily: 'var(--font-sans)' }}
+                >
                   {formatEUR(ukupno)}
                 </p>
               </div>
             </div>
-            <p className="text-[8.5px] text-[#8a8a8a]/60 mb-6" style={{ fontFamily: 'var(--font-sans)' }}>
-              Cena ne uključuje PDV. Plaćanje u salonu.
-            </p>
             <div className="flex flex-col gap-2.5">
               <Link
                 href="/rezervacija"
@@ -224,7 +245,7 @@ export default function KorpaClient() {
               </Link>
               <Link
                 href="/katalog"
-                className="flex items-center justify-center w-full border border-[#e8e0d8] text-[#8a8a8a] py-4 text-[9px] tracking-[0.35em] uppercase hover:border-[#1a1a1a] hover:text-[#1a1a1a] transition-all duration-300 cursor-pointer"
+                className="flex items-center justify-center w-full border border-[#e8e0d8] text-[#6a6a6a] py-4 text-[9px] tracking-[0.35em] uppercase hover:border-[#1a1a1a] hover:text-[#1a1a1a] transition-all duration-300 cursor-pointer"
                 style={{ fontFamily: 'var(--font-sans)' }}
               >
                 Nastavi kupovinu
@@ -233,7 +254,7 @@ export default function KorpaClient() {
           </div>
         </div>
 
-        {/* ── RIGHT — Dark sticky summary (desktop only) ── */}
+        {/* RIGHT — Dark sticky summary */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -241,9 +262,8 @@ export default function KorpaClient() {
           className="hidden lg:block lg:sticky lg:top-28"
         >
           <div className="bg-[#1a1a1a] px-7 py-8">
-            {/* Panel label */}
             <p
-              className="text-[7px] tracking-[0.65em] uppercase text-[#c9a96e]/55 mb-1"
+              className="text-[9px] tracking-[0.65em] uppercase text-[#c9a96e]/70 mb-1"
               style={{ fontFamily: 'var(--font-sans)' }}
             >
               Tesoro Couture
@@ -255,27 +275,35 @@ export default function KorpaClient() {
               Pregled<br />porudžbine
             </h2>
 
-            {/* Items breakdown */}
-            <div className="space-y-3.5 pb-6 mb-6 border-b border-white/[0.08]">
+            {/* Item list in summary */}
+            <div className="space-y-4 pb-6 mb-6 border-b border-white/[0.08]">
               {artikli.map((artikl) => (
-                <div
-                  key={`sum-${artikl.haljina_id}-${artikl.boja}-${artikl.velicina}`}
-                  className="flex items-start justify-between gap-3"
-                >
+                <div key={`sum-${artikl.inventar_id}`} className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <p
-                      className="text-[10px] text-[#faf7f4]/60 leading-snug truncate"
+                      className="text-[10.5px] text-[#faf7f4]/75 leading-snug truncate"
                       style={{ fontFamily: 'var(--font-sans)' }}
                     >
                       {artikl.naziv}
                     </p>
-                    <p className="text-[9px] text-[#faf7f4]/28 mt-0.5" style={{ fontFamily: 'var(--font-sans)' }}>
-                      {getVelicinaLabel(artikl.velicina)}
-                      {artikl.boja ? ` · ${artikl.boja}` : ''}
-                    </p>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      {artikl.boja_hex && (
+                        <span
+                          className="w-2 h-2 rounded-full shrink-0 ring-1 ring-white/10"
+                          style={{ background: artikl.boja_hex }}
+                        />
+                      )}
+                      <p
+                        className="text-[9px] text-[#faf7f4]/65"
+                        style={{ fontFamily: 'var(--font-sans)' }}
+                      >
+                        {getVelicinaLabel(artikl.velicina)}
+                        {artikl.boja_naziv ? ` · ${artikl.boja_naziv}` : ''}
+                      </p>
+                    </div>
                   </div>
                   <span
-                    className="text-[10px] text-[#faf7f4]/65 shrink-0 tabular-nums"
+                    className="text-[10.5px] text-[#faf7f4]/70 shrink-0 tabular-nums"
                     style={{ fontFamily: 'var(--font-sans)' }}
                   >
                     {formatCijena(artikl.cijena_rsd)}
@@ -287,26 +315,25 @@ export default function KorpaClient() {
             {/* Total */}
             <div className="flex items-baseline justify-between mb-1">
               <span
-                className="text-[8.5px] tracking-[0.35em] uppercase text-[#faf7f4]/35"
+                className="text-[10px] tracking-[0.35em] uppercase text-[#faf7f4]/65"
                 style={{ fontFamily: 'var(--font-sans)' }}
               >
                 Ukupno
               </span>
               <span
-                className="text-[19px] font-light text-[#faf7f4] tabular-nums"
+                className="text-[20px] font-light text-[#faf7f4] tabular-nums"
                 style={{ fontFamily: 'var(--font-sans)' }}
               >
                 {formatCijena(ukupno)}
               </span>
             </div>
             <p
-              className="text-right text-[10px] text-[#c9a96e]/65 mb-8"
+              className="text-right text-[11px] text-[#c9a96e]/80 mb-8"
               style={{ fontFamily: 'var(--font-sans)' }}
             >
               {formatEUR(ukupno)}
             </p>
 
-            {/* CTAs */}
             <Link
               href="/rezervacija"
               className="flex items-center justify-center gap-2.5 w-full bg-[#c9a96e] text-[#1a1a1a] py-4 text-[9px] tracking-[0.35em] uppercase hover:bg-[#d4b87d] transition-all duration-300 cursor-pointer"
@@ -318,21 +345,11 @@ export default function KorpaClient() {
 
             <Link
               href="/katalog"
-              className="flex items-center justify-center w-full mt-3 py-3 text-[8.5px] tracking-[0.25em] uppercase text-[#faf7f4]/30 hover:text-[#faf7f4]/65 transition-colors duration-200 cursor-pointer"
+              className="flex items-center justify-center w-full mt-3 py-3 text-[10px] tracking-[0.25em] uppercase text-[#faf7f4]/65 hover:text-[#faf7f4]/90 transition-colors duration-200 cursor-pointer"
               style={{ fontFamily: 'var(--font-sans)' }}
             >
               Nastavi kupovinu
             </Link>
-
-            {/* Footer note */}
-            <div className="mt-7 pt-6 border-t border-white/[0.07]">
-              <p
-                className="text-[7.5px] text-[#faf7f4]/18 leading-relaxed text-center"
-                style={{ fontFamily: 'var(--font-sans)' }}
-              >
-                Plaćanje u salonu · Bez PDV-a
-              </p>
-            </div>
           </div>
         </motion.div>
 

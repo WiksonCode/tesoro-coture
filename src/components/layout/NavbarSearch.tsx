@@ -14,19 +14,18 @@ interface Props {
   mobileInline?: boolean
 }
 
-const KATEGORIJA_LABEL: Record<string, string> = {
-  vjencana: 'Vjenčana',
-  koktel: 'Koktel',
-  svecana: 'Svečana',
-  casual: 'Casual',
-  maturska: 'Maturska',
-}
-
-const formatCijena = (c: number) =>
-  new Intl.NumberFormat('sr-RS').format(c) + ' RSD'
-
 const firstImage = (h: Haljina) =>
   Array.isArray(h.slike) ? h.slike[0] : null
+
+function getMinCijena(h: Haljina): number | null {
+  const prices = h.inventar?.filter(i => i.dostupna).map(i => i.cijena_rsd) ?? []
+  if (prices.length === 0) return null
+  return Math.min(...prices)
+}
+
+function formatCijena(c: number) {
+  return new Intl.NumberFormat('sr-RS').format(c) + ' RSD'
+}
 
 export default function NavbarSearch({ isHero, mobileInline = false }: Props) {
   const [open, setOpen] = useState(false)
@@ -62,14 +61,11 @@ export default function NavbarSearch({ isHero, mobileInline = false }: Props) {
     if (!open || suggested.length > 0) return
     createClient()
       .from('haljine')
-      .select('id, slug, naziv_sr, kategorija, cijena_rsd, slike')
-      .eq('dostupna', true)
-      .not('slike', 'is', null)
-      .not('slike', 'eq', '[]')
+      .select('id, slug, naziv_sr, slike, kategorija:kategorije(slug, naziv_sr), inventar(cijena_rsd, dostupna)')
       .order('featured', { ascending: false })
       .order('created_at', { ascending: false })
       .limit(4)
-      .then(({ data }) => setSuggested((data as Haljina[]) || []))
+      .then(({ data }) => setSuggested((data as unknown as Haljina[]) || []))
   }, [open, suggested.length])
 
   useEffect(() => {
@@ -78,13 +74,10 @@ export default function NavbarSearch({ isHero, mobileInline = false }: Props) {
     const t = setTimeout(async () => {
       const { data } = await createClient()
         .from('haljine')
-        .select('id, slug, naziv_sr, kategorija, cijena_rsd, slike')
-        .eq('dostupna', true)
-        .not('slike', 'is', null)
-        .not('slike', 'eq', '[]')
+        .select('id, slug, naziv_sr, slike, kategorija:kategorije(slug, naziv_sr), inventar(cijena_rsd, dostupna)')
         .ilike('naziv_sr', `%${query.trim()}%`)
         .limit(4)
-      setResults((data as Haljina[]) || [])
+      setResults((data as unknown as Haljina[]) || [])
       setLoading(false)
     }, 280)
     return () => clearTimeout(t)
@@ -132,7 +125,9 @@ export default function NavbarSearch({ isHero, mobileInline = false }: Props) {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[11px] text-[#1a1a1a] truncate" style={{ fontFamily: 'var(--font-serif)' }}>{h.naziv_sr}</p>
-                    <p className="text-[10px] font-semibold text-[#c9a96e] mt-0.5" style={{ fontFamily: 'var(--font-sans)' }}>{formatCijena(h.cijena_rsd)}</p>
+                    {getMinCijena(h) !== null && (
+                      <p className="text-[10px] font-semibold text-[#c9a96e] mt-0.5" style={{ fontFamily: 'var(--font-sans)' }}>{formatCijena(getMinCijena(h)!)}</p>
+                    )}
                   </div>
                 </Link>
               </li>
@@ -175,7 +170,7 @@ export default function NavbarSearch({ isHero, mobileInline = false }: Props) {
       {open && createPortal(
         <div
           className="fixed inset-0 z-[60] flex flex-col overflow-hidden"
-          style={{ backgroundColor: 'rgba(14,13,13,0.97)', backdropFilter: 'blur(18px)' }}
+          style={{ backgroundColor: 'rgba(14,13,13,0.97)' }}
         >
           {/* ── Top bar (shared) ───────────────────────────────────────── */}
           <div className="flex-shrink-0 flex items-center justify-between px-6 lg:px-12 pt-6 pb-0">
@@ -238,7 +233,7 @@ export default function NavbarSearch({ isHero, mobileInline = false }: Props) {
               <div className="mt-10 flex flex-col animate-fade-up">
 
                 {/* Section label */}
-                <div className="px-12 mb-5 flex items-center justify-between">
+                <div className="mb-5 flex items-center justify-between" style={{ padding: '0 clamp(24px, 4vw, 80px)' }}>
                   <p className="text-[9px] tracking-[0.5em] uppercase text-white/65" style={{ fontFamily: 'var(--font-sans)' }}>
                     {isSearching ? 'Rezultati' : 'Preporučujemo'}
                     {isSearching && results.length > 0 && (
@@ -256,16 +251,16 @@ export default function NavbarSearch({ isHero, mobileInline = false }: Props) {
                   </Link>
                 </div>
 
-                {/* Horizontalni red — centriran */}
-                <div className="px-12">
-                  <ul className="flex justify-center gap-5 pb-8">
+                {/* Grid kartica — uvijek 4 kolone, sve skalira sa vw */}
+                <div style={{ padding: '0 clamp(24px, 4vw, 80px)' }}>
+                  <ul style={{ gap: 'clamp(12px, 1.5vw, 24px)', paddingBottom: '2rem' }} className="grid grid-cols-4">
                     {displayList.map((h) => {
                       const img1 = Array.isArray(h.slike) ? h.slike[0] : null
                       const img2 = Array.isArray(h.slike) ? h.slike[1] : null
                       return (
-                        <li key={h.id} className="w-[270px] flex-shrink-0">
+                        <li key={h.id}>
                           <Link href={`/haljina/${h.slug}`} onClick={close} className="group flex flex-col cursor-pointer">
-                            {/* Image — 3:4, hover swap */}
+                            {/* Image — 3:4 */}
                             <div className="relative w-full aspect-[3/4] overflow-hidden bg-white/5">
                               {img1 && (
                                 // eslint-disable-next-line @next/next/no-img-element
@@ -287,30 +282,31 @@ export default function NavbarSearch({ isHero, mobileInline = false }: Props) {
                                 />
                               )}
                               {!img1 && <div className="w-full h-full bg-white/8" />}
-                              {/* Subtle dark vignette on hover */}
                               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
                             </div>
 
-                            {/* Info */}
-                            <div className="mt-3 flex flex-col gap-0.5">
+                            {/* Info — tekst skalira sa karticom */}
+                            <div style={{ marginTop: 'clamp(8px, 1.2vw, 20px)', gap: 'clamp(2px, 0.4vw, 6px)', display: 'flex', flexDirection: 'column' }}>
                               <p
-                                className="text-white text-[14px] font-light leading-snug"
-                                style={{ fontFamily: 'var(--font-serif)' }}
+                                style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(11px, 1.25vw, 20px)' }}
+                                className="text-white font-light leading-snug truncate"
                               >
                                 {h.naziv_sr}
                               </p>
                               <p
-                                className="text-[8px] tracking-[0.35em] uppercase text-white/35"
-                                style={{ fontFamily: 'var(--font-sans)' }}
+                                style={{ fontFamily: 'var(--font-sans)', fontSize: 'clamp(7px, 0.65vw, 11px)', letterSpacing: '0.35em' }}
+                                className="uppercase text-white/35"
                               >
-                                {KATEGORIJA_LABEL[h.kategorija] ?? h.kategorija}
+                                {h.kategorija?.naziv_sr ?? ''}
                               </p>
-                              <p
-                                className="text-[#c9a96e] text-[15px] font-semibold tracking-tight mt-1"
-                                style={{ fontFamily: 'var(--font-sans)' }}
-                              >
-                                {formatCijena(h.cijena_rsd)}
-                              </p>
+                              {getMinCijena(h) !== null && (
+                                <p
+                                  style={{ fontFamily: 'var(--font-sans)', fontSize: 'clamp(11px, 1.25vw, 20px)', marginTop: 'clamp(2px, 0.4vw, 8px)' }}
+                                  className="text-[#c9a96e] font-semibold tracking-tight"
+                                >
+                                  {formatCijena(getMinCijena(h)!)}
+                                </p>
+                              )}
                             </div>
                           </Link>
                         </li>
@@ -379,7 +375,7 @@ export default function NavbarSearch({ isHero, mobileInline = false }: Props) {
                   >
                     {isSearching ? `Rezultati (${results.length})` : 'Preporučujemo'}
                   </p>
-                  <ul className="grid grid-cols-2 gap-4">
+                  <ul className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-5">
                     {displayList.map((h) => (
                       <li key={h.id}>
                         <Link href={`/haljina/${h.slug}`} onClick={close} className="group flex flex-col cursor-pointer">
@@ -388,16 +384,18 @@ export default function NavbarSearch({ isHero, mobileInline = false }: Props) {
                               ? <img src={firstImage(h)!} alt={h.naziv_sr} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" /> // eslint-disable-line
                               : <div className="w-full h-full bg-white/8" />}
                           </div>
-                          <div className="mt-2.5 flex flex-col gap-0.5">
-                            <p className="text-white text-[13px] font-light leading-snug truncate" style={{ fontFamily: 'var(--font-serif)' }}>
+                          <div className="mt-2.5 sm:mt-3 flex flex-col gap-0.5">
+                            <p className="text-white text-[13px] sm:text-[14px] font-light leading-snug truncate" style={{ fontFamily: 'var(--font-serif)' }}>
                               {h.naziv_sr}
                             </p>
                             <p className="text-[8px] tracking-[0.3em] uppercase text-white/35" style={{ fontFamily: 'var(--font-sans)' }}>
-                              {KATEGORIJA_LABEL[h.kategorija] ?? h.kategorija}
+                              {h.kategorija?.naziv_sr ?? ''}
                             </p>
-                            <p className="text-[#c9a96e] text-[12px] font-semibold mt-1" style={{ fontFamily: 'var(--font-sans)' }}>
-                              {formatCijena(h.cijena_rsd)}
-                            </p>
+                            {getMinCijena(h) !== null && (
+                              <p className="text-[#c9a96e] text-[12px] sm:text-[13px] font-semibold mt-0.5" style={{ fontFamily: 'var(--font-sans)' }}>
+                                {formatCijena(getMinCijena(h)!)}
+                              </p>
+                            )}
                           </div>
                         </Link>
                       </li>

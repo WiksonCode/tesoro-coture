@@ -5,7 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { ChevronDown, X, Check, SlidersHorizontal } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
-import type { Boja } from '@/types'
+
+type Boja = { naziv: string; hex: string }
 
 const KATEGORIJE = [
   { value: '', label: 'Sve' },

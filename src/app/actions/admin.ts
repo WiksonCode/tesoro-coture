@@ -18,19 +18,12 @@ function extractHaljinaData(formData: FormData) {
   return {
     slug: formData.get('slug') as string,
     naziv_sr: formData.get('naziv_sr') as string,
-    naziv_en: formData.get('naziv_en') as string,
-    opis_sr: (formData.get('opis_sr') as string) || '',
-    opis_en: (formData.get('opis_en') as string) || '',
-    cijena_rsd: parseFloat(formData.get('cijena_rsd') as string) || 0,
-    na_popustu: formData.get('na_popustu') === 'true',
-    popust_procenat: parseInt(formData.get('popust_procenat') as string) || 0,
-    kategorija: formData.get('kategorija') as string,
-    dostupne_boje: JSON.parse((formData.get('dostupne_boje') as string) || '[]'),
-    dostupne_velicine: JSON.parse((formData.get('dostupne_velicine') as string) || '[]'),
+    naziv_en: (formData.get('naziv_en') as string) || null,
+    opis_sr: (formData.get('opis_sr') as string) || null,
+    opis_en: (formData.get('opis_en') as string) || null,
+    kategorija_id: formData.get('kategorija_id') as string,
     slike: JSON.parse((formData.get('slike') as string) || '[]'),
     video_url: (formData.get('video_url') as string) || null,
-    dostupna: formData.get('dostupna') === 'true',
-    kolicina_na_lageru: parseInt(formData.get('kolicina_na_lageru') as string) || 0,
     featured: formData.get('featured') === 'true',
   }
 }
@@ -78,16 +71,78 @@ export async function deleteHaljina(id: string): Promise<{ error: string } | voi
   revalidatePath('/katalog')
 }
 
-export async function toggleDostupnost(id: string, dostupna: boolean): Promise<{ error: string } | void> {
+export async function toggleFeatured(id: string, featured: boolean): Promise<{ error: string } | void> {
   let supabase
   try {
     supabase = await adminClient()
   } catch {
     return { error: 'Nemate pristup.' }
   }
-  const { error } = await supabase.from('haljine').update({ dostupna }).eq('id', id)
+  const { error } = await supabase.from('haljine').update({ featured }).eq('id', id)
   if (error) return { error: error.message }
   revalidatePath('/admin/haljine')
+}
+
+export async function toggleDostupnostInventara(inventarId: string, dostupna: boolean): Promise<{ error: string } | void> {
+  let supabase
+  try {
+    supabase = await adminClient()
+  } catch {
+    return { error: 'Nemate pristup.' }
+  }
+  const { error } = await supabase.from('inventar').update({ dostupna }).eq('id', inventarId)
+  if (error) return { error: error.message }
+  revalidatePath('/admin/haljine')
+  revalidatePath('/katalog')
+}
+
+export async function deleteInventarStavka(id: string): Promise<{ error: string } | void> {
+  let supabase
+  try { supabase = await adminClient() } catch { return { error: 'Nemate pristup.' } }
+  const { error } = await supabase.from('inventar').delete().eq('id', id)
+  if (error) return { error: error.message }
+  revalidatePath('/admin/haljine')
+  revalidatePath('/katalog')
+}
+
+export async function updateInventarStavka(id: string, formData: FormData): Promise<{ error: string } | void> {
+  let supabase
+  try { supabase = await adminClient() } catch { return { error: 'Nemate pristup.' } }
+  const data = {
+    boja_naziv: formData.get('boja_naziv') as string,
+    boja_hex: formData.get('boja_hex') as string,
+    velicina: formData.get('velicina') as string,
+    cijena_rsd: parseFloat(formData.get('cijena_rsd') as string),
+    cijena_eur: parseFloat(formData.get('cijena_eur') as string),
+    slike: JSON.parse((formData.get('slike') as string) || '[]'),
+    dostupna: formData.get('dostupna') === 'true',
+    updated_at: new Date().toISOString(),
+  }
+  const { error } = await supabase.from('inventar').update(data).eq('id', id)
+  if (error) return { error: error.message }
+  revalidatePath('/admin/haljine')
+  revalidatePath('/katalog')
+}
+
+export async function createInventarStavka(haljina_id: string, formData: FormData): Promise<{ error: string } | void> {
+  let supabase
+  try { supabase = await adminClient() } catch { return { error: 'Nemate pristup.' } }
+  const sifra = `INV-${Date.now().toString(36).toUpperCase()}`
+  const data = {
+    haljina_id,
+    sifra,
+    boja_naziv: formData.get('boja_naziv') as string,
+    boja_hex: formData.get('boja_hex') as string,
+    velicina: formData.get('velicina') as string,
+    cijena_rsd: parseFloat(formData.get('cijena_rsd') as string),
+    cijena_eur: parseFloat(formData.get('cijena_eur') as string),
+    slike: JSON.parse((formData.get('slike') as string) || '[]'),
+    dostupna: true,
+  }
+  const { error } = await supabase.from('inventar').insert(data)
+  if (error) return { error: error.message }
+  revalidatePath('/admin/haljine')
+  revalidatePath('/katalog')
 }
 
 export async function updateStatusRezervacije(id: string, status: StatusRezervacije): Promise<{ error: string } | void> {
@@ -101,4 +156,6 @@ export async function updateStatusRezervacije(id: string, status: StatusRezervac
   if (error) return { error: error.message }
   revalidatePath('/admin/rezervacije')
   revalidatePath(`/admin/rezervacije/${id}`)
+  revalidatePath('/katalog')
+  revalidatePath('/haljina', 'layout')
 }

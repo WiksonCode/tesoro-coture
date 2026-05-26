@@ -31,7 +31,7 @@ export default function StatusSelector({ id, currentStatus }: { id: string; curr
     <div className="bg-white border border-[#e8e0d8] p-5">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-[10px] tracking-[0.3em] uppercase text-[#8a8a8a]" style={{ fontFamily: 'var(--font-sans)' }}>
-          Promjeni status
+          Promeni status
         </h2>
         {isPending && <Loader2 size={12} className="animate-spin text-[#8a8a8a]" />}
         {!isPending && saved && (

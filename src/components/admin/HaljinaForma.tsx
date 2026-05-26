@@ -2,20 +2,10 @@
 
 import { useState, useTransition, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, X, Upload, Loader2, ArrowLeft } from 'lucide-react'
+import { X, Upload, Loader2, ArrowLeft, Video, Play } from 'lucide-react'
 import { cn, slugify } from '@/lib/utils'
-import { createClient } from '@/lib/supabase/client'
 import { createHaljina, updateHaljina } from '@/app/actions/admin'
-import type { Haljina, Boja } from '@/types'
-
-const VELICINE = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Po mjeri']
-const KATEGORIJE = [
-  { value: 'vjencana', label: 'Vjenčana' },
-  { value: 'koktel', label: 'Koktel' },
-  { value: 'svecana', label: 'Svečana' },
-  { value: 'casual', label: 'Casual' },
-  { value: 'maturska', label: 'Maturska' },
-]
+import type { Haljina, Kategorija } from '@/types'
 
 const inputCls = 'w-full border border-[#e8e0d8] bg-white px-3.5 py-2.5 text-[13px] text-[#1a1a1a] outline-none focus:border-[#1a1a1a] transition-colors'
 const labelCls = 'block text-[8px] tracking-[0.35em] uppercase text-[#8a8a8a] mb-1.5'
@@ -32,9 +22,10 @@ function Field({ label, error, children }: { label: string; error?: string; chil
 
 interface Props {
   haljina?: Haljina
+  kategorije: Kategorija[]
 }
 
-export default function HaljinaForma({ haljina }: Props) {
+export default function HaljinaForma({ haljina, kategorije }: Props) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
 
@@ -44,21 +35,13 @@ export default function HaljinaForma({ haljina }: Props) {
   const [slugManual, setSlugManual] = useState(!!haljina)
   const [opis_sr, setOpisSr] = useState(haljina?.opis_sr ?? '')
   const [opis_en, setOpisEn] = useState(haljina?.opis_en ?? '')
-  const [cijena, setCijena] = useState(haljina?.cijena_rsd?.toString() ?? '')
-  const [kategorija, setKategorija] = useState<string>(haljina?.kategorija ?? 'koktel')
-  const [naPopustu, setNaPopustu] = useState(haljina?.na_popustu ?? false)
-  const [popust, setPopust] = useState(haljina?.popust_procenat?.toString() ?? '0')
-  const [dostupna, setDostupna] = useState(haljina?.dostupna ?? true)
-  const [kolicina, setKolicina] = useState(haljina?.kolicina_na_lageru?.toString() ?? '0')
+  const [kategorija_id, setKategorijaId] = useState(haljina?.kategorija_id ?? kategorije[0]?.id ?? '')
   const [featured, setFeatured] = useState(haljina?.featured ?? false)
   const [videoUrl, setVideoUrl] = useState(haljina?.video_url ?? '')
 
-  const [velicine, setVelicine] = useState<string[]>(haljina?.dostupne_velicine ?? [])
-  const [boje, setBoje] = useState<Boja[]>(haljina?.dostupne_boje ?? [])
-  const [novaBoja, setNovaBoja] = useState({ naziv: '', hex: '#c9a96e' })
-
   const [slike, setSlike] = useState<string[]>(haljina?.slike ?? [])
   const [uploading, setUploading] = useState(false)
+  const [uploadingVideo, setUploadingVideo] = useState(false)
   const [serverError, setServerError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -70,39 +53,53 @@ export default function HaljinaForma({ haljina }: Props) {
   async function handleImageUpload(files: FileList | null) {
     if (!files || files.length === 0) return
     setUploading(true)
-    const supabase = createClient()
+    setServerError(null)
     const newUrls: string[] = []
 
-    for (const file of Array.from(files)) {
-      const ext = file.name.split('.').pop()
-      const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-      const { data, error } = await supabase.storage.from('haljine-slike').upload(path, file)
-      if (!error && data) {
-        const { data: { publicUrl } } = supabase.storage.from('haljine-slike').getPublicUrl(data.path)
-        newUrls.push(publicUrl)
+    try {
+      for (const file of Array.from(files)) {
+        const fd = new FormData()
+        fd.append('file', file)
+        const res = await fetch('/api/upload', { method: 'POST', body: fd })
+        const json = await res.json()
+        if (!res.ok) {
+          setServerError(`Upload greška: ${json.error ?? res.statusText}`)
+          setUploading(false)
+          return
+        }
+        newUrls.push(json.url)
       }
+      setSlike((prev) => [...prev, ...newUrls])
+    } catch (err) {
+      setServerError(`Upload greška: ${err instanceof Error ? err.message : 'Nepoznata greška'}`)
+    } finally {
+      setUploading(false)
     }
-
-    setSlike((prev) => [...prev, ...newUrls])
-    setUploading(false)
-  }
-
-  function toggleVelicina(v: string) {
-    setVelicine((prev) => prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v])
-  }
-
-  function addBoja() {
-    if (!novaBoja.naziv.trim()) return
-    setBoje((prev) => [...prev, { naziv: novaBoja.naziv.trim(), hex: novaBoja.hex }])
-    setNovaBoja({ naziv: '', hex: '#c9a96e' })
-  }
-
-  function removeBoja(index: number) {
-    setBoje((prev) => prev.filter((_, i) => i !== index))
   }
 
   function removeSlika(url: string) {
     setSlike((prev) => prev.filter((s) => s !== url))
+  }
+
+  async function handleVideoUpload(files: FileList | null) {
+    if (!files || files.length === 0) return
+    setUploadingVideo(true)
+    setServerError(null)
+    try {
+      const fd = new FormData()
+      fd.append('file', files[0])
+      const res = await fetch('/api/upload', { method: 'POST', body: fd })
+      const json = await res.json()
+      if (!res.ok) {
+        setServerError(`Upload greška: ${json.error ?? res.statusText}`)
+        return
+      }
+      setVideoUrl(json.url)
+    } catch (err) {
+      setServerError(`Upload greška: ${err instanceof Error ? err.message : 'Nepoznata greška'}`)
+    } finally {
+      setUploadingVideo(false)
+    }
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -114,17 +111,10 @@ export default function HaljinaForma({ haljina }: Props) {
     formData.set('naziv_en', naziv_en)
     formData.set('opis_sr', opis_sr)
     formData.set('opis_en', opis_en)
-    formData.set('cijena_rsd', cijena)
-    formData.set('kategorija', kategorija)
-    formData.set('na_popustu', naPopustu.toString())
-    formData.set('popust_procenat', popust)
-    formData.set('dostupna', dostupna.toString())
-    formData.set('kolicina_na_lageru', kolicina)
+    formData.set('kategorija_id', kategorija_id)
     formData.set('featured', featured.toString())
     formData.set('video_url', videoUrl)
     formData.set('slike', JSON.stringify(slike))
-    formData.set('dostupne_boje', JSON.stringify(boje))
-    formData.set('dostupne_velicine', JSON.stringify(velicine))
 
     startTransition(async () => {
       const result = haljina
@@ -191,13 +181,13 @@ export default function HaljinaForma({ haljina }: Props) {
           <Field label="Kategorija *">
             <select
               required
-              value={kategorija}
-              onChange={(e) => setKategorija(e.target.value)}
+              value={kategorija_id}
+              onChange={(e) => setKategorijaId(e.target.value)}
               className={cn(inputCls, 'cursor-pointer')}
               style={{ fontFamily: 'var(--font-sans)' }}
             >
-              {KATEGORIJE.map((k) => (
-                <option key={k.value} value={k.value}>{k.label}</option>
+              {kategorije.map((k) => (
+                <option key={k.id} value={k.id}>{k.naziv_sr}</option>
               ))}
             </select>
           </Field>
@@ -222,64 +212,11 @@ export default function HaljinaForma({ haljina }: Props) {
             />
           </Field>
         </div>
-      </div>
-
-      {/* Section: Cijena */}
-      <div className="bg-white border border-[#e8e0d8] p-6">
-        <h2 className="text-[11px] tracking-[0.3em] uppercase text-[#8a8a8a] mb-5" style={{ fontFamily: 'var(--font-sans)' }}>
-          Cijena i dostupnost
-        </h2>
-        <div className="grid lg:grid-cols-3 gap-4">
-          <Field label="Cijena (RSD) *">
-            <input
-              type="number"
-              required
-              min={0}
-              step={100}
-              value={cijena}
-              onChange={(e) => setCijena(e.target.value)}
-              className={inputCls}
-              style={{ fontFamily: 'var(--font-sans)' }}
-              placeholder="15000"
-            />
-          </Field>
-          <Field label="Količina na lageru">
-            <input
-              type="number"
-              min={0}
-              value={kolicina}
-              onChange={(e) => setKolicina(e.target.value)}
-              className={inputCls}
-              style={{ fontFamily: 'var(--font-sans)' }}
-            />
-          </Field>
-          <div className="flex flex-col gap-3 pt-6">
-            <label className="flex items-center gap-2.5 cursor-pointer">
-              <input type="checkbox" checked={dostupna} onChange={(e) => setDostupna(e.target.checked)} className="w-4 h-4 accent-[#1a1a1a]" />
-              <span className="text-[11px] text-[#1a1a1a]" style={{ fontFamily: 'var(--font-sans)' }}>Dostupna u katalogu</span>
-            </label>
-            <label className="flex items-center gap-2.5 cursor-pointer">
-              <input type="checkbox" checked={featured} onChange={(e) => setFeatured(e.target.checked)} className="w-4 h-4 accent-[#c9a96e]" />
-              <span className="text-[11px] text-[#1a1a1a]" style={{ fontFamily: 'var(--font-sans)' }}>Featured (homepage)</span>
-            </label>
-            <label className="flex items-center gap-2.5 cursor-pointer">
-              <input type="checkbox" checked={naPopustu} onChange={(e) => setNaPopustu(e.target.checked)} className="w-4 h-4 accent-red-500" />
-              <span className="text-[11px] text-[#1a1a1a]" style={{ fontFamily: 'var(--font-sans)' }}>Na popustu</span>
-            </label>
-          </div>
-          {naPopustu && (
-            <Field label="Procenat popusta (%)">
-              <input
-                type="number"
-                min={1}
-                max={100}
-                value={popust}
-                onChange={(e) => setPopust(e.target.value)}
-                className={inputCls}
-                style={{ fontFamily: 'var(--font-sans)' }}
-              />
-            </Field>
-          )}
+        <div className="mt-4">
+          <label className="flex items-center gap-2.5 cursor-pointer">
+            <input type="checkbox" checked={featured} onChange={(e) => setFeatured(e.target.checked)} className="w-4 h-4 accent-[#c9a96e]" />
+            <span className="text-[11px] text-[#1a1a1a]" style={{ fontFamily: 'var(--font-sans)' }}>Featured (prikazati na početnoj strani)</span>
+          </label>
         </div>
       </div>
 
@@ -327,96 +264,63 @@ export default function HaljinaForma({ haljina }: Props) {
             </span>
           </label>
         </div>
-        <Field label="Video URL (opciono)">
-          <input
-            type="url"
-            value={videoUrl}
-            onChange={(e) => setVideoUrl(e.target.value)}
-            className={inputCls}
-            style={{ fontFamily: 'var(--font-sans)' }}
-            placeholder="https://..."
-          />
-        </Field>
-      </div>
-
-      {/* Section: Veličine */}
-      <div className="bg-white border border-[#e8e0d8] p-6">
-        <h2 className="text-[11px] tracking-[0.3em] uppercase text-[#8a8a8a] mb-5" style={{ fontFamily: 'var(--font-sans)' }}>
-          Veličine
-        </h2>
-        <div className="flex flex-wrap gap-2">
-          {VELICINE.map((v) => (
-            <button
-              key={v}
-              type="button"
-              onClick={() => toggleVelicina(v)}
-              className={cn(
-                'px-4 py-2 text-[10px] tracking-[0.2em] uppercase border transition-all duration-200 cursor-pointer',
-                velicine.includes(v)
-                  ? 'bg-[#1a1a1a] text-white border-[#1a1a1a]'
-                  : 'border-[#e8e0d8] text-[#8a8a8a] hover:border-[#1a1a1a]'
-              )}
-              style={{ fontFamily: 'var(--font-sans)' }}
-            >
-              {v}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Section: Boje */}
-      <div className="bg-white border border-[#e8e0d8] p-6">
-        <h2 className="text-[11px] tracking-[0.3em] uppercase text-[#8a8a8a] mb-5" style={{ fontFamily: 'var(--font-sans)' }}>
-          Boje
-        </h2>
-        <div className="flex flex-wrap gap-2 mb-4">
-          {boje.map((b, i) => (
-            <div
-              key={i}
-              className="flex items-center gap-2 border border-[#e8e0d8] px-3 py-1.5 group"
-            >
-              <span
-                className="w-4 h-4 rounded-full border border-[#e8e0d8] shrink-0"
-                style={{ backgroundColor: b.hex }}
+        <div>
+          <label className={labelCls} style={{ fontFamily: 'var(--font-sans)' }}>Video (opciono)</label>
+          {videoUrl ? (
+            <div className="relative bg-black">
+              {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+              <video
+                src={videoUrl}
+                controls
+                muted
+                playsInline
+                className="w-full max-h-52 object-contain"
               />
-              <span className="text-[10px] text-[#1a1a1a]" style={{ fontFamily: 'var(--font-sans)' }}>{b.naziv}</span>
               <button
                 type="button"
-                onClick={() => removeBoja(i)}
-                className="text-[#8a8a8a] hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                onClick={() => setVideoUrl('')}
+                className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition-colors"
+                title="Ukloni video"
               >
                 <X size={10} />
               </button>
             </div>
-          ))}
+          ) : (
+            <div className="flex gap-2 items-center">
+              <label className={cn(
+                'flex items-center gap-2 px-4 py-2.5 border border-dashed border-[#e8e0d8] text-[11px] text-[#8a8a8a] cursor-pointer hover:border-[#c9a96e] hover:text-[#c9a96e] transition-colors shrink-0',
+                uploadingVideo && 'opacity-50 pointer-events-none'
+              )} style={{ fontFamily: 'var(--font-sans)' }}>
+                <input
+                  type="file"
+                  accept="video/*"
+                  className="hidden"
+                  onChange={(e) => handleVideoUpload(e.target.files)}
+                />
+                {uploadingVideo
+                  ? <Loader2 size={13} strokeWidth={1.5} className="animate-spin" />
+                  : <Video size={13} strokeWidth={1.5} />}
+                {uploadingVideo ? 'Upload...' : 'Upload video'}
+              </label>
+              <span className="text-[11px] text-[#8a8a8a] shrink-0" style={{ fontFamily: 'var(--font-sans)' }}>ili</span>
+              <input
+                type="url"
+                value={videoUrl}
+                onChange={(e) => setVideoUrl(e.target.value)}
+                className={cn(inputCls, 'flex-1')}
+                style={{ fontFamily: 'var(--font-sans)' }}
+                placeholder="https://... (URL videa)"
+              />
+            </div>
+          )}
         </div>
-        <div className="flex items-center gap-3">
-          <input
-            type="color"
-            value={novaBoja.hex}
-            onChange={(e) => setNovaBoja((p) => ({ ...p, hex: e.target.value }))}
-            className="w-9 h-9 border border-[#e8e0d8] cursor-pointer p-0.5"
-          />
-          <input
-            type="text"
-            value={novaBoja.naziv}
-            onChange={(e) => setNovaBoja((p) => ({ ...p, naziv: e.target.value }))}
-            onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addBoja())}
-            className={cn(inputCls, 'flex-1')}
-            style={{ fontFamily: 'var(--font-sans)' }}
-            placeholder="Naziv boje (npr. Roze)"
-          />
-          <button
-            type="button"
-            onClick={addBoja}
-            disabled={!novaBoja.naziv.trim()}
-            className="flex items-center gap-1.5 px-4 py-2.5 bg-[#1a1a1a] text-white text-[9px] tracking-[0.2em] uppercase hover:bg-[#c9a96e] hover:text-[#1a1a1a] transition-all duration-200 disabled:opacity-40 cursor-pointer"
-            style={{ fontFamily: 'var(--font-sans)' }}
-          >
-            <Plus size={11} />
-            Dodaj
-          </button>
-        </div>
+      </div>
+
+      {/* Note about inventar */}
+      <div className="bg-[#faf7f4] border border-[#e8e0d8] px-5 py-4">
+        <p className="text-[10px] text-[#8a8a8a] leading-relaxed" style={{ fontFamily: 'var(--font-sans)' }}>
+          Boje, veličine, cene i dostupnost se upravljaju po stavkama inventara — dodajte ih nakon što sačuvate haljinu.
+        </p>
       </div>
 
       {/* Submit */}
@@ -432,12 +336,12 @@ export default function HaljinaForma({ haljina }: Props) {
         </button>
         <button
           type="submit"
-          disabled={isPending || uploading}
+          disabled={isPending || uploading || uploadingVideo}
           className="flex items-center gap-2.5 bg-[#1a1a1a] text-white px-8 py-3 text-[9px] tracking-[0.3em] uppercase hover:bg-[#c9a96e] hover:text-[#1a1a1a] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           style={{ fontFamily: 'var(--font-sans)' }}
         >
           {isPending && <Loader2 size={12} className="animate-spin" />}
-          {haljina ? 'Sačuvaj izmjene' : 'Dodaj haljinu'}
+          {haljina ? 'Sačuvaj izmene' : 'Dodaj haljinu'}
         </button>
       </div>
     </form>

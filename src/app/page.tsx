@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import HeroSection from '@/components/home/HeroSection'
 import MarqueeStrip from '@/components/home/MarqueeStrip'
@@ -7,6 +8,10 @@ import StatsStrip from '@/components/home/StatsStrip'
 import AboutSection from '@/components/home/AboutSection'
 import CTASection from '@/components/home/CTASection'
 import type { Haljina } from '@/types'
+
+export const metadata: Metadata = {
+  title: 'Početna | TESORO Couture',
+}
 
 export default async function HomePage() {
   const supabase = await createClient()

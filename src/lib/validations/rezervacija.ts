@@ -5,7 +5,7 @@ export const rezervacijaSchema = z.object({
   prezime: z.string().min(2, "Prezime mora imati najmanje 2 karaktera"),
   telefon: z.string().min(9, "Unesite validan broj telefona"),
   email: z.string().email("Unesite validan email"),
-  datum_termina: z.string().optional(),
+  datum_termina: z.string().min(1, "Odaberite željeni datum termina"),
   napomena: z.string().optional(),
 })
 

@@ -10,11 +10,10 @@ export default async function EditHaljinaPage({ params }: { params: Promise<{ id
   const { id } = await params
   const supabase = await createClient()
 
-  const { data: haljina } = await supabase
-    .from('haljine')
-    .select('*')
-    .eq('id', id)
-    .single()
+  const [{ data: haljina }, { data: kategorije }] = await Promise.all([
+    supabase.from('haljine').select('*').eq('id', id).single(),
+    supabase.from('kategorije').select('*').order('redosled'),
+  ])
 
   if (!haljina) notFound()
 
@@ -28,7 +27,7 @@ export default async function EditHaljinaPage({ params }: { params: Promise<{ id
           {(haljina as Haljina).naziv_sr}
         </h1>
       </div>
-      <HaljinaForma haljina={haljina as Haljina} />
+      <HaljinaForma haljina={haljina as Haljina} kategorije={kategorije ?? []} />
     </div>
   )
 }

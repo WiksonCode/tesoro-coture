@@ -5,6 +5,8 @@ import HaljinaDetalji from '@/components/haljine/HaljinaDetalji'
 import SrodneHaljine from '@/components/haljine/SrodneHaljine'
 import type { Haljina } from '@/types'
 
+const HALJINA_SELECT = 'id, slug, naziv_sr, naziv_en, opis_sr, opis_en, slike, video_url, featured, created_at, updated_at, kategorija_id, kategorija:kategorije(id, slug, naziv_sr, naziv_en, redosled), inventar(id, sifra, boja_naziv, boja_hex, velicina, cijena_rsd, cijena_eur, slike, dostupna)'
+
 interface Props {
   params: Promise<{ slug: string }>
 }
@@ -35,34 +37,32 @@ export default async function HaljinaPage({ params }: Props) {
 
   const { data } = await supabase
     .from('haljine')
-    .select('*')
+    .select(HALJINA_SELECT)
     .eq('slug', slug)
     .single()
 
   if (!data) notFound()
 
-  const haljina = data as Haljina
+  const haljina = data as unknown as Haljina
 
   const { data: srodneData } = await supabase
     .from('haljine')
-    .select('*')
-    .eq('dostupna', true)
-    .eq('kategorija', haljina.kategorija)
+    .select(HALJINA_SELECT)
+    .eq('kategorija_id', haljina.kategorija_id)
     .neq('id', haljina.id)
     .order('created_at', { ascending: false })
     .limit(4)
 
-  let srodneHaljine = (srodneData as Haljina[]) || []
+  let srodneHaljine = (srodneData as unknown as Haljina[]) || []
 
   if (srodneHaljine.length === 0) {
     const { data: ostalePodaci } = await supabase
       .from('haljine')
-      .select('*')
-      .eq('dostupna', true)
+      .select(HALJINA_SELECT)
       .neq('id', haljina.id)
       .order('created_at', { ascending: false })
       .limit(4)
-    srodneHaljine = (ostalePodaci as Haljina[]) || []
+    srodneHaljine = (ostalePodaci as unknown as Haljina[]) || []
   }
 
   return (
@@ -71,7 +71,7 @@ export default async function HaljinaPage({ params }: Props) {
       <SrodneHaljine
         haljine={srodneHaljine}
         kategorija={haljina.kategorija}
-        istaKategorija={srodneData != null && (srodneData as Haljina[]).length > 0}
+        istaKategorija={srodneData != null && (srodneData as unknown as Haljina[]).length > 0}
       />
     </main>
   )

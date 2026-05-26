@@ -6,13 +6,11 @@ import { motion, AnimatePresence } from 'framer-motion'
 import HaljinaCard from '@/components/haljine/HaljinaCard'
 import Filteri from '@/components/haljine/Filteri'
 import { cn } from '@/lib/utils'
-import type { Haljina, Boja } from '@/types'
+import type { Haljina } from '@/types'
 
 interface ActiveParams {
   kategorija?: string
   sort?: string
-  naPopustu?: string
-  maxCijena?: string
   q?: string
   boje?: string
   velicine?: string
@@ -40,64 +38,66 @@ export default function KatalogClient({ haljine, activeParams }: KatalogClientPr
   const [selectedBoje, setSelectedBoje] = useState<string[]>(() => parseList(activeParams.boje))
   const [selectedVelicine, setSelectedVelicine] = useState<string[]>(() => parseList(activeParams.velicine))
 
-  // Sync when URL params change (e.g. after router.replace in Filteri)
-  useEffect(() => {
-    setSelectedBoje(parseList(activeParams.boje))
-  }, [activeParams.boje])
+  useEffect(() => { setSelectedBoje(parseList(activeParams.boje)) }, [activeParams.boje])
+  useEffect(() => { setSelectedVelicine(parseList(activeParams.velicine)) }, [activeParams.velicine])
 
-  useEffect(() => {
-    setSelectedVelicine(parseList(activeParams.velicine))
-  }, [activeParams.velicine])
+  const sveBoje = useMemo(() => {
+    const map = new Map<string, { naziv: string; hex: string }>()
+    haljine.forEach((h) =>
+      h.inventar?.filter((i) => i.dostupna).forEach((i) => {
+        if (!map.has(i.boja_naziv)) map.set(i.boja_naziv, { naziv: i.boja_naziv, hex: i.boja_hex })
+      })
+    )
+    return Array.from(map.values())
+  }, [haljine])
+
+  const sveVelicine = useMemo(() => {
+    const set = new Set<string>()
+    haljine.forEach((h) =>
+      h.inventar?.filter((i) => i.dostupna).forEach((i) => set.add(i.velicina))
+    )
+    return ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'po_mjeri'].filter((v) => set.has(v))
+  }, [haljine])
 
   const priceBounds = useMemo(() => {
-    if (haljine.length === 0) return { min: 0, max: 200000 }
-    const prices = haljine.map(h => h.cijena_rsd)
+    const prices: number[] = []
+    haljine.forEach((h) =>
+      h.inventar?.filter((i) => i.dostupna).forEach((i) => prices.push(i.cijena_rsd))
+    )
+    if (prices.length === 0) return { min: 0, max: 200000 }
     return { min: Math.min(...prices), max: Math.max(...prices) }
   }, [haljine])
 
-  const [priceRange, setPriceRange] = useState<[number, number]>(() => {
-    if (haljine.length === 0) return [0, 200000]
-    const prices = haljine.map(h => h.cijena_rsd)
-    return [Math.min(...prices), Math.max(...prices)]
-  })
+  const [priceRange, setPriceRange] = useState<[number, number]>([priceBounds.min, priceBounds.max])
 
   useEffect(() => {
     setPriceRange([priceBounds.min, priceBounds.max])
   }, [priceBounds.min, priceBounds.max])
 
-  const sveBoje = useMemo(() => {
-    const bojeMap = new Map<string, Boja>()
-    haljine.forEach(h => {
-      h.dostupne_boje?.forEach(b => {
-        if (!bojeMap.has(b.naziv)) bojeMap.set(b.naziv, b)
-      })
-    })
-    return Array.from(bojeMap.values())
-  }, [haljine])
-
-  const sveVelicine = useMemo(() => {
-    const set = new Set<string>()
-    haljine.forEach(h => h.dostupne_velicine?.forEach(v => set.add(v)))
-    return ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'po_mjeri'].filter(v => set.has(v))
-  }, [haljine])
-
   const filtrirane = useMemo(() => {
-    return haljine.filter(h => {
+    return haljine.filter((h) => {
+      const dostupniInv = h.inventar?.filter((i) => i.dostupna) ?? []
+
       if (selectedBoje.length > 0) {
-        const imenaBoja = h.dostupne_boje?.map(b => b.naziv) || []
-        if (imenaBoja.length > 0 && !selectedBoje.some(b => imenaBoja.includes(b))) return false
+        const imenaBoja = dostupniInv.map((i) => i.boja_naziv)
+        if (!selectedBoje.some((b) => imenaBoja.includes(b))) return false
       }
+
       if (selectedVelicine.length > 0) {
-        const velicine = h.dostupne_velicine || []
-        if (velicine.length > 0 && !selectedVelicine.some(v => velicine.includes(v))) return false
+        const velicine = dostupniInv.map((i) => i.velicina)
+        if (!selectedVelicine.some((v) => velicine.includes(v as never))) return false
       }
-      const efektivnaCijena = h.na_popustu
-        ? h.cijena_rsd * (1 - h.popust_procenat / 100)
-        : h.cijena_rsd
-      if (efektivnaCijena < priceRange[0] || efektivnaCijena > priceRange[1]) return false
+
+      if (priceRange[0] > priceBounds.min || priceRange[1] < priceBounds.max) {
+        const cijene = dostupniInv.map((i) => i.cijena_rsd)
+        if (cijene.length === 0) return false
+        const minCijena = Math.min(...cijene)
+        if (minCijena < priceRange[0] || minCijena > priceRange[1]) return false
+      }
+
       return true
     })
-  }, [haljine, selectedBoje, selectedVelicine, priceRange])
+  }, [haljine, selectedBoje, selectedVelicine, priceRange, priceBounds])
 
   const handleReset = useCallback(() => {
     setSelectedBoje([])
@@ -114,7 +114,6 @@ export default function KatalogClient({ haljine, activeParams }: KatalogClientPr
     selectedBoje.length > 0 ||
     selectedVelicine.length > 0 ||
     !!activeParams.kategorija ||
-    !!activeParams.naPopustu ||
     !!activeParams.sort ||
     !!activeParams.q ||
     priceRange[0] > priceBounds.min ||
@@ -157,16 +156,10 @@ export default function KatalogClient({ haljine, activeParams }: KatalogClientPr
               >
                 ∅
               </p>
-              <p
-                className="text-2xl font-light italic text-[#1a1a1a] mb-3"
-                style={{ fontFamily: 'var(--font-serif)' }}
-              >
+              <p className="text-2xl font-light italic text-[#1a1a1a] mb-3" style={{ fontFamily: 'var(--font-serif)' }}>
                 Nema rezultata
               </p>
-              <p
-                className="text-[11px] tracking-wide text-[#8a8a8a] mb-8 max-w-xs leading-relaxed"
-                style={{ fontFamily: 'var(--font-sans)' }}
-              >
+              <p className="text-[11px] tracking-wide text-[#8a8a8a] mb-8 max-w-xs leading-relaxed" style={{ fontFamily: 'var(--font-sans)' }}>
                 Nijedna haljina ne odgovara odabranim filterima.
               </p>
               {hasActiveFilters && (

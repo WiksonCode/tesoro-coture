@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { LogOut, CalendarDays, Package, Settings } from 'lucide-react'
 import { logoutAction } from '@/app/actions/auth'
-import type { Rezervacija, Profil } from '@/types'
+import type { Korisnik } from '@/types'
 import { cn } from '@/lib/utils'
 
 export const metadata: Metadata = {
@@ -27,40 +27,48 @@ function formatDatum(iso: string) {
   })
 }
 
+type RezervacijaSaInventarom = {
+  id: string
+  status: string
+  datum_termina: string | null
+  created_at: string
+  inventar: {
+    boja_naziv: string
+    velicina: string
+    haljina: { naziv_sr: string; slike: string[] } | null
+  } | null
+}
+
 export default async function ProfilPage() {
   const supabase = await createClient()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
 
-  if (!user) {
-    redirect('/login')
-  }
-
-  const [{ data: profil }, { data: rezervacije }] = await Promise.all([
-    supabase.from('profiles').select('*').eq('id', user.id).single(),
+  const [{ data: korisnik }, { data: rezervacije }] = await Promise.all([
+    supabase.from('korisnici').select('*').eq('auth_id', user.id).single(),
     supabase
       .from('rezervacije')
-      .select('*, haljina:haljine(naziv_sr, slike)')
+      .select('id, status, datum_termina, created_at, inventar:inventar(boja_naziv, velicina, haljina:haljine(naziv_sr, slike))')
       .order('created_at', { ascending: false }),
   ])
 
-  const p = profil as Profil | null
-  const rez = (rezervacije as (Rezervacija & { haljina: { naziv_sr: string; slike: string[] } | null })[]) ?? []
-  const initials = p ? `${p.ime?.[0] ?? ''}${p.prezime?.[0] ?? ''}`.toUpperCase() : user.email?.[0]?.toUpperCase() ?? '?'
+  const k = korisnik as Korisnik | null
+  const rez = (rezervacije as unknown as RezervacijaSaInventarom[]) ?? []
+  const initials = k
+    ? `${k.ime?.[0] ?? ''}${k.prezime?.[0] ?? ''}`.toUpperCase()
+    : user.email?.[0]?.toUpperCase() ?? '?'
 
   return (
     <main className="min-h-screen bg-[#faf7f4] pt-16 lg:pt-20">
 
-      {/* Page header */}
       <div className="border-b border-[#e8e0d8] bg-[#faf7f4]">
         <div className="max-w-5xl mx-auto px-6 lg:px-10 py-10 lg:py-14">
           <p className="text-[9px] tracking-[0.5em] uppercase text-[#c9a96e] mb-3" style={{ fontFamily: 'var(--font-sans)' }}>
             Moj nalog
           </p>
           <h1 className="text-[clamp(28px,4vw,44px)] font-light text-[#1a1a1a]" style={{ fontFamily: 'var(--font-serif)' }}>
-            {p ? `${p.ime} ${p.prezime}` : user.email}
+            {k ? `${k.ime} ${k.prezime}` : user.email}
           </h1>
         </div>
       </div>
@@ -68,10 +76,7 @@ export default async function ProfilPage() {
       <div className="max-w-5xl mx-auto px-6 lg:px-10 py-12 lg:py-16">
         <div className="grid lg:grid-cols-[280px_1fr] gap-10 lg:gap-16 items-start">
 
-          {/* Sidebar — profile card */}
           <aside className="space-y-4">
-
-            {/* Avatar + info */}
             <div className="border border-[#e8e0d8] bg-white p-6">
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 bg-[#1a1a1a] flex items-center justify-center shrink-0">
@@ -81,7 +86,7 @@ export default async function ProfilPage() {
                 </div>
                 <div className="min-w-0">
                   <p className="text-[14px] font-light text-[#1a1a1a] truncate" style={{ fontFamily: 'var(--font-serif)' }}>
-                    {p ? `${p.ime} ${p.prezime}` : 'Korisnik'}
+                    {k ? `${k.ime} ${k.prezime}` : 'Korisnik'}
                   </p>
                   <p className="text-[10px] text-[#8a8a8a] truncate" style={{ fontFamily: 'var(--font-sans)' }}>
                     {user.email}
@@ -90,13 +95,13 @@ export default async function ProfilPage() {
               </div>
 
               <div className="flex flex-col gap-3 border-t border-[#e8e0d8] pt-5">
-                {p?.telefon && (
+                {k?.telefon && (
                   <div>
                     <p className="text-[8px] tracking-[0.35em] uppercase text-[#8a8a8a] mb-0.5" style={{ fontFamily: 'var(--font-sans)' }}>
                       Telefon
                     </p>
                     <p className="text-[12px] text-[#1a1a1a]" style={{ fontFamily: 'var(--font-sans)' }}>
-                      {p.telefon}
+                      {k.telefon}
                     </p>
                   </div>
                 )}
@@ -108,7 +113,7 @@ export default async function ProfilPage() {
                     {formatDatum(user.created_at)}
                   </p>
                 </div>
-                {p?.uloga === 'admin' && (
+                {k?.uloga === 'admin' && (
                   <div className="pt-1">
                     <span className="inline-block px-2 py-1 bg-[#c9a96e]/15 text-[#8a6630] text-[8px] tracking-[0.3em] uppercase" style={{ fontFamily: 'var(--font-sans)' }}>
                       Admin
@@ -118,8 +123,7 @@ export default async function ProfilPage() {
               </div>
             </div>
 
-            {/* Admin link */}
-            {p?.uloga === 'admin' && (
+            {k?.uloga === 'admin' && (
               <Link
                 href="/admin"
                 className="flex items-center gap-3 border border-[#e8e0d8] bg-white px-4 py-3.5 text-[10px] tracking-[0.2em] uppercase text-[#8a8a8a] hover:border-[#1a1a1a] hover:text-[#1a1a1a] transition-all duration-200 group"
@@ -130,7 +134,6 @@ export default async function ProfilPage() {
               </Link>
             )}
 
-            {/* Logout */}
             <form action={logoutAction}>
               <button
                 type="submit"
@@ -143,7 +146,6 @@ export default async function ProfilPage() {
             </form>
           </aside>
 
-          {/* Main content — reservations */}
           <div>
             <div className="flex items-center justify-between mb-8">
               <div>
@@ -162,7 +164,6 @@ export default async function ProfilPage() {
             </div>
 
             {rez.length === 0 ? (
-              /* Empty state */
               <div className="border border-[#e8e0d8] bg-white px-8 py-16 text-center">
                 <div className="flex justify-center mb-4">
                   <Package size={28} strokeWidth={1} className="text-[#e8e0d8]" />
@@ -185,18 +186,17 @@ export default async function ProfilPage() {
               <div className="flex flex-col gap-4">
                 {rez.map((r) => {
                   const status = STATUS_LABELS[r.status] ?? { label: r.status, classes: 'bg-gray-50 text-gray-600' }
-                  const slika = r.haljina?.slike?.[0]
+                  const slika = r.inventar?.haljina?.slike?.[0]
 
                   return (
                     <div
                       key={r.id}
                       className="border border-[#e8e0d8] bg-white flex gap-5 p-5 hover:border-[#1a1a1a]/20 transition-colors duration-200"
                     >
-                      {/* Dress thumbnail */}
                       <div className="w-16 h-20 shrink-0 bg-[#f0ebe5] overflow-hidden">
                         {slika ? (
                           // eslint-disable-next-line @next/next/no-img-element
-                          <img src={slika} alt={r.haljina?.naziv_sr ?? ''} className="w-full h-full object-cover object-top" />
+                          <img src={slika} alt={r.inventar?.haljina?.naziv_sr ?? ''} className="w-full h-full object-cover object-top" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
                             <span className="text-[28px] font-light italic text-[#1a1a1a]/10" style={{ fontFamily: 'var(--font-serif)' }}>T</span>
@@ -204,14 +204,10 @@ export default async function ProfilPage() {
                         )}
                       </div>
 
-                      {/* Info */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-4 mb-3">
-                          <h3
-                            className="text-[15px] font-light text-[#1a1a1a] leading-tight"
-                            style={{ fontFamily: 'var(--font-serif)' }}
-                          >
-                            {r.haljina?.naziv_sr ?? 'Haljina'}
+                          <h3 className="text-[15px] font-light text-[#1a1a1a] leading-tight" style={{ fontFamily: 'var(--font-serif)' }}>
+                            {r.inventar?.haljina?.naziv_sr ?? 'Haljina'}
                           </h3>
                           <span
                             className={cn('shrink-0 px-2.5 py-1 text-[8px] tracking-[0.25em] uppercase', status.classes)}
@@ -222,14 +218,14 @@ export default async function ProfilPage() {
                         </div>
 
                         <div className="flex flex-wrap gap-x-6 gap-y-1">
-                          {r.odabrana_velicina && (
+                          {r.inventar?.velicina && (
                             <span className="text-[10px] text-[#8a8a8a]" style={{ fontFamily: 'var(--font-sans)' }}>
-                              Veličina: <span className="text-[#1a1a1a]">{r.odabrana_velicina}</span>
+                              Veličina: <span className="text-[#1a1a1a]">{r.inventar.velicina}</span>
                             </span>
                           )}
-                          {r.odabrana_boja && (
+                          {r.inventar?.boja_naziv && (
                             <span className="text-[10px] text-[#8a8a8a]" style={{ fontFamily: 'var(--font-sans)' }}>
-                              Boja: <span className="text-[#1a1a1a]">{r.odabrana_boja}</span>
+                              Boja: <span className="text-[#1a1a1a]">{r.inventar.boja_naziv}</span>
                             </span>
                           )}
                           {r.datum_termina && (

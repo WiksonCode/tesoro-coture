@@ -26,16 +26,13 @@ export async function POST(req: NextRequest) {
     const supabase = await createClient()
 
     const rezervacije = artikli.map((artikl) => ({
-      haljina_id: artikl.haljina_id,
+      inventar_id: artikl.inventar_id,
       ime: parsed.data.ime,
       prezime: parsed.data.prezime,
       telefon: parsed.data.telefon,
       email: parsed.data.email,
-      odabrana_boja: artikl.boja,
-      odabrana_velicina: artikl.velicina,
-      mjere: artikl.mjere ?? null,
       napomena: parsed.data.napomena ?? null,
-      datum_termina: parsed.data.datum_termina ?? null,
+      datum_termina: parsed.data.datum_termina || null,
       status: 'na_cekanju' as const,
     }))
 
@@ -48,10 +45,6 @@ export async function POST(req: NextRequest) {
         { status: 500 }
       )
     }
-
-    // TODO (Faza 5): dodati Resend email notifikaciju adminu i korisniku
-    // Instalirati: npm install resend
-    // Koristiti RESEND_API_KEY i ADMIN_EMAIL env varijable
 
     return NextResponse.json({ success: true }, { status: 201 })
   } catch (e) {

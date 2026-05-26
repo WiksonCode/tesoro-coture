@@ -40,22 +40,33 @@ function Row({ label, value }: { label: string; value?: string | null }) {
   )
 }
 
+type RezervacijaDetalji = Rezervacija & {
+  inventar: {
+    sifra: string
+    boja_naziv: string
+    boja_hex: string
+    velicina: string
+    cijena_rsd: number
+    haljina: { naziv_sr: string; slike: string[] } | null
+  } | null
+}
+
 export default async function RezervacijaDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const supabase = await createClient()
 
   const { data: rezervacija } = await supabase
     .from('rezervacije')
-    .select('*, haljina:haljine(naziv_sr, slike, cijena_rsd)')
+    .select('*, inventar:inventar(sifra, boja_naziv, boja_hex, velicina, cijena_rsd, haljina:haljine(naziv_sr, slike))')
     .eq('id', id)
     .single()
 
   if (!rezervacija) notFound()
 
-  const r = rezervacija as Rezervacija & { haljina: { naziv_sr: string; slike: string[]; cijena_rsd: number } | null }
+  const r = rezervacija as unknown as RezervacijaDetalji
 
   return (
-    <div className="p-6 lg:p-10 max-w-3xl">
+    <div className="p-4 sm:p-6 lg:p-10 max-w-3xl">
       <div className="mb-8">
         <Link
           href="/admin/rezervacije"
@@ -85,13 +96,12 @@ export default async function RezervacijaDetailPage({ params }: { params: Promis
 
       <div className="grid lg:grid-cols-[1fr_240px] gap-6">
         <div className="space-y-4">
-          {/* Dress info */}
-          {r.haljina && (
+          {r.inventar && (
             <div className="bg-white border border-[#e8e0d8] p-5 flex gap-4">
               <div className="w-16 h-20 shrink-0 bg-[#f0ebe5] overflow-hidden">
-                {r.haljina.slike?.[0] ? (
+                {r.inventar.haljina?.slike?.[0] ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={r.haljina.slike[0]} alt={r.haljina.naziv_sr} className="w-full h-full object-cover object-top" />
+                  <img src={r.inventar.haljina.slike[0]} alt={r.inventar.haljina.naziv_sr} className="w-full h-full object-cover object-top" />
                 ) : null}
               </div>
               <div>
@@ -99,18 +109,21 @@ export default async function RezervacijaDetailPage({ params }: { params: Promis
                   Haljina
                 </p>
                 <p className="text-[16px] font-light text-[#1a1a1a]" style={{ fontFamily: 'var(--font-serif)' }}>
-                  {r.haljina.naziv_sr}
+                  {r.inventar.haljina?.naziv_sr ?? '—'}
                 </p>
-                {r.odabrana_boja && (
-                  <p className="text-[11px] text-[#8a8a8a] mt-1" style={{ fontFamily: 'var(--font-sans)' }}>
-                    Boja: {r.odabrana_boja} · Veličina: {r.odabrana_velicina}
+                <div className="flex items-center gap-2 mt-1">
+                  <span
+                    className="w-3 h-3 rounded-full border border-[#e8e0d8] shrink-0"
+                    style={{ backgroundColor: r.inventar.boja_hex }}
+                  />
+                  <p className="text-[11px] text-[#8a8a8a]" style={{ fontFamily: 'var(--font-sans)' }}>
+                    {r.inventar.boja_naziv} · {r.inventar.velicina} · {r.inventar.sifra}
                   </p>
-                )}
+                </div>
               </div>
             </div>
           )}
 
-          {/* Client info */}
           <div className="bg-white border border-[#e8e0d8] p-5">
             <h2 className="text-[10px] tracking-[0.3em] uppercase text-[#8a8a8a] mb-3" style={{ fontFamily: 'var(--font-sans)' }}>
               Podaci o klijentu
@@ -120,19 +133,10 @@ export default async function RezervacijaDetailPage({ params }: { params: Promis
             <Row label="Telefon" value={r.telefon} />
             <Row label="Željeni termin" value={r.datum_termina ? formatDatum(r.datum_termina) : null} />
             <Row label="Napomena" value={r.napomena} />
-            {r.mjere && (
-              <>
-                <Row label="Grudi" value={`${(r.mjere as { grudi?: number }).grudi} cm`} />
-                <Row label="Struk" value={`${(r.mjere as { struk?: number }).struk} cm`} />
-                <Row label="Bokovi" value={`${(r.mjere as { bokovi?: number }).bokovi} cm`} />
-                <Row label="Visina" value={`${(r.mjere as { visina?: number }).visina} cm`} />
-              </>
-            )}
             <Row label="Rezervisano" value={formatDatum(r.created_at)} />
           </div>
         </div>
 
-        {/* Status change */}
         <div>
           <StatusSelector id={r.id} currentStatus={r.status} />
         </div>

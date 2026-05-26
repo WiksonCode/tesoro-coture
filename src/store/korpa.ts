@@ -5,7 +5,7 @@ import type { KorpaArtikl } from '@/types'
 interface KorpaState {
   artikli: KorpaArtikl[]
   dodajArtikl: (artikl: KorpaArtikl) => void
-  ukloniArtikl: (haljina_id: string, boja: string, velicina: string) => void
+  ukloniArtikl: (inventar_id: string) => void
   ocistiKorpu: () => void
 }
 
@@ -16,26 +16,14 @@ export const useKorpa = create<KorpaState>()(
 
       dodajArtikl: (artikl) =>
         set((state) => {
-          const exists = state.artikli.some(
-            (a) =>
-              a.haljina_id === artikl.haljina_id &&
-              a.boja === artikl.boja &&
-              a.velicina === artikl.velicina
-          )
+          const exists = state.artikli.some((a) => a.inventar_id === artikl.inventar_id)
           if (exists) return state
           return { artikli: [...state.artikli, artikl] }
         }),
 
-      ukloniArtikl: (haljina_id, boja, velicina) =>
+      ukloniArtikl: (inventar_id) =>
         set((state) => ({
-          artikli: state.artikli.filter(
-            (a) =>
-              !(
-                a.haljina_id === haljina_id &&
-                a.boja === boja &&
-                a.velicina === velicina
-              )
-          ),
+          artikli: state.artikli.filter((a) => a.inventar_id !== inventar_id),
         })),
 
       ocistiKorpu: () => set({ artikli: [] }),

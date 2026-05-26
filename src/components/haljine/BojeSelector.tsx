@@ -1,7 +1,8 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import type { Boja } from '@/types'
+
+type Boja = { naziv: string; hex: string }
 
 interface BojeSelectorProps {
   boje: Boja[]

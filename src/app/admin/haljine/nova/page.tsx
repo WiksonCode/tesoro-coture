@@ -1,9 +1,13 @@
 import type { Metadata } from 'next'
+import { createClient } from '@/lib/supabase/server'
 import HaljinaForma from '@/components/admin/HaljinaForma'
 
 export const metadata: Metadata = { title: 'Nova haljina' }
 
-export default function NovahaljinaPage() {
+export default async function NovahaljinaPage() {
+  const supabase = await createClient()
+  const { data: kategorije } = await supabase.from('kategorije').select('*').order('redosled')
+
   return (
     <div className="p-6 lg:p-10 max-w-4xl">
       <div className="mb-8">
@@ -14,7 +18,7 @@ export default function NovahaljinaPage() {
           Nova haljina
         </h1>
       </div>
-      <HaljinaForma />
+      <HaljinaForma kategorije={kategorije ?? []} />
     </div>
   )
 }

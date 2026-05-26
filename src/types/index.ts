@@ -1,79 +1,99 @@
-export type Kategorija = 'vjencana' | 'koktel' | 'svecana' | 'casual' | 'maturska'
-
+export type Velicina = 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL' | 'po_mjeri'
 export type StatusRezervacije = 'na_cekanju' | 'potvrdjena' | 'otkazana' | 'realizovana'
-
 export type UlogaKorisnika = 'korisnik' | 'admin'
 
-export interface Boja {
-  naziv: string
-  hex: string
+export interface Kategorija {
+  id: string
+  slug: string
+  naziv_sr: string
+  naziv_en: string | null
+  redosled: number
+  created_at: string
 }
 
 export interface Haljina {
   id: string
   slug: string
   naziv_sr: string
-  naziv_en: string
-  opis_sr: string
-  opis_en: string
-  cijena_rsd: number
-  na_popustu: boolean
-  popust_procenat: number
-  kategorija: Kategorija
-  dostupne_boje: Boja[]
-  dostupne_velicine: string[]
+  naziv_en: string | null
+  opis_sr: string | null
+  opis_en: string | null
+  kategorija_id: string
+  kategorija?: Kategorija
   slike: string[]
   video_url: string | null
-  dostupna: boolean
-  kolicina_na_lageru: number
   featured: boolean
   created_at: string
   updated_at: string
+  inventar?: InventarStavka[]
 }
 
-export interface Mjere {
-  grudi: number
-  struk: number
-  bokovi: number
-  visina: number
+export interface InventarStavka {
+  id: string
+  sifra: string
+  haljina_id: string
+  haljina?: Haljina
+  boja_naziv: string
+  boja_hex: string
+  velicina: Velicina
+  cijena_rsd: number
+  cijena_eur: number
+
+  slike: string[]
+  dostupna: boolean
+  napomena: string | null
+  created_at: string
+  updated_at: string
 }
 
 export interface Rezervacija {
   id: string
-  user_id: string | null
-  haljina_id: string
+  inventar_id: string
+  inventar?: InventarStavka
+  korisnik_id: string | null
+  korisnik?: Korisnik
   ime: string
   prezime: string
   telefon: string
   email: string
-  odabrana_boja: string
-  odabrana_velicina: string
-  mjere: Mjere | null
-  napomena: string | null
+  datum_termina: string
   status: StatusRezervacije
-  datum_termina: string | null
+  napomena: string | null
   created_at: string
   updated_at: string
-  haljina?: Haljina
 }
 
-export interface Profil {
+export interface Korisnik {
   id: string
+  auth_id: string | null
   ime: string
   prezime: string
-  telefon: string
+  email: string
+  telefon: string | null
   uloga: UlogaKorisnika
   created_at: string
 }
 
+export interface AuditLog {
+  id: string
+  tabela: string
+  zapis_id: string
+  akcija: 'INSERT' | 'UPDATE' | 'DELETE'
+  stari_podaci: Record<string, unknown> | null
+  novi_podaci: Record<string, unknown> | null
+  korisnik_id: string | null
+  created_at: string
+}
+
 export interface KorpaArtikl {
+  inventar_id: string
   haljina_id: string
   slug: string
   naziv: string
   slika: string
-  boja: string
+  boja_naziv: string
   boja_hex: string
-  velicina: string
-  mjere?: Mjere
+  velicina: Velicina
   cijena_rsd: number
+  cijena_eur: number
 }

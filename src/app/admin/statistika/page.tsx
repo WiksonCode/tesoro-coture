@@ -80,7 +80,7 @@ export default async function StatistikaPage() {
   ]
 
   return (
-    <div className="p-6 lg:p-10 max-w-5xl">
+    <div className="p-6 lg:p-10 w-full">
       <div className="mb-8">
         <p className="text-[9px] tracking-[0.45em] uppercase text-[#c9a96e] mb-1" style={{ fontFamily: 'var(--font-sans)' }}>
           Analitika

@@ -3,41 +3,90 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react'
+import { X, ChevronLeft, ChevronRight, ZoomIn, Play } from 'lucide-react'
 import { cn } from '@/lib/utils'
+
+type MediaItem = { type: 'image'; src: string } | { type: 'video'; src: string }
 
 interface HaljinaGalerijaProps {
   slike: string[]
   naziv: string
+  videoUrl?: string | null
 }
 
-export default function HaljinaGalerija({ slike, naziv }: HaljinaGalerijaProps) {
+export default function HaljinaGalerija({ slike, naziv, videoUrl }: HaljinaGalerijaProps) {
+  const media: MediaItem[] = [
+    ...slike.map((src) => ({ type: 'image' as const, src })),
+    ...(videoUrl ? [{ type: 'video' as const, src: videoUrl }] : []),
+  ]
+  const total = media.length
+
   const [aktivna, setAktivna] = useState(0)
   const [lightbox, setLightbox] = useState(false)
+  const [hoverZoom, setHoverZoom] = useState(false)
+  const [zoomOrigin, setZoomOrigin] = useState({ x: 50, y: 50 })
 
-  // Touch tracking — gallery + lightbox
   const touchStartX = useRef<number | null>(null)
   const touchDeltaX = useRef(0)
   const didSwipe = useRef(false)
 
-  const prev = useCallback(() => setAktivna(i => (i - 1 + slike.length) % slike.length), [slike.length])
-  const next = useCallback(() => setAktivna(i => (i + 1) % slike.length), [slike.length])
+  const current = media[aktivna]
+  const isVideo = current?.type === 'video'
 
-  // Keyboard + scroll lock for lightbox
+  const prev = useCallback(() => {
+    if (isVideo || hoverZoom) { setHoverZoom(false); setZoomOrigin({ x: 50, y: 50 }) }
+    setAktivna((i) => (i - 1 + total) % total)
+  }, [total, isVideo, hoverZoom])
+
+  const next = useCallback(() => {
+    if (isVideo || hoverZoom) { setHoverZoom(false); setZoomOrigin({ x: 50, y: 50 }) }
+    setAktivna((i) => (i + 1) % total)
+  }, [total, isVideo, hoverZoom])
+
   useEffect(() => {
-    if (!lightbox) return
-    document.body.style.overflow = 'hidden'
+    if (isVideo) { setHoverZoom(false); setZoomOrigin({ x: 50, y: 50 }) }
+  }, [isVideo])
+
+  useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setLightbox(false)
-      if (e.key === 'ArrowRight') next()
-      if (e.key === 'ArrowLeft') prev()
+      if (e.key === 'Escape') {
+        if (lightbox) setLightbox(false)
+        else if (hoverZoom) { setHoverZoom(false); setZoomOrigin({ x: 50, y: 50 }) }
+      }
+      if (lightbox && e.key === 'ArrowRight') next()
+      if (lightbox && e.key === 'ArrowLeft') prev()
     }
+    if (lightbox) document.body.style.overflow = 'hidden'
     window.addEventListener('keydown', onKey)
     return () => {
       window.removeEventListener('keydown', onKey)
-      document.body.style.overflow = ''
+      if (lightbox) document.body.style.overflow = ''
     }
-  }, [lightbox, next, prev])
+  }, [lightbox, hoverZoom, next, prev])
+
+  function handleZoomMove(e: React.MouseEvent<HTMLDivElement>) {
+    if (!hoverZoom || isVideo) return
+    const rect = e.currentTarget.getBoundingClientRect()
+    setZoomOrigin({
+      x: ((e.clientX - rect.left) / rect.width) * 100,
+      y: ((e.clientY - rect.top) / rect.height) * 100,
+    })
+  }
+
+  function handleImageClick(e: React.MouseEvent<HTMLDivElement>) {
+    if (didSwipe.current || isVideo) return
+    if (hoverZoom) {
+      setHoverZoom(false)
+      setZoomOrigin({ x: 50, y: 50 })
+      return
+    }
+    const rect = e.currentTarget.getBoundingClientRect()
+    setZoomOrigin({
+      x: ((e.clientX - rect.left) / rect.width) * 100,
+      y: ((e.clientY - rect.top) / rect.height) * 100,
+    })
+    setHoverZoom(true)
+  }
 
   const swipeHandlers = {
     onTouchStart: (e: React.TouchEvent) => {
@@ -59,7 +108,7 @@ export default function HaljinaGalerija({ slike, naziv }: HaljinaGalerijaProps) 
     },
   }
 
-  if (!slike || slike.length === 0) {
+  if (total === 0) {
     return (
       <div className="relative bg-[#f0ebe5] flex items-center justify-center" style={{ aspectRatio: '3/4' }}>
         <span className="absolute top-4 left-4 w-6 h-6 border-t border-l border-[#c9a96e]/40" />
@@ -71,31 +120,51 @@ export default function HaljinaGalerija({ slike, naziv }: HaljinaGalerijaProps) 
     )
   }
 
-  // Shared image content (used in both mobile and desktop main image)
-  const imageContent = (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={aktivna}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.22 }}
-        className="absolute inset-0"
-      >
-        <Image
-          src={slike[aktivna]}
-          alt={`${naziv} — slika ${aktivna + 1}`}
-          fill
-          sizes="(max-width: 1024px) 100vw, 50vw"
-          className="object-cover object-top transition-transform duration-500 group-hover/img:scale-[1.02]"
-          priority
+  function renderMainMedia(inLightbox = false) {
+    if (!current) return null
+    if (current.type === 'video') {
+      return (
+        // eslint-disable-next-line jsx-a11y/media-has-caption
+        <video
+          key={current.src}
+          src={current.src}
+          autoPlay
+          muted={!inLightbox}
+          loop
+          playsInline
+          controls={inLightbox}
+          className={cn(
+            'absolute inset-0 w-full h-full',
+            inLightbox ? 'object-contain' : 'object-cover object-center'
+          )}
         />
-      </motion.div>
-    </AnimatePresence>
-  )
+      )
+    }
+    return (
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={aktivna}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.22 }}
+          className="absolute inset-0"
+        >
+          <Image
+            src={current.src}
+            alt={`${naziv} — slika ${aktivna + 1}`}
+            fill
+            sizes={inLightbox ? '90vw' : '(max-width: 1024px) 100vw, 60vw'}
+            className={inLightbox ? 'object-contain' : 'object-cover object-top'}
+            priority
+          />
+        </motion.div>
+      </AnimatePresence>
+    )
+  }
 
-  const thumbs = (vertical: boolean) =>
-    slike.map((slika, i) => (
+  function renderThumb(item: MediaItem, i: number, vertical: boolean) {
+    return (
       <button
         key={i}
         onClick={() => setAktivna(i)}
@@ -105,11 +174,19 @@ export default function HaljinaGalerija({ slike, naziv }: HaljinaGalerijaProps) 
         )}
         style={vertical ? { width: 68, height: 91 } : { width: 56, height: 75 }}
       >
-        <Image src={slika} alt={`${naziv} — thumbnail ${i + 1}`} fill sizes="70px" className="object-cover object-top" />
+        {item.type === 'image' ? (
+          <Image src={item.src} alt={`${naziv} — thumbnail ${i + 1}`} fill sizes="70px" className="object-cover object-top" />
+        ) : (
+          <div className="w-full h-full bg-[#1a1a1a] flex flex-col items-center justify-center gap-1">
+            <Play size={14} strokeWidth={1.5} className="text-[#c9a96e] fill-[#c9a96e]" />
+            <span className="text-[6px] tracking-[0.2em] uppercase text-[#8a8a8a]" style={{ fontFamily: 'var(--font-sans)' }}>Video</span>
+          </div>
+        )}
       </button>
-    ))
+    )
+  }
 
-  const navArrows = (stopProp = false) => slike.length > 1 && (
+  const navArrows = (stopProp = false) => total > 1 && (
     <>
       <button
         type="button"
@@ -130,39 +207,69 @@ export default function HaljinaGalerija({ slike, naziv }: HaljinaGalerijaProps) 
 
   return (
     <>
-      {/* ── Desktop: thumbnails left + full aspect-ratio main image ── */}
+      {/* ── Desktop ── */}
       <div className="hidden lg:flex gap-3 items-start">
-        {slike.length > 1 && <div className="flex flex-col gap-2 shrink-0">{thumbs(true)}</div>}
+        {total > 1 && (
+          <div className="flex flex-col gap-2 shrink-0">
+            {media.map((item, i) => renderThumb(item, i, true))}
+          </div>
+        )}
         <div className="flex-1">
           <div
-            className="relative overflow-hidden bg-[#f0ebe5] group/img cursor-zoom-in"
+            className={cn(
+              'relative overflow-hidden bg-[#f0ebe5] group/img',
+              isVideo ? 'cursor-default bg-black' : hoverZoom ? 'cursor-zoom-out' : 'cursor-zoom-in'
+            )}
             style={{ aspectRatio: '3/4' }}
-            onClick={() => { if (!didSwipe.current) setLightbox(true) }}
+            onMouseMove={handleZoomMove}
+            onClick={handleImageClick}
             {...swipeHandlers}
           >
-            {imageContent}
-            <div className="absolute bottom-3 right-3 opacity-0 group-hover/img:opacity-100 transition-opacity duration-200 bg-black/30 backdrop-blur-sm p-1.5">
-              <ZoomIn size={13} strokeWidth={1.5} className="text-white" />
-            </div>
-            {navArrows(true)}
+            {isVideo ? (
+              renderMainMedia(false)
+            ) : (
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  transformOrigin: `${zoomOrigin.x}% ${zoomOrigin.y}%`,
+                  transform: hoverZoom ? 'scale(2)' : 'scale(1)',
+                  transition: hoverZoom ? 'transform 0.25s ease-out' : 'transform 0.2s ease-out',
+                }}
+              >
+                {renderMainMedia(false)}
+              </div>
+            )}
+            {!isVideo && (
+              <button
+                type="button"
+                onClick={e => { e.stopPropagation(); setHoverZoom(false); setZoomOrigin({ x: 50, y: 50 }); setLightbox(true) }}
+                className="absolute bottom-3 right-3 opacity-0 group-hover/img:opacity-100 transition-opacity duration-200 bg-black/30 backdrop-blur-sm p-1.5 hover:bg-black/50 cursor-pointer"
+                title="Fullscreen"
+              >
+                <ZoomIn size={13} strokeWidth={1.5} className="text-white" />
+              </button>
+            )}
+            {!hoverZoom && navArrows(true)}
           </div>
         </div>
       </div>
 
-      {/* ── Mobile: capped height image + thumbnails below ── */}
+      {/* ── Mobile ── */}
       <div className="lg:hidden flex flex-col gap-2.5">
-        {/* Image capped at 52vh so name/price visible without scrolling */}
         <div
-          className="relative overflow-hidden bg-[#f0ebe5] group/img cursor-zoom-in w-full"
+          className={cn(
+            'relative overflow-hidden group/img w-full',
+            isVideo ? 'bg-black' : 'bg-[#f0ebe5] cursor-zoom-in'
+          )}
           style={{ height: 'min(52vh, calc(100vw * 4 / 3))' }}
-          onClick={() => { if (!didSwipe.current) setLightbox(true) }}
+          onClick={() => { if (!didSwipe.current && !isVideo) setLightbox(true) }}
           {...swipeHandlers}
         >
-          {imageContent}
-          {/* Swipe hint dots */}
-          {slike.length > 1 && (
+          {renderMainMedia(false)}
+          {!isVideo && total > 1 && (
             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 pointer-events-none">
-              {slike.map((_, i) => (
+              {media.map((_, i) => (
                 <span
                   key={i}
                   className={cn(
@@ -174,17 +281,16 @@ export default function HaljinaGalerija({ slike, naziv }: HaljinaGalerijaProps) 
             </div>
           )}
         </div>
-
-        {slike.length > 1 && (
+        {total > 1 && (
           <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none px-0.5">
-            {thumbs(false)}
+            {media.map((item, i) => renderThumb(item, i, false))}
           </div>
         )}
       </div>
 
-      {/* ── Lightbox ────────────────────────────────────────────────────────── */}
+      {/* ── Lightbox — only for images ── */}
       <AnimatePresence>
-        {lightbox && (
+        {lightbox && !isVideo && (
           <>
             <motion.div
               key="lb-backdrop"
@@ -201,7 +307,6 @@ export default function HaljinaGalerija({ slike, naziv }: HaljinaGalerijaProps) 
               exit={{ opacity: 0, scale: 0.96 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
             >
-              {/* Close */}
               <button
                 type="button"
                 onClick={() => setLightbox(false)}
@@ -210,14 +315,12 @@ export default function HaljinaGalerija({ slike, naziv }: HaljinaGalerijaProps) 
                 <X size={16} strokeWidth={1.5} />
               </button>
 
-              {/* Counter */}
-              {slike.length > 1 && (
+              {total > 1 && (
                 <p className="absolute top-5 left-1/2 -translate-x-1/2 text-[9px] tracking-[0.4em] uppercase text-white/40 z-10 select-none" style={{ fontFamily: 'var(--font-sans)' }}>
-                  {aktivna + 1} / {slike.length}
+                  {aktivna + 1} / {total}
                 </p>
               )}
 
-              {/* Image — swipeable */}
               <div
                 className="relative"
                 style={{ width: 'min(90vw, calc(82vh * 3 / 4))', aspectRatio: '3/4' }}
@@ -231,13 +334,14 @@ export default function HaljinaGalerija({ slike, naziv }: HaljinaGalerijaProps) 
                     transition={{ duration: 0.18 }}
                     className="absolute inset-0"
                   >
-                    <Image src={slike[aktivna]} alt={`${naziv} — slika ${aktivna + 1}`} fill sizes="90vw" className="object-contain" priority />
+                    {current?.type === 'image' && (
+                      <Image src={current.src} alt={`${naziv} — slika ${aktivna + 1}`} fill sizes="90vw" className="object-contain" priority />
+                    )}
                   </motion.div>
                 </AnimatePresence>
               </div>
 
-              {/* Prev/Next — desktop only (mobile uses swipe) */}
-              {slike.length > 1 && (
+              {total > 1 && (
                 <>
                   <button
                     type="button"
@@ -256,15 +360,19 @@ export default function HaljinaGalerija({ slike, naziv }: HaljinaGalerijaProps) 
                 </>
               )}
 
-              {/* Dot indicators */}
-              {slike.length > 1 && (
+              {total > 1 && (
                 <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5">
-                  {slike.map((_, i) => (
+                  {media.map((item, i) => (
                     <button
                       key={i}
                       type="button"
                       onClick={e => { e.stopPropagation(); setAktivna(i) }}
-                      className={cn('w-1.5 h-1.5 rounded-full transition-all duration-200 cursor-pointer', i === aktivna ? 'bg-white scale-125' : 'bg-white/35 hover:bg-white/60')}
+                      className={cn(
+                        'transition-all duration-200 cursor-pointer',
+                        item.type === 'video'
+                          ? cn('w-4 h-1.5 rounded-full', i === aktivna ? 'bg-[#c9a96e]' : 'bg-white/35 hover:bg-white/60')
+                          : cn('w-1.5 h-1.5 rounded-full', i === aktivna ? 'bg-white scale-125' : 'bg-white/35 hover:bg-white/60')
+                      )}
                     />
                   ))}
                 </div>

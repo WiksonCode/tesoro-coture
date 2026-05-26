@@ -1,4 +1,7 @@
+'use client'
+
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 const footerLinks = [
   { href: '/katalog', label: 'Katalog' },
@@ -8,7 +11,12 @@ const footerLinks = [
 ]
 
 export default function Footer() {
+  const pathname = usePathname()
   const year = new Date().getFullYear()
+
+  if (pathname.startsWith('/admin') || pathname === '/login' || pathname === '/registracija') {
+    return null
+  }
 
   return (
     <footer className="bg-[#1a1a1a] text-[#faf7f4]">
@@ -32,7 +40,7 @@ export default function Footer() {
         {/* Social */}
         <div className="flex items-center justify-center gap-3 mb-10">
           <a
-            href="https://www.instagram.com/tesorocouture"
+            href="https://www.instagram.com/tesoro_couture/"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Instagram"
@@ -148,13 +156,20 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-10 pt-5 border-t border-[#faf7f4]/[0.07] text-center">
+        <div className="mt-10 pt-5 border-t border-[#faf7f4]/[0.07] flex flex-col sm:flex-row items-center justify-between gap-3">
           <p
             className="text-[9px] tracking-[0.25em] uppercase text-[#faf7f4]/50"
             style={{ fontFamily: 'var(--font-sans)' }}
           >
             © {year} TESORO Couture · Sva prava zadržana
           </p>
+          <Link
+            href="/politika-privatnosti"
+            className="text-[9px] tracking-[0.25em] uppercase text-[#faf7f4]/30 hover:text-[#c9a96e] transition-colors duration-300"
+            style={{ fontFamily: 'var(--font-sans)' }}
+          >
+            Politika privatnosti
+          </Link>
         </div>
       </div>
     </footer>
