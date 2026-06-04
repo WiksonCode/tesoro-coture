@@ -614,12 +614,12 @@ export default function ONamaContent() {
                 {
                   icon: MapPin,
                   label: 'Adresa',
-                  content: <p className="text-[13px] text-[#1a1a1a] leading-relaxed" style={{ fontFamily: 'var(--font-sans)' }}>Knez Mihailova 14<br />11000 Beograd, Srbija</p>,
+                  content: <p className="text-[13px] text-[#1a1a1a] leading-relaxed" style={{ fontFamily: 'var(--font-sans)' }}>Jurija Gagarina 151a<br />11070 Beograd, Srbija</p>,
                 },
                 {
                   icon: Phone,
                   label: 'Telefon',
-                  content: <a href="tel:+381111234567" className="text-[13px] text-[#1a1a1a] hover:text-[#c9a96e] transition-colors duration-300" style={{ fontFamily: 'var(--font-sans)' }}>+381 11 123 4567</a>,
+                  content: <a href="tel:+381654033795" className="text-[13px] text-[#1a1a1a] hover:text-[#c9a96e] transition-colors duration-300" style={{ fontFamily: 'var(--font-sans)' }}>065 403 3795</a>,
                 },
                 {
                   icon: Mail,
@@ -651,9 +651,13 @@ export default function ONamaContent() {
                   </p>
                   <div className="flex flex-col gap-1.5" style={{ fontFamily: 'var(--font-sans)' }}>
                     {[
-                      { dan: 'Ponedeljak – Petak', vreme: '10:00 – 20:00' },
-                      { dan: 'Subota', vreme: '10:00 – 17:00' },
-                      { dan: 'Nedelja', vreme: 'Po dogovoru' },
+                      { dan: 'Ponedeljak', vreme: '12:00 – 19:00' },
+                      { dan: 'Utorak', vreme: '12:00 – 19:00' },
+                      { dan: 'Sreda', vreme: '12:00 – 19:00' },
+                      { dan: 'Četvrtak', vreme: '12:00 – 19:00' },
+                      { dan: 'Petak', vreme: '12:00 – 19:00' },
+                      { dan: 'Subota', vreme: '10:00 – 16:00' },
+                      { dan: 'Nedelja', vreme: 'Zatvoreno' },
                     ].map(({ dan, vreme }) => (
                       <div key={dan} className="flex justify-between gap-8">
                         <span className="text-[12px] text-[#1a1a1a]">{dan}</span>
@@ -715,14 +719,6 @@ export default function ONamaContent() {
                   className="absolute inset-0"
                   title="TESORO Couture lokacija"
                 />
-              </div>
-              <div className="absolute top-4 left-4 bg-[#141414] px-4 py-3">
-                <p className="text-[8px] tracking-[0.4em] uppercase text-[#c9a96e] mb-0.5" style={{ fontFamily: 'var(--font-sans)' }}>
-                  TESORO Couture
-                </p>
-                <p className="text-[9px] text-[#faf7f4]/55" style={{ fontFamily: 'var(--font-sans)' }}>
-                  Knez Mihailova 14, Beograd
-                </p>
               </div>
             </motion.div>
           </div>
