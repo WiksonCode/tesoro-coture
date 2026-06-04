@@ -1,6 +1,7 @@
 'use client'
 
 import { Fragment, useEffect, useRef, useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Pencil, Trash2, Star, Search, ChevronDown, ChevronRight, Plus, Check, X, Upload, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -352,14 +353,28 @@ function InventarAddForm({
 // ─── Main component ────────────────────────────────────────────────────────
 
 export default function HaljineTableClient({ haljine }: Props) {
+  const router = useRouter()
   const [search, setSearch] = useState('')
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [editingInventarId, setEditingInventarId] = useState<string | null>(null)
   const [addingToHaljinaId, setAddingToHaljinaId] = useState<string | null>(null)
   const [pendingDeletes, setPendingDeletes] = useState<Map<string, PendingDelete>>(new Map())
+  const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set())
   const [invPending, startInvTransition] = useTransition()
 
-  const hiddenIds = new Set(pendingDeletes.keys())
+  // Kada dođe novi prop sa servera, ukloni ids koji više ne postoje u listi
+  useEffect(() => {
+    const existing = new Set([
+      ...haljine.map((h) => h.id),
+      ...haljine.flatMap((h) => (h.inventar ?? []).map((s) => s.id)),
+    ])
+    setDeletedIds((prev) => {
+      const cleaned = new Set([...prev].filter((id) => existing.has(id)))
+      return cleaned.size === prev.size ? prev : cleaned
+    })
+  }, [haljine])
+
+  const hiddenIds = new Set([...pendingDeletes.keys(), ...deletedIds])
 
   const filtered = haljine.filter(
     (h) =>
@@ -375,11 +390,14 @@ export default function HaljineTableClient({ haljine }: Props) {
       } else {
         await deleteInventarStavka(id)
       }
+      // Drži id skriven dok router.refresh() ne dovuče novi prop
+      setDeletedIds((prev) => new Set([...prev, id]))
       setPendingDeletes((prev) => {
         const next = new Map(prev)
         next.delete(id)
         return next
       })
+      router.refresh()
     }, UNDO_DELAY)
 
     setPendingDeletes((prev) => {
