@@ -5,7 +5,7 @@ import HaljinaDetalji from '@/components/haljine/HaljinaDetalji'
 import SrodneHaljine from '@/components/haljine/SrodneHaljine'
 import type { Haljina } from '@/types'
 
-const HALJINA_SELECT = 'id, slug, naziv_sr, naziv_en, opis_sr, opis_en, slike, video_url, featured, created_at, updated_at, kategorija_id, kategorija:kategorije(id, slug, naziv_sr, naziv_en, redosled), inventar(id, sifra, boja_naziv, boja_hex, velicina, cijena_rsd, cijena_eur, slike, dostupna)'
+const HALJINA_SELECT = 'id, slug, naziv_sr, naziv_en, opis_sr, opis_en, slike, video_url, featured, created_at, updated_at, kategorija_id, kategorija:kategorije(id, slug, naziv_sr, naziv_en, redosled), inventar(id, sifra, boja_naziv, boja_hex, velicina, cijena_rsd, cijena_eur, slike, dostupna, arhivirana)'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -39,6 +39,7 @@ export default async function HaljinaPage({ params }: Props) {
     .from('haljine')
     .select(HALJINA_SELECT)
     .eq('slug', slug)
+    .eq('arhivirana', false)
     .single()
 
   if (!data) notFound()
@@ -49,6 +50,7 @@ export default async function HaljinaPage({ params }: Props) {
     .from('haljine')
     .select(HALJINA_SELECT)
     .eq('kategorija_id', haljina.kategorija_id)
+    .eq('arhivirana', false)
     .neq('id', haljina.id)
     .order('created_at', { ascending: false })
     .limit(4)
@@ -59,6 +61,7 @@ export default async function HaljinaPage({ params }: Props) {
     const { data: ostalePodaci } = await supabase
       .from('haljine')
       .select(HALJINA_SELECT)
+      .eq('arhivirana', false)
       .neq('id', haljina.id)
       .order('created_at', { ascending: false })
       .limit(4)

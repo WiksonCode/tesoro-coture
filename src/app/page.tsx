@@ -21,6 +21,7 @@ export default async function HomePage() {
     .select('*')
     .eq('featured', true)
     .eq('dostupna', true)
+    .eq('arhivirana', false)
     .order('created_at', { ascending: false })
     .limit(3)
 

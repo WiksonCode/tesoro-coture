@@ -11,7 +11,8 @@ export default async function AdminHaljinePage() {
   const supabase = await createClient()
   const { data: haljine } = await supabase
     .from('haljine')
-    .select('id, slug, naziv_sr, featured, slike, created_at, kategorija:kategorije(id, slug, naziv_sr), inventar(id, sifra, boja_naziv, boja_hex, velicina, cijena_rsd, cijena_eur, slike, dostupna)')
+    .select('id, slug, naziv_sr, featured, slike, created_at, kategorija:kategorije(id, slug, naziv_sr), inventar(id, sifra, boja_naziv, boja_hex, velicina, cijena_rsd, cijena_eur, slike, dostupna, arhivirana, rezervacije(status))')
+    .eq('arhivirana', false)
     .order('created_at', { ascending: false })
 
   return (

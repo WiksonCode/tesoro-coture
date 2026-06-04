@@ -110,16 +110,16 @@ export default function Footer() {
                 className="text-[11px] tracking-wide text-[#faf7f4]/40 leading-relaxed"
                 style={{ fontFamily: 'var(--font-sans)' }}
               >
-                Bulevar Kralja Aleksandra 42<br />
-                11000 Beograd, Srbija
+                Jurija Gagarina 151a<br />
+                11070 Beograd, Srbija
               </li>
               <li>
                 <a
-                  href="tel:+381611234567"
+                  href="tel:+381654033795"
                   className="text-[11px] tracking-wide text-[#faf7f4]/40 hover:text-[#c9a96e] transition-colors duration-300 cursor-pointer"
                   style={{ fontFamily: 'var(--font-sans)' }}
                 >
-                  +381 61 123 45 67
+                  065 403 3795
                 </a>
               </li>
               <li>

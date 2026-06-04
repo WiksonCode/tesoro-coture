@@ -34,7 +34,7 @@ export default function HaljinaDetalji({ haljina }: { haljina: Haljina }) {
   const searchParams = useSearchParams()
 
   const dostupniInventar = useMemo(
-    () => haljina.inventar?.filter((i) => i.dostupna) ?? [],
+    () => haljina.inventar?.filter((i) => i.dostupna && !i.arhivirana) ?? [],
     [haljina.inventar]
   )
 
@@ -119,11 +119,15 @@ export default function HaljinaDetalji({ haljina }: { haljina: Haljina }) {
   }, [haljina.naziv_sr, odabranaBoja, odabranaVelicina])
 
   const galerija = useMemo(() => {
-    if (!odabranaBoja) return haljina.slike || []
+    const glavne = haljina.slike || []
+    if (!odabranaBoja) return glavne
     const bojaSlike = dostupniInventar
       .filter((i) => i.boja_naziv === odabranaBoja)
       .flatMap((i) => i.slike ?? [])
-    return bojaSlike.length > 0 ? bojaSlike : (haljina.slike || [])
+    if (bojaSlike.length === 0) return glavne
+    // Kombinuj slike stavke + glavne slike haljine (bez duplikata)
+    const kombinovane = [...bojaSlike, ...glavne.filter((s) => !bojaSlike.includes(s))]
+    return kombinovane
   }, [odabranaBoja, dostupniInventar, haljina.slike])
 
   const dodajArtikl = useKorpa((s) => s.dodajArtikl)

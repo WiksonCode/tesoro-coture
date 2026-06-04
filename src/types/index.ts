@@ -23,6 +23,7 @@ export interface Haljina {
   slike: string[]
   video_url: string | null
   featured: boolean
+  arhivirana: boolean
   created_at: string
   updated_at: string
   inventar?: InventarStavka[]
@@ -31,6 +32,8 @@ export interface Haljina {
 export interface InventarStavka {
   id: string
   sifra: string
+  arhivirana?: boolean
+  rezervacije?: { status: string }[]
   haljina_id: string
   haljina?: Haljina
   boja_naziv: string

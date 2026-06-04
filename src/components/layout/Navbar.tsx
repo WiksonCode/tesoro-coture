@@ -71,16 +71,9 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handler)
   }, [userMenuOpen])
 
-  async function handleLogout() {
-    setUser(null)
+  function handleLogout() {
     setUserMenuOpen(false)
-    try {
-      const supabase = createClient()
-      await supabase.auth.signOut()
-    } catch {
-      // ignorišemo grešku, sesija je svakako očišćena klijentski
-    }
-    window.location.href = '/'
+    window.location.href = '/api/auth/signout'
   }
 
   const userInitial = user?.email?.[0]?.toUpperCase() ?? '?'

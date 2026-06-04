@@ -44,7 +44,7 @@ export default function KatalogClient({ haljine, activeParams }: KatalogClientPr
   const sveBoje = useMemo(() => {
     const map = new Map<string, { naziv: string; hex: string }>()
     haljine.forEach((h) =>
-      h.inventar?.filter((i) => i.dostupna).forEach((i) => {
+      h.inventar?.filter((i) => i.dostupna && !i.arhivirana).forEach((i) => {
         if (!map.has(i.boja_naziv)) map.set(i.boja_naziv, { naziv: i.boja_naziv, hex: i.boja_hex })
       })
     )
@@ -54,7 +54,7 @@ export default function KatalogClient({ haljine, activeParams }: KatalogClientPr
   const sveVelicine = useMemo(() => {
     const set = new Set<string>()
     haljine.forEach((h) =>
-      h.inventar?.filter((i) => i.dostupna).forEach((i) => set.add(i.velicina))
+      h.inventar?.filter((i) => i.dostupna && !i.arhivirana).forEach((i) => set.add(i.velicina))
     )
     return ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'po_mjeri'].filter((v) => set.has(v))
   }, [haljine])
@@ -62,7 +62,7 @@ export default function KatalogClient({ haljine, activeParams }: KatalogClientPr
   const priceBounds = useMemo(() => {
     const prices: number[] = []
     haljine.forEach((h) =>
-      h.inventar?.filter((i) => i.dostupna).forEach((i) => prices.push(i.cijena_rsd))
+      h.inventar?.filter((i) => i.dostupna && !i.arhivirana).forEach((i) => prices.push(i.cijena_rsd))
     )
     if (prices.length === 0) return { min: 0, max: 200000 }
     return { min: Math.min(...prices), max: Math.max(...prices) }
@@ -76,7 +76,7 @@ export default function KatalogClient({ haljine, activeParams }: KatalogClientPr
 
   const filtrirane = useMemo(() => {
     return haljine.filter((h) => {
-      const dostupniInv = h.inventar?.filter((i) => i.dostupna) ?? []
+      const dostupniInv = h.inventar?.filter((i) => i.dostupna && !i.arhivirana) ?? []
 
       if (selectedBoje.length > 0) {
         const imenaBoja = dostupniInv.map((i) => i.boja_naziv)

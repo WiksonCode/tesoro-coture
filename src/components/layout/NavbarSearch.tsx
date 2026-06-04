@@ -18,7 +18,7 @@ const firstImage = (h: Haljina) =>
   Array.isArray(h.slike) ? h.slike[0] : null
 
 function getMinCijena(h: Haljina): number | null {
-  const prices = h.inventar?.filter(i => i.dostupna).map(i => i.cijena_rsd) ?? []
+  const prices = h.inventar?.filter(i => i.dostupna && !i.arhivirana).map(i => i.cijena_rsd) ?? []
   if (prices.length === 0) return null
   return Math.min(...prices)
 }
@@ -62,6 +62,7 @@ export default function NavbarSearch({ isHero, mobileInline = false }: Props) {
     createClient()
       .from('haljine')
       .select('id, slug, naziv_sr, slike, kategorija:kategorije(slug, naziv_sr), inventar(cijena_rsd, dostupna)')
+      .eq('arhivirana', false)
       .order('featured', { ascending: false })
       .order('created_at', { ascending: false })
       .limit(4)
@@ -75,6 +76,7 @@ export default function NavbarSearch({ isHero, mobileInline = false }: Props) {
       const { data } = await createClient()
         .from('haljine')
         .select('id, slug, naziv_sr, slike, kategorija:kategorije(slug, naziv_sr), inventar(cijena_rsd, dostupna)')
+        .eq('arhivirana', false)
         .ilike('naziv_sr', `%${query.trim()}%`)
         .limit(4)
       setResults((data as unknown as Haljina[]) || [])

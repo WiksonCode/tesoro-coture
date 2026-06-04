@@ -31,7 +31,7 @@ function getVelicineIzInventara(inventar: InventarStavka[]) {
 }
 
 export default function HaljinaCard({ haljina, className }: { haljina: Haljina; className?: string }) {
-  const dostupniInventar = haljina.inventar?.filter((i) => i.dostupna) ?? []
+  const dostupniInventar = haljina.inventar?.filter((i) => i.dostupna && !i.arhivirana) ?? []
   const sviInventar = haljina.inventar ?? []
 
   const isRasprodato = dostupniInventar.length === 0

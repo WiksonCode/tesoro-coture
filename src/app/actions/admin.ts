@@ -65,7 +65,10 @@ export async function deleteHaljina(id: string): Promise<{ error: string } | voi
   } catch {
     return { error: 'Nemate pristup.' }
   }
-  const { error } = await supabase.from('haljine').delete().eq('id', id)
+  const { error } = await supabase
+    .from('haljine')
+    .update({ arhivirana: true, updated_at: new Date().toISOString() })
+    .eq('id', id)
   if (error) return { error: error.message }
   revalidatePath('/admin/haljine')
   revalidatePath('/katalog')
@@ -99,7 +102,24 @@ export async function toggleDostupnostInventara(inventarId: string, dostupna: bo
 export async function deleteInventarStavka(id: string): Promise<{ error: string } | void> {
   let supabase
   try { supabase = await adminClient() } catch { return { error: 'Nemate pristup.' } }
-  const { error } = await supabase.from('inventar').delete().eq('id', id)
+
+  // Provjeri aktivne rezervacije (na čekanju ili potvrđene)
+  const { data: aktivne } = await supabase
+    .from('rezervacije')
+    .select('id')
+    .eq('inventar_id', id)
+    .in('status', ['na_cekanju', 'potvrdjena'])
+    .limit(1)
+
+  if (aktivne && aktivne.length > 0) {
+    return { error: 'Ova stavka ima aktivnu rezervaciju koja još nije realizovana. Stavku možete ukloniti tek kada rezervacija bude realizovana ili otkazana.' }
+  }
+
+  // Soft delete — sačuvaj podatke za historiju rezervacija
+  const { error } = await supabase
+    .from('inventar')
+    .update({ arhivirana: true })
+    .eq('id', id)
   if (error) return { error: error.message }
   revalidatePath('/admin/haljine')
   revalidatePath('/katalog')
@@ -152,10 +172,32 @@ export async function updateStatusRezervacije(id: string, status: StatusRezervac
   } catch {
     return { error: 'Nemate pristup.' }
   }
-  const { error } = await supabase.from('rezervacije').update({ status, updated_at: new Date().toISOString() }).eq('id', id)
+
+  const { error } = await supabase
+    .from('rezervacije')
+    .update({ status, updated_at: new Date().toISOString() })
+    .eq('id', id)
   if (error) return { error: error.message }
+
+  // Kada je kupovina realizovana → arhiviraj samo tu inventar stavku
+  if (status === 'realizovana') {
+    const { data: rez } = await supabase
+      .from('rezervacije')
+      .select('inventar_id')
+      .eq('id', id)
+      .single()
+
+    if (rez?.inventar_id) {
+      await supabase
+        .from('inventar')
+        .update({ arhivirana: true })
+        .eq('id', rez.inventar_id)
+    }
+  }
+
   revalidatePath('/admin/rezervacije')
   revalidatePath(`/admin/rezervacije/${id}`)
+  revalidatePath('/admin/haljine')
   revalidatePath('/katalog')
   revalidatePath('/haljina', 'layout')
 }

@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { Resend } from 'resend'
 import { createClient } from '@/lib/supabase/server'
 import { rezervacijaSchema } from '@/lib/validations/rezervacija'
+import { PotvrdarezervacijeEmail } from '@/emails/PotvrdarezervacijeEmail'
 import type { KorpaArtikl } from '@/types'
+
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(req: NextRequest) {
   try {
@@ -44,6 +48,32 @@ export async function POST(req: NextRequest) {
         { error: 'Greška pri čuvanju rezervacije. Pokušajte ponovo.' },
         { status: 500 }
       )
+    }
+
+    // Šalji potvrdu korisniku — ne blokiraj odgovor ako email ne uspe
+    if (process.env.RESEND_API_KEY) {
+      const from = process.env.RESEND_FROM_EMAIL
+        ? `TESORO Couture <${process.env.RESEND_FROM_EMAIL}>`
+        : 'TESORO Couture <onboarding@resend.dev>'
+
+      const emailHtml = PotvrdarezervacijeEmail({
+        ime: parsed.data.ime,
+        prezime: parsed.data.prezime,
+        artikli,
+        datumTermina: parsed.data.datum_termina || null,
+        napomena: parsed.data.napomena ?? null,
+      })
+
+      const { error: emailError } = await resend.emails.send({
+        from,
+        to: [parsed.data.email],
+        subject: 'Potvrda rezervacije — TESORO Couture',
+        html: emailHtml,
+      })
+
+      if (emailError) {
+        console.error('[rezervacije] Email error:', emailError)
+      }
     }
 
     return NextResponse.json({ success: true }, { status: 201 })

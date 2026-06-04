@@ -45,8 +45,7 @@ export default function LoginClient() {
       return
     }
 
-    router.push(callbackUrl)
-    router.refresh()
+    window.location.href = callbackUrl
   }
 
   return (

@@ -269,7 +269,7 @@ function InventarEditRow({
               />
             </div>
             <select name="velicina" defaultValue={stavka.velicina} className="text-[11px] px-2 py-1 border border-[#e8e0d8] bg-white outline-none focus:border-[#c9a96e]" style={{ fontFamily: 'var(--font-sans)' }}>
-              {VELICINE.map((v) => <option key={v} value={v}>{v}</option>)}
+              {VELICINE.map((v) => <option key={v} value={v}>{v === 'po_mjeri' ? 'Po meri' : v}</option>)}
             </select>
             <input type="number" name="cijena_rsd" defaultValue={stavka.cijena_rsd} placeholder="RSD" step="100" min="0" className="w-24 text-[11px] px-2 py-1 border border-[#e8e0d8] bg-white outline-none focus:border-[#c9a96e]" style={{ fontFamily: 'var(--font-sans)' }} />
             <input type="number" name="cijena_eur" defaultValue={stavka.cijena_eur} placeholder="EUR" step="1" min="0" className="w-16 text-[11px] px-2 py-1 border border-[#e8e0d8] bg-white outline-none focus:border-[#c9a96e]" style={{ fontFamily: 'var(--font-sans)' }} />
@@ -317,7 +317,7 @@ function InventarAddForm({
             <input type="text" name="boja_naziv" placeholder="Naziv boje *" required className="w-28 text-[11px] px-2 py-1.5 border border-[#e8e0d8] bg-white outline-none focus:border-[#c9a96e]" style={{ fontFamily: 'var(--font-sans)' }} />
           </div>
           <select name="velicina" required className="text-[11px] px-2 py-1.5 border border-[#e8e0d8] bg-white outline-none focus:border-[#c9a96e]" style={{ fontFamily: 'var(--font-sans)' }}>
-            {VELICINE.map((v) => <option key={v} value={v}>{v}</option>)}
+            {VELICINE.map((v) => <option key={v} value={v}>{v === 'po_mjeri' ? 'Po meri' : v}</option>)}
           </select>
           <input type="number" name="cijena_rsd" placeholder="RSD *" required step="100" min="0" className="w-24 text-[11px] px-2 py-1.5 border border-[#e8e0d8] bg-white outline-none focus:border-[#c9a96e]" style={{ fontFamily: 'var(--font-sans)' }} />
           <input type="number" name="cijena_eur" placeholder="EUR *" required step="1" min="0" className="w-16 text-[11px] px-2 py-1.5 border border-[#e8e0d8] bg-white outline-none focus:border-[#c9a96e]" style={{ fontFamily: 'var(--font-sans)' }} />
@@ -360,6 +360,7 @@ export default function HaljineTableClient({ haljine }: Props) {
   const [addingToHaljinaId, setAddingToHaljinaId] = useState<string | null>(null)
   const [pendingDeletes, setPendingDeletes] = useState<Map<string, PendingDelete>>(new Map())
   const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set())
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [invPending, startInvTransition] = useTransition()
 
   // Kada dođe novi prop sa servera, ukloni ids koji više ne postoje u listi
@@ -383,14 +384,35 @@ export default function HaljineTableClient({ haljine }: Props) {
         h.slug.toLowerCase().includes(search.toLowerCase()))
   )
 
-  function scheduleDelete(id: string, type: 'haljina' | 'inventar', label: string) {
-    const timeoutId = setTimeout(async () => {
-      if (type === 'haljina') {
-        await deleteHaljina(id)
-      } else {
-        await deleteInventarStavka(id)
+  function scheduleDelete(id: string, type: 'haljina' | 'inventar', label: string, stavka?: InventarStavka) {
+    // Trenutna provjera za inventar — ne čekaj 5s
+    if (type === 'inventar' && stavka) {
+      const aktivna = stavka.rezervacije?.some(
+        (r) => r.status === 'na_cekanju' || r.status === 'potvrdjena'
+      )
+      if (aktivna) {
+        setErrorMsg('Ova stavka ima aktivnu rezervaciju koja još nije realizovana. Možete je ukloniti tek kada rezervacija bude realizovana ili otkazana.')
+        setTimeout(() => setErrorMsg(null), 7000)
+        return
       }
-      // Drži id skriven dok router.refresh() ne dovuče novi prop
+    }
+
+    const timeoutId = setTimeout(async () => {
+      const result = type === 'haljina'
+        ? await deleteHaljina(id)
+        : await deleteInventarStavka(id)
+
+      if (result && 'error' in result) {
+        setErrorMsg(result.error)
+        setPendingDeletes((prev) => {
+          const next = new Map(prev)
+          next.delete(id)
+          return next
+        })
+        setTimeout(() => setErrorMsg(null), 7000)
+        return
+      }
+
       setDeletedIds((prev) => new Set([...prev, id]))
       setPendingDeletes((prev) => {
         const next = new Map(prev)
@@ -496,7 +518,7 @@ export default function HaljineTableClient({ haljine }: Props) {
               )}
               {filtered.map((h) => {
                 const ukupno = h.inventar?.length ?? 0
-                const dostupno = h.inventar?.filter((i) => i.dostupna && !hiddenIds.has(i.id)).length ?? 0
+                const dostupno = h.inventar?.filter((i) => i.dostupna && !i.arhivirana && !hiddenIds.has(i.id)).length ?? 0
                 const isExpanded = expandedId === h.id
 
                 return (
@@ -624,7 +646,7 @@ export default function HaljineTableClient({ haljine }: Props) {
                                     </tr>
                                   </thead>
                                   <tbody className="divide-y divide-[#e8e0d8]/60">
-                                    {h.inventar!.map((stavka) =>
+                                    {h.inventar!.filter((s) => !s.arhivirana).map((stavka) =>
                                       editingInventarId === stavka.id ? (
                                         <InventarEditRow
                                           key={stavka.id}
@@ -640,7 +662,7 @@ export default function HaljineTableClient({ haljine }: Props) {
                                           pending={invPending}
                                           hiddenIds={hiddenIds}
                                           onEdit={() => setEditingInventarId(stavka.id)}
-                                          onDelete={() => scheduleDelete(stavka.id, 'inventar', `${stavka.boja_naziv} / ${stavka.velicina}`)}
+                                          onDelete={() => scheduleDelete(stavka.id, 'inventar', `${stavka.boja_naziv} / ${stavka.velicina}`, stavka)}
                                           onToggle={() => handleToggle(stavka.id, stavka.dostupna)}
                                         />
                                       )
@@ -670,6 +692,31 @@ export default function HaljineTableClient({ haljine }: Props) {
       </div>
 
       <UndoToastStack items={toastItems} onUndo={cancelDelete} />
+
+      {/* Error modal za blokirano brisanje */}
+      {errorMsg && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center px-4" onClick={() => setErrorMsg(null)}>
+          <div className="absolute inset-0 bg-black/40" />
+          <div
+            className="relative bg-white shadow-2xl max-w-sm w-full p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="text-[10px] tracking-[0.3em] uppercase text-red-500 mb-3" style={{ fontFamily: 'var(--font-sans)' }}>
+              Nije moguće obrisati
+            </p>
+            <p className="text-[13px] text-[#1a1a1a] leading-relaxed mb-5" style={{ fontFamily: 'var(--font-sans)' }}>
+              {errorMsg}
+            </p>
+            <button
+              onClick={() => setErrorMsg(null)}
+              className="w-full bg-[#1a1a1a] text-white text-[10px] tracking-[0.3em] uppercase py-3 hover:bg-[#c9a96e] transition-colors cursor-pointer"
+              style={{ fontFamily: 'var(--font-sans)' }}
+            >
+              Razumijem
+            </button>
+          </div>
+        </div>
+      )}
     </>
   )
 }

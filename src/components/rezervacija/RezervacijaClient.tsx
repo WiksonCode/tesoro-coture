@@ -421,9 +421,9 @@ export default function RezervacijaClient() {
           ) : (
             <>
               <div className="space-y-5 mb-6">
-                {artikli.map((a) => (
+                {artikli.map((a, i) => (
                   <div
-                    key={a.inventar_id}
+                    key={a.inventar_id ?? i}
                     className="flex gap-3"
                   >
                     <div
@@ -463,7 +463,7 @@ export default function RezervacijaClient() {
                         {a.boja_naziv} · {a.velicina === 'po_mjeri' ? 'Po meri' : a.velicina}
                       </p>
                       <p
-                        className="text-[11px] text-[#1a1a1a] mt-1"
+                        className="text-[11px] font-medium text-[#1a1a1a] mt-1"
                         style={{ fontFamily: 'var(--font-sans)' }}
                       >
                         {formatCijena(a.cijena_rsd)}
@@ -483,7 +483,7 @@ export default function RezervacijaClient() {
                   </span>
                   <div className="text-right">
                     <p
-                      className="text-[15px] font-light text-[#1a1a1a]"
+                      className="text-[15px] font-medium text-[#1a1a1a]"
                       style={{ fontFamily: 'var(--font-sans)' }}
                     >
                       {formatCijena(ukupno)}
