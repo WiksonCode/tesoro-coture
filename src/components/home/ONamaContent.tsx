@@ -705,7 +705,7 @@ export default function ONamaContent() {
             >
               <div className="w-full h-[420px] lg:h-full min-h-[380px] overflow-hidden relative">
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2830.452059624948!2d20.455022!3d44.816498!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x475a7ab409d8d3f3%3A0xb6f3b9e2e47d0ab6!2sKnez%20Mihailova%2C%20Beograd!5e0!3m2!1ssr!2srs!4v1715000000000!5m2!1ssr!2srs"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2830.9706587842456!2d20.386919299999995!3d44.8017866!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x475a6f3fb11a7287%3A0xbfae49a9b699ac4c!2sTesoro%20Couture!5e0!3m2!1sen!2srs!4v1780604882822!5m2!1sen!2srs"
                   width="100%"
                   height="100%"
                   style={{ border: 0, filter: 'grayscale(30%) contrast(1.05) brightness(0.96)' }}
