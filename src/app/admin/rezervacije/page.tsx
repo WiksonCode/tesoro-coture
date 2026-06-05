@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { cn } from '@/lib/utils'
+import { Plus } from 'lucide-react'
 import RezervacijeTableClient, { type RezervacijaSaInventarom } from './RezervacijeTableClient'
 
 export const metadata: Metadata = { title: 'Rezervacije' }
@@ -30,7 +31,7 @@ export default async function AdminRezervacijePage({
 
   let dataQuery = supabase
     .from('rezervacije')
-    .select('id, ime, prezime, email, telefon, status, created_at, datum_termina, inventar:inventar(sifra, boja_naziv, velicina, haljina:haljine(naziv_sr))')
+    .select('id, ime, prezime, email, telefon, status, created_at, datum_termina, vreme_termina, inventar:inventar(sifra, boja_naziv, velicina, haljina:haljine(naziv_sr))')
     .order('created_at', { ascending: false })
 
   if (activeStatus) {
@@ -50,13 +51,23 @@ export default async function AdminRezervacijePage({
 
   return (
     <div className="p-4 sm:p-6 lg:p-10">
-      <div className="mb-6 sm:mb-8">
-        <p className="text-[11px] tracking-[0.45em] uppercase text-[#c9a96e] mb-1" style={{ fontFamily: 'var(--font-sans)' }}>
-          Upravljanje
-        </p>
-        <h1 className="text-[24px] sm:text-[28px] font-light text-[#1a1a1a]" style={{ fontFamily: 'var(--font-serif)' }}>
-          Rezervacije
-        </h1>
+      <div className="flex items-start justify-between mb-6 sm:mb-8">
+        <div>
+          <p className="text-[11px] tracking-[0.45em] uppercase text-[#c9a96e] mb-1" style={{ fontFamily: 'var(--font-sans)' }}>
+            Upravljanje
+          </p>
+          <h1 className="text-[24px] sm:text-[28px] font-light text-[#1a1a1a]" style={{ fontFamily: 'var(--font-serif)' }}>
+            Rezervacije
+          </h1>
+        </div>
+        <Link
+          href="/admin/rezervacije/nova"
+          className="flex items-center gap-2 px-4 py-2.5 bg-[#1a1a1a] text-white text-[10px] tracking-[0.25em] uppercase hover:bg-[#c9a96e] transition-all duration-300"
+          style={{ fontFamily: 'var(--font-sans)' }}
+        >
+          <Plus size={12} strokeWidth={2} />
+          Nova rezervacija
+        </Link>
       </div>
 
       <div className="flex flex-wrap gap-1 mb-4">

@@ -377,11 +377,13 @@ export default function HaljineTableClient({ haljine }: Props) {
 
   const hiddenIds = new Set([...pendingDeletes.keys(), ...deletedIds])
 
+  const searchLower = search.toLowerCase()
   const filtered = haljine.filter(
     (h) =>
       !hiddenIds.has(h.id) &&
-      (h.naziv_sr.toLowerCase().includes(search.toLowerCase()) ||
-        h.slug.toLowerCase().includes(search.toLowerCase()))
+      (h.naziv_sr.toLowerCase().includes(searchLower) ||
+        h.slug.toLowerCase().includes(searchLower) ||
+        h.inventar?.some((i) => i.sifra?.toLowerCase().includes(searchLower)))
   )
 
   function scheduleDelete(id: string, type: 'haljina' | 'inventar', label: string, stavka?: InventarStavka) {

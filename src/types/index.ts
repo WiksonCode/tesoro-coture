@@ -59,7 +59,8 @@ export interface Rezervacija {
   prezime: string
   telefon: string
   email: string
-  datum_termina: string
+  datum_termina: string | null
+  vreme_termina: string | null
   status: StatusRezervacije
   napomena: string | null
   created_at: string

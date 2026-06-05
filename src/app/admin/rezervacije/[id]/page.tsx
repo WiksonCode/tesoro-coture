@@ -6,6 +6,7 @@ import { ArrowLeft } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Rezervacija } from '@/types'
 import StatusSelector from './StatusSelector'
+import TerminEditor from './TerminEditor'
 
 export const metadata: Metadata = { title: 'Detalji rezervacije' }
 
@@ -131,14 +132,19 @@ export default async function RezervacijaDetailPage({ params }: { params: Promis
             <Row label="Ime i prezime" value={`${r.ime} ${r.prezime}`} />
             <Row label="Email" value={r.email} />
             <Row label="Telefon" value={r.telefon} />
-            <Row label="Željeni termin" value={r.datum_termina ? formatDatum(r.datum_termina) : null} />
+            <Row label="Željeni termin" value={r.datum_termina ? formatDatum(r.datum_termina) + (r.vreme_termina ? ' u ' + String(r.vreme_termina).slice(0, 5) : '') : null} />
             <Row label="Napomena" value={r.napomena} />
             <Row label="Rezervisano" value={formatDatum(r.created_at)} />
           </div>
         </div>
 
-        <div>
+        <div className="space-y-4">
           <StatusSelector id={r.id} currentStatus={r.status} />
+          <TerminEditor
+            id={r.id}
+            initialDatum={r.datum_termina ?? null}
+            initialVreme={r.vreme_termina ?? null}
+          />
         </div>
       </div>
     </div>

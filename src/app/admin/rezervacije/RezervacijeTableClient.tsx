@@ -15,6 +15,7 @@ export type RezervacijaSaInventarom = {
   status: StatusRezervacije
   created_at: string
   datum_termina: string | null
+  vreme_termina: string | null
   inventar: {
     sifra: string
     boja_naziv: string
@@ -122,7 +123,7 @@ export default function RezervacijeTableClient({ rezervacije }: { rezervacije: R
                 </p>
                 <p className="text-[10px] text-[#b0a898] mt-0.5" style={{ fontFamily: 'var(--font-sans)' }}>
                   {formatDatum(r.created_at)}
-                  {r.datum_termina ? ` · Termin: ${formatDatum(r.datum_termina)}` : ''}
+                  {r.datum_termina ? ` · Termin: ${formatDatum(r.datum_termina)}${r.vreme_termina ? ' u ' + r.vreme_termina.slice(0, 5) : ''}` : ''}
                 </p>
               </div>
 
@@ -178,7 +179,7 @@ export default function RezervacijeTableClient({ rezervacije }: { rezervacije: R
                     </td>
                     <td className="px-5 py-3">
                       <span className="text-[11px] text-[#8a8a8a]" style={{ fontFamily: 'var(--font-sans)' }}>
-                        {r.datum_termina ? formatDatum(r.datum_termina) : '—'}
+                        {r.datum_termina ? formatDatum(r.datum_termina) + (r.vreme_termina ? ', ' + r.vreme_termina.slice(0, 5) : '') : '—'}
                       </span>
                     </td>
                     <td className="px-5 py-3">

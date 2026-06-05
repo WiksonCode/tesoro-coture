@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { CalendarCheck, Shirt, Users, TrendingUp, ArrowRight, Clock, Plus } from 'lucide-react'
+import { CalendarCheck, Shirt, Users, TrendingUp, ArrowRight, Clock, Plus, CalendarDays } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export const metadata: Metadata = { title: 'Dashboard' }
@@ -40,23 +40,38 @@ export default async function AdminDashboardPage() {
   const { data: profil } = await supabase.from('profiles').select('ime').eq('id', user!.id).single()
   const firstName = profil?.ime || null
 
+  const today = now.toISOString().slice(0, 10)
+  const nextWeek = new Date(now)
+  nextWeek.setDate(now.getDate() + 7)
+  const nextWeekStr = nextWeek.toISOString().slice(0, 10)
+
   const [
     { count: totalRez },
     { count: rezOvajMjesec },
-    { count: totalInventar },
+    { count: totalInventarDostupno },
+    { count: totalInventarSve },
     { count: totalKorisnici },
     { data: rezPoStatusu },
     { data: recentRez },
+    { data: predstojeci },
   ] = await Promise.all([
     supabase.from('rezervacije').select('*', { count: 'exact', head: true }),
     supabase.from('rezervacije').select('*', { count: 'exact', head: true }).gte('created_at', startOfMonth.toISOString()),
-    supabase.from('inventar').select('*', { count: 'exact', head: true }).eq('dostupna', true),
+    supabase.from('inventar').select('*', { count: 'exact', head: true }).eq('dostupna', true).eq('arhivirana', false),
+    supabase.from('inventar').select('*', { count: 'exact', head: true }).eq('arhivirana', false),
     supabase.from('profiles').select('*', { count: 'exact', head: true }),
     supabase.from('rezervacije').select('status'),
     supabase.from('rezervacije')
       .select('id, ime, prezime, status, created_at, inventar:inventar(haljina:haljine(naziv_sr))')
       .order('created_at', { ascending: false })
       .limit(6),
+    supabase.from('rezervacije')
+      .select('id, ime, prezime, datum_termina, status, inventar:inventar(haljina:haljine(naziv_sr))')
+      .gte('datum_termina', today)
+      .lte('datum_termina', nextWeekStr)
+      .in('status', ['na_cekanju', 'potvrdjena'])
+      .order('datum_termina', { ascending: true })
+      .limit(5),
   ])
 
   const statusCounts = (rezPoStatusu ?? []).reduce<Record<string, number>>((acc, r) => {
@@ -158,9 +173,9 @@ export default async function AdminDashboardPage() {
       <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-8">
         {[
           { label: 'Ukupno rezervacija', labelShort: 'Rezervacije', value: totalRezCount, icon: CalendarCheck },
-          { label: 'Dostupnih u inventaru', labelShort: 'Inventar', value: totalInventar ?? 0, icon: Shirt },
+          { label: 'Dostupnih u inventaru', labelShort: 'Inventar', value: totalInventarDostupno ?? 0, total: totalInventarSve ?? 0, icon: Shirt },
           { label: 'Korisnici', labelShort: 'Korisnici', value: totalKorisnici ?? 0, icon: Users },
-        ].map(({ label, labelShort, value, icon: Icon }) => (
+        ].map(({ label, labelShort, value, total, icon: Icon }) => (
           <div key={label} className="bg-white border border-[#e8e0d8] p-3 sm:p-5 relative overflow-hidden">
             <span className="absolute bottom-0 right-0 w-8 h-8 border-b border-r border-[#e8e0d8] opacity-60" />
             <Icon size={12} strokeWidth={1.5} className="text-[#c8c0b8] mb-2 sm:mb-3" />
@@ -168,7 +183,7 @@ export default async function AdminDashboardPage() {
               className="text-[24px] sm:text-[34px] font-light leading-none text-[#1a1a1a] mb-1 tabular-nums"
               style={{ fontFamily: 'var(--font-serif)' }}
             >
-              {value}
+              {value}{total != null && total > 0 ? <span className="text-[16px] sm:text-[20px] text-[#c8c0b8]"> / {total}</span> : null}
             </p>
             <p className="text-[9px] sm:text-[10px] text-[#8a8a8a] leading-snug" style={{ fontFamily: 'var(--font-sans)' }}>
               <span className="sm:hidden">{labelShort}</span>
@@ -288,43 +303,50 @@ export default async function AdminDashboardPage() {
             </div>
           </div>
 
-          {/* Quick actions */}
+          {/* Predstojeći termini */}
           <div className="bg-white border border-[#e8e0d8] p-5">
-            <h2 className="text-[13px] font-light text-[#1a1a1a] mb-4" style={{ fontFamily: 'var(--font-serif)' }}>
-              Brze akcije
-            </h2>
-            <div className="space-y-2.5">
-              <Link
-                href="/admin/haljine/nova"
-                className="flex items-center gap-3.5 px-4 py-3.5 bg-[#1a1a1a] hover:bg-[#c9a96e] transition-all duration-300 group"
-              >
-                <Plus size={14} strokeWidth={1.5} className="text-white group-hover:text-[#1a1a1a] shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-[10px] tracking-[0.25em] uppercase text-white group-hover:text-[#1a1a1a] transition-colors" style={{ fontFamily: 'var(--font-sans)' }}>
-                    Dodaj haljinu
-                  </p>
-                </div>
-                <ArrowRight size={11} strokeWidth={1.5} className="text-white/40 group-hover:text-[#1a1a1a]/60 group-hover:translate-x-0.5 transition-all duration-200 shrink-0" />
-              </Link>
-
-              <Link
-                href="/admin/rezervacije"
-                className="flex items-center gap-3.5 px-4 py-3.5 border border-[#e8e0d8] hover:border-[#1a1a1a] transition-all duration-300 group"
-              >
-                <CalendarCheck size={14} strokeWidth={1.5} className="text-[#8a8a8a] group-hover:text-[#1a1a1a] shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-[10px] tracking-[0.25em] uppercase text-[#8a8a8a] group-hover:text-[#1a1a1a] transition-colors" style={{ fontFamily: 'var(--font-sans)' }}>
-                    Rezervacije
-                  </p>
-                  {pendingCount > 0 && (
-                    <p className="text-[9px] text-[#c9a96e] mt-0.5" style={{ fontFamily: 'var(--font-sans)' }}>
-                      {pendingCount} čeka potvrdu
-                    </p>
-                  )}
-                </div>
-                <ArrowRight size={11} strokeWidth={1.5} className="text-[#e8e0d8] group-hover:text-[#1a1a1a] group-hover:translate-x-0.5 transition-all duration-200 shrink-0" />
-              </Link>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <CalendarDays size={12} strokeWidth={1.5} className="text-[#c9a96e]" />
+                <h2 className="text-[13px] font-light text-[#1a1a1a]" style={{ fontFamily: 'var(--font-serif)' }}>
+                  Ove nedelje
+                </h2>
+              </div>
             </div>
+            {(predstojeci ?? []).length === 0 ? (
+              <p className="text-[11px] text-[#8a8a8a] py-4 text-center" style={{ fontFamily: 'var(--font-sans)' }}>
+                Nema termina u narednih 7 dana
+              </p>
+            ) : (
+              <div className="space-y-0 divide-y divide-[#f0ebe5]">
+                {(predstojeci ?? []).map((r) => {
+                  const inv = r.inventar as unknown as { haljina: { naziv_sr: string } | null } | null
+                  const datum = r.datum_termina ? new Date(r.datum_termina + 'T00:00:00') : null
+                  const danLabel = datum?.toLocaleDateString('sr-Latn-RS', { weekday: 'short', day: 'numeric', month: 'short' }) ?? '—'
+                  const cfg = STATUS_CONFIG[r.status]
+                  return (
+                    <Link
+                      key={r.id}
+                      href={`/admin/rezervacije/${r.id}`}
+                      className="flex items-center gap-3 py-2.5 hover:opacity-70 transition-opacity"
+                    >
+                      <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: r.status === 'potvrdjena' ? '#3d6b4a' : '#c9a96e' }} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[11px] text-[#1a1a1a]" style={{ fontFamily: 'var(--font-sans)' }}>
+                          {r.ime} {r.prezime}
+                        </p>
+                        <p className="text-[10px] text-[#8a8a8a] truncate" style={{ fontFamily: 'var(--font-sans)' }}>
+                          {inv?.haljina?.naziv_sr ?? '—'}
+                        </p>
+                      </div>
+                      <span className="text-[10px] text-[#8a8a8a] shrink-0 capitalize" style={{ fontFamily: 'var(--font-sans)' }}>
+                        {danLabel}
+                      </span>
+                    </Link>
+                  )
+                })}
+              </div>
+            )}
           </div>
 
         </div>

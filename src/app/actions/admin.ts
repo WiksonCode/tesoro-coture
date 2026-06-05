@@ -165,6 +165,30 @@ export async function createInventarStavka(haljina_id: string, formData: FormDat
   revalidatePath('/katalog')
 }
 
+export async function updateTerminRezervacije(
+  id: string,
+  datum: string | null,
+  vreme: string | null,
+): Promise<{ error: string } | void> {
+  let supabase
+  try {
+    supabase = await adminClient()
+  } catch {
+    return { error: 'Nemate pristup.' }
+  }
+  const { error } = await supabase
+    .from('rezervacije')
+    .update({
+      datum_termina: datum || null,
+      vreme_termina: vreme || null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', id)
+  if (error) return { error: error.message }
+  revalidatePath(`/admin/rezervacije/${id}`)
+  revalidatePath('/admin/rezervacije')
+}
+
 export async function updateStatusRezervacije(id: string, status: StatusRezervacije): Promise<{ error: string } | void> {
   let supabase
   try {
