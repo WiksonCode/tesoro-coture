@@ -2,7 +2,7 @@
 
 import { useState, useTransition, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { X, Upload, Loader2, ArrowLeft, Video, Play } from 'lucide-react'
+import { X, Upload, Loader2, ArrowLeft, Video, Star } from 'lucide-react'
 import { cn, slugify } from '@/lib/utils'
 import { createHaljina, updateHaljina } from '@/app/actions/admin'
 import type { Haljina, Kategorija } from '@/types'
@@ -79,6 +79,10 @@ export default function HaljinaForma({ haljina, kategorije }: Props) {
 
   function removeSlika(url: string) {
     setSlike((prev) => prev.filter((s) => s !== url))
+  }
+
+  function setGlavnaSlika(url: string) {
+    setSlike((prev) => [url, ...prev.filter((s) => s !== url)])
   }
 
   async function handleVideoUpload(files: FileList | null) {
@@ -237,9 +241,25 @@ export default function HaljinaForma({ haljina, kategorije }: Props) {
               >
                 <X size={10} />
               </button>
+              <button
+                type="button"
+                onClick={() => setGlavnaSlika(url)}
+                title={i === 0 ? 'Naslovna fotografija' : 'Postavi kao naslovnu'}
+                className={cn(
+                  'absolute top-1 left-1 w-5 h-5 flex items-center justify-center transition-opacity',
+                  i === 0
+                    ? 'opacity-100'
+                    : 'opacity-0 group-hover:opacity-100'
+                )}
+              >
+                <Star
+                  size={14}
+                  className={i === 0 ? 'fill-[#c9a96e] text-[#c9a96e]' : 'fill-white/60 text-white drop-shadow'}
+                />
+              </button>
               {i === 0 && (
                 <span className="absolute bottom-1 left-1 text-[7px] tracking-[0.2em] uppercase bg-[#1a1a1a] text-white px-1.5 py-0.5" style={{ fontFamily: 'var(--font-sans)' }}>
-                  Glavna
+                  Naslovna
                 </span>
               )}
             </div>

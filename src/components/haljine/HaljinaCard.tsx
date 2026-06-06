@@ -120,13 +120,16 @@ export default function HaljinaCard({ haljina, className }: { haljina: Haljina; 
                 slika2 ? 'group-hover:opacity-0' : 'group-hover:scale-[1.03]'
               )}
             />
-            {slika2 && !isRasprodato && (
+            {slika2 && (
               <Image
                 src={slika2}
                 alt={`${haljina.naziv_sr} — drugi ugao`}
                 fill
                 sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                className="object-cover object-center opacity-0 group-hover:opacity-100 transition-opacity duration-700 ease-out"
+                className={cn(
+                  'object-cover object-center opacity-0 group-hover:opacity-100 transition-opacity duration-700 ease-out',
+                  isRasprodato && 'brightness-[0.65]'
+                )}
               />
             )}
           </>

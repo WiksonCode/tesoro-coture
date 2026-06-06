@@ -53,7 +53,7 @@ export default async function KatalogPage({
 
   let query = supabase
     .from('haljine')
-    .select('id, slug, naziv_sr, naziv_en, opis_sr, slike, video_url, featured, created_at, kategorija_id, kategorija:kategorije(id, slug, naziv_sr, naziv_en, redosled), inventar(id, sifra, boja_naziv, boja_hex, velicina, cijena_rsd, cijena_eur, slike, dostupna, arhivirana)')
+    .select('id, slug, naziv_sr, naziv_en, opis_sr, slike, video_url, featured, created_at, redoslijed, kategorija_id, kategorija:kategorije(id, slug, naziv_sr, naziv_en, redosled), inventar(id, sifra, boja_naziv, boja_hex, velicina, cijena_rsd, cijena_eur, slike, dostupna, arhivirana)')
     .eq('arhivirana', false)
 
   if (params.q) {
@@ -74,7 +74,7 @@ export default async function KatalogPage({
       query = query.order('created_at', { ascending: true })
       break
     default:
-      query = query.order('created_at', { ascending: false })
+      query = query.order('redoslijed', { ascending: true }).order('created_at', { ascending: false })
   }
 
   const { data } = await query

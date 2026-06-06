@@ -24,6 +24,7 @@ export interface Haljina {
   video_url: string | null
   featured: boolean
   arhivirana: boolean
+  redoslijed: number
   created_at: string
   updated_at: string
   inventar?: InventarStavka[]

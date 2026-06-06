@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { Plus } from 'lucide-react'
+import { Plus, LayoutGrid } from 'lucide-react'
 import type { Haljina } from '@/types'
 import HaljineTableClient from './HaljineTableClient'
 
@@ -26,15 +26,25 @@ export default async function AdminHaljinePage() {
             Haljine
           </h1>
         </div>
-        <Link
-          href="/admin/haljine/nova"
-          className="flex items-center gap-2 bg-[#1a1a1a] text-white px-3 sm:px-5 py-2.5 text-[11px] tracking-[0.25em] uppercase hover:bg-[#c9a96e] hover:text-[#1a1a1a] transition-all duration-300"
-          style={{ fontFamily: 'var(--font-sans)' }}
-        >
-          <Plus size={13} strokeWidth={1.5} />
-          <span className="hidden sm:inline">Nova haljina</span>
-          <span className="sm:hidden">Nova</span>
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/admin/haljine/raspored"
+            className="flex items-center gap-2 border border-[#e8e0d8] text-[#1a1a1a] px-3 sm:px-5 py-2.5 text-[11px] tracking-[0.25em] uppercase hover:border-[#1a1a1a] transition-all duration-300"
+            style={{ fontFamily: 'var(--font-sans)' }}
+          >
+            <LayoutGrid size={13} strokeWidth={1.5} />
+            <span className="hidden sm:inline">Raspored</span>
+          </Link>
+          <Link
+            href="/admin/haljine/nova"
+            className="flex items-center gap-2 bg-[#1a1a1a] text-white px-3 sm:px-5 py-2.5 text-[11px] tracking-[0.25em] uppercase hover:bg-[#c9a96e] hover:text-[#1a1a1a] transition-all duration-300"
+            style={{ fontFamily: 'var(--font-sans)' }}
+          >
+            <Plus size={13} strokeWidth={1.5} />
+            <span className="hidden sm:inline">Nova haljina</span>
+            <span className="sm:hidden">Nova</span>
+          </Link>
+        </div>
       </div>
 
       <HaljineTableClient haljine={(haljine as unknown as Haljina[]) ?? []} />

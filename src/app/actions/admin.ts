@@ -225,3 +225,14 @@ export async function updateStatusRezervacije(id: string, status: StatusRezervac
   revalidatePath('/katalog')
   revalidatePath('/haljina', 'layout')
 }
+
+export async function updateRedoslijed(ids: string[]) {
+  const supabase = await adminClient()
+  const updates = ids.map((id, i) =>
+    supabase.from('haljine').update({ redoslijed: (i + 1) * 10 }).eq('id', id)
+  )
+  await Promise.all(updates)
+  revalidatePath('/admin/haljine/raspored')
+  revalidatePath('/katalog')
+  revalidatePath('/haljina', 'layout')
+}
