@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { ShoppingBag, Menu, User, LogOut, LayoutDashboard } from 'lucide-react'
 import NavbarSearch from '@/components/layout/NavbarSearch'
@@ -100,27 +101,17 @@ export default function Navbar() {
         {/* Logo */}
         <Link
           href="/"
-          className="flex flex-col leading-none"
+          className="flex items-center"
           onClick={() => { if (pathname === '/') window.scrollTo({ top: 0, behavior: 'smooth' }) }}
         >
-          <span
-            className={cn(
-              'text-[22px] lg:text-[26px] tracking-[0.3em] font-light uppercase transition-colors duration-500',
-              isHero ? 'text-white' : 'text-[#1a1a1a]'
-            )}
-            style={{
-              fontFamily: 'var(--font-serif)',
-              ...(isHero ? heroTextShadow : {}),
-            }}
-          >
-            TESORO
-          </span>
-          <span
-            className="text-[9px] tracking-[0.5em] text-[#c9a96e] uppercase -mt-0.5 pl-0.5"
-            style={{ fontFamily: 'var(--font-sans)' }}
-          >
-            Couture
-          </span>
+          <Image
+            src={isHero ? '/logo.png' : '/logo-dark.png'}
+            alt="TESORO Couture"
+            width={140}
+            height={70}
+            className="object-contain transition-opacity duration-500 w-[110px] lg:w-[140px]"
+            priority
+          />
         </Link>
 
         {/* Desktop navigation */}
@@ -301,18 +292,13 @@ export default function Navbar() {
               <div className="flex flex-col h-full px-8 pt-10 pb-8">
                 {/* Mobile logo */}
                 <div className="mb-10">
-                  <span
-                    className="text-2xl tracking-[0.3em] font-light text-[#1a1a1a]"
-                    style={{ fontFamily: 'var(--font-serif)' }}
-                  >
-                    TESORO
-                  </span>
-                  <p
-                    className="text-[9px] tracking-[0.5em] text-[#c9a96e] uppercase mt-0.5"
-                    style={{ fontFamily: 'var(--font-sans)' }}
-                  >
-                    Couture
-                  </p>
+                  <Image
+                    src="/logo-dark.png"
+                    alt="TESORO Couture"
+                    width={120}
+                    height={60}
+                    className="object-contain w-[100px]"
+                  />
                 </div>
 
                 {/* Mobile nav links — min 44px touch target each */}
