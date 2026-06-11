@@ -14,14 +14,25 @@ export const metadata: Metadata = {
 export default async function HomePage() {
   const supabase = await createClient()
 
-  const { data } = await supabase
+  const { data: featuredData } = await supabase
     .from('haljine')
     .select('id, slug, naziv_sr, naziv_en, slike, video_url, featured, created_at, redoslijed, kategorija_id, kategorija:kategorije(id, slug, naziv_sr, naziv_en, redosled), inventar(id, sifra, boja_naziv, boja_hex, velicina, cijena_rsd, cijena_eur, slike, dostupna, arhivirana)')
     .eq('arhivirana', false)
+    .eq('featured', true)
     .order('redoslijed', { ascending: false })
     .limit(3)
 
-  const haljine = (data as unknown as Haljina[]) || []
+  let haljine = (featuredData as unknown as Haljina[]) || []
+
+  if (!haljine.length) {
+    const { data: fallback } = await supabase
+      .from('haljine')
+      .select('id, slug, naziv_sr, naziv_en, slike, video_url, featured, created_at, redoslijed, kategorija_id, kategorija:kategorije(id, slug, naziv_sr, naziv_en, redosled), inventar(id, sifra, boja_naziv, boja_hex, velicina, cijena_rsd, cijena_eur, slike, dostupna, arhivirana)')
+      .eq('arhivirana', false)
+      .order('redoslijed', { ascending: false })
+      .limit(3)
+    haljine = (fallback as unknown as Haljina[]) || []
+  }
 
   return (
     <main className="w-full overflow-x-hidden">

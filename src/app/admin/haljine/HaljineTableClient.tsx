@@ -12,6 +12,7 @@ import {
   updateInventarStavka,
   createInventarStavka,
   toggleDostupnostInventara,
+  toggleFeatured,
 } from '@/app/actions/admin'
 
 interface Props {
@@ -586,6 +587,14 @@ export default function HaljineTableClient({ haljine }: Props) {
 
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={async () => { await toggleFeatured(h.id, !h.featured); router.refresh() }}
+                            className={cn('p-1.5 transition-colors cursor-pointer', h.featured ? 'text-[#c9a96e]' : 'text-[#8a8a8a] hover:text-[#c9a96e] hover:bg-[#c9a96e]/10')}
+                            title={h.featured ? 'Ukloni sa početne' : 'Prikaži na početnoj'}
+                          >
+                            <Star size={13} strokeWidth={1.5} fill={h.featured ? 'currentColor' : 'none'} />
+                          </button>
                           <Link
                             href={`/admin/haljine/${h.id}`}
                             className="p-1.5 text-[#8a8a8a] hover:text-[#1a1a1a] hover:bg-[#e8e0d8] transition-colors"

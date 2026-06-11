@@ -57,8 +57,8 @@ export default async function AdminDashboardPage() {
   ] = await Promise.all([
     supabase.from('rezervacije').select('*', { count: 'exact', head: true }),
     supabase.from('rezervacije').select('*', { count: 'exact', head: true }).gte('created_at', startOfMonth.toISOString()),
-    supabase.from('inventar').select('*', { count: 'exact', head: true }).eq('dostupna', true).eq('arhivirana', false),
-    supabase.from('inventar').select('*', { count: 'exact', head: true }).eq('arhivirana', false),
+    supabase.from('inventar').select('*, haljine!inner(arhivirana)', { count: 'exact', head: true }).eq('dostupna', true).eq('arhivirana', false).eq('haljine.arhivirana', false),
+    supabase.from('inventar').select('*, haljine!inner(arhivirana)', { count: 'exact', head: true }).eq('arhivirana', false).eq('haljine.arhivirana', false),
     supabase.from('profiles').select('*', { count: 'exact', head: true }),
     supabase.from('rezervacije').select('status'),
     supabase.from('rezervacije')

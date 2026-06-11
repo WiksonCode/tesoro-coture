@@ -96,8 +96,8 @@ export default async function KatalogPage({
   }
 
   const naslov = params.kategorija
-    ? (KATEGORIJE_NAZIVI[params.kategorija] ?? 'Katalog haljina')
-    : 'Katalog haljina'
+    ? (KATEGORIJE_NAZIVI[params.kategorija] ?? 'Kolekcija haljina')
+    : 'Kolekcija haljina'
   const opis = params.kategorija ? (KATEGORIJE_OPISI[params.kategorija] ?? null) : null
   const bannerSlika = params.kategorija
     ? (KATEGORIJE_SLIKE[params.kategorija] ?? DEFAULT_BANNER)
@@ -119,7 +119,7 @@ export default async function KatalogPage({
               <li>/</li>
               <li>
                 <Link href="/katalog" className={params.kategorija ? 'hover:text-white/70 transition-colors duration-200' : 'text-white/70'}>
-                  Katalog
+                  Kolekcija
                 </Link>
               </li>
               {params.kategorija && (
@@ -133,7 +133,7 @@ export default async function KatalogPage({
 
           <div className="text-center pb-2">
             <p className="text-[9px] tracking-[0.6em] uppercase text-[#c9a96e] mb-4" style={{ fontFamily: 'var(--font-sans)' }}>
-              Kolekcija 2025
+              Kolekcija 2026
             </p>
             <h1 className="text-[clamp(38px,7vw,80px)] font-light text-white leading-tight" style={{ fontFamily: 'var(--font-serif)' }}>
               {naslov}

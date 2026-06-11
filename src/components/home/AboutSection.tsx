@@ -75,7 +75,7 @@ export default function AboutSection({ haljine }: AboutSectionProps) {
         </motion.div>
 
         <motion.div
-          className="mt-14 flex flex-col sm:flex-row items-center justify-center gap-5"
+          className="mt-20 flex flex-col sm:flex-row items-center justify-center gap-5"
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.01 }}
