@@ -52,15 +52,6 @@ export default function KorpaPage() {
               </h1>
             </div>
 
-            {/* Decorative corner mark */}
-            <div className="hidden lg:block shrink-0 mb-2">
-              <div className="relative w-14 h-14 opacity-20">
-                <span className="absolute top-0 left-0 w-5 h-5 border-t border-l border-[#c9a96e]" />
-                <span className="absolute top-0 right-0 w-5 h-5 border-t border-r border-[#c9a96e]" />
-                <span className="absolute bottom-0 left-0 w-5 h-5 border-b border-l border-[#c9a96e]" />
-                <span className="absolute bottom-0 right-0 w-5 h-5 border-b border-r border-[#c9a96e]" />
-              </div>
-            </div>
           </div>
 
           {/* Bottom accent line */}

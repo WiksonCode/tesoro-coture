@@ -234,7 +234,7 @@ export default function RezervacijaClient() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 lg:px-10 py-12">
+    <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-10 py-10 lg:py-12">
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-12 lg:gap-20">
         {/* Form */}
         <motion.div

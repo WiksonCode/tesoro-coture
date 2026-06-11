@@ -18,7 +18,7 @@ import { createClient } from '@/lib/supabase/client'
 
 const navLinks = [
   { href: '/', label: 'Početna' },
-  { href: '/katalog', label: 'Katalog' },
+  { href: '/katalog', label: 'Kolekcija' },
   { href: '/o-nama', label: 'O nama' },
 ]
 

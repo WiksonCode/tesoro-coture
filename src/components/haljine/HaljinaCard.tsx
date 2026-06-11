@@ -275,14 +275,14 @@ export default function HaljinaCard({ haljina, className }: { haljina: Haljina; 
           </p>
         )}
         <h3
-          className="font-light text-[#1a1a1a] leading-tight mb-1.5 group-hover:text-[#c9a96e] transition-colors duration-300"
-          style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(15px, 1.2vw, 20px)' }}
+          className="font-normal text-[#1a1a1a] leading-tight mb-2 group-hover:text-[#c9a96e] transition-colors duration-300"
+          style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(16px, 1.3vw, 21px)' }}
         >
           {haljina.naziv_sr}
         </h3>
         <div className="flex items-center justify-between">
           {minCijena > 0 && (
-            <span className="text-[13px] font-medium text-[#c9a96e]" style={{ fontFamily: 'var(--font-sans)' }}>
+            <span className="text-[15px] font-semibold text-[#c9a96e]" style={{ fontFamily: 'var(--font-sans)' }}>
               {formatCijena(minCijena)}
             </span>
           )}

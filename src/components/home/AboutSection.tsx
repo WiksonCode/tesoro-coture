@@ -1,108 +1,96 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
+import HaljinaCard from '@/components/haljine/HaljinaCard'
+import type { Haljina } from '@/types'
 
-export default function AboutSection() {
+interface AboutSectionProps {
+  haljine: Haljina[]
+}
+
+const containerVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.12 } },
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0 },
+}
+
+export default function AboutSection({ haljine }: AboutSectionProps) {
+  if (!haljine.length) return null
+
   return (
-    <section className="py-14 lg:py-32 px-6 bg-white overflow-hidden">
+    <section className="py-14 lg:py-32 px-6 bg-white">
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
 
-          {/* Tekst */}
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
-          >
+        <motion.div
+          className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-14 gap-6"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.01 }}
+          transition={{ duration: 0.7 }}
+        >
+          <div>
             <p
-              className="text-[9px] tracking-[0.5em] uppercase text-[#c9a96e] mb-6"
+              className="text-[9px] tracking-[0.5em] uppercase text-[#c9a96e] mb-4"
               style={{ fontFamily: 'var(--font-sans)' }}
             >
-              O salonu
+              Kolekcija
             </p>
-
             <h2
-              className="text-[clamp(32px,4vw,52px)] font-light text-[#1a1a1a] leading-[1.1] mb-6"
+              className="text-[clamp(28px,4vw,48px)] font-light text-[#1a1a1a] leading-tight"
               style={{ fontFamily: 'var(--font-serif)' }}
             >
-              Više od haljine —<br />
-              <span className="italic">iskustvo koje pamtite</span>
+              Pronađi svoju<br />
+              <span className="italic">savršenu haljinu</span>
             </h2>
+          </div>
 
-            <div className="w-10 h-px bg-[#c9a96e] mb-8" />
-
-            <p
-              className="text-sm text-[#8a8a8a] leading-relaxed mb-5"
-              style={{ fontFamily: 'var(--font-sans)' }}
-            >
-              TESORO Couture je beogradski salon koji veruje da svaka žena zaslužuje haljinu koja je čini neponovljivom. Naša kolekcija obuhvata venčane, koktel, svečane i maturske kreacije.
-            </p>
-            <p
-              className="text-sm text-[#8a8a8a] leading-relaxed mb-10"
-              style={{ fontFamily: 'var(--font-sans)' }}
-            >
-              Svaka poseta salonu je individualni doživljaj. Naš tim vam pomaže da pronađete savršenu haljinu — po meri ili iz naše ekskluzivne kolekcije.
-            </p>
-
-            <Link
-              href="/o-nama"
-              className="group inline-flex items-center gap-3 text-[10px] tracking-[0.3em] uppercase text-[#1a1a1a] hover:text-[#c9a96e] transition-colors duration-300 border-b border-[#1a1a1a] hover:border-[#c9a96e] pb-1"
-              style={{ fontFamily: 'var(--font-sans)' }}
-            >
-              Saznaj više
-              <ArrowRight size={11} className="transition-transform duration-300 group-hover:translate-x-1" />
-            </Link>
-          </motion.div>
-
-          {/* Slika */}
-          <motion.div
-            className="relative"
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: 'easeOut', delay: 0.15 }}
+          <Link
+            href="/katalog"
+            className="group hidden sm:inline-flex items-center gap-2 text-[10px] tracking-[0.3em] uppercase text-[#8a8a8a] hover:text-[#c9a96e] transition-colors duration-300 border-b border-[#e8e0d8] hover:border-[#c9a96e] pb-1 shrink-0"
+            style={{ fontFamily: 'var(--font-sans)' }}
           >
-            <div className="relative aspect-[3/2] sm:aspect-[4/5] overflow-hidden">
-              <Image
-                src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&q=85&fit=crop&auto=format"
-                alt="TESORO Couture salon — elegantna haljina"
-                fill
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-cover object-top"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-              <span className="absolute top-4 left-4 w-6 h-6 border-t border-l border-[#c9a96e]" />
-              <span className="absolute top-4 right-4 w-6 h-6 border-t border-r border-[#c9a96e]" />
-              <span className="absolute bottom-4 left-4 w-6 h-6 border-b border-l border-[#c9a96e]" />
-              <span className="absolute bottom-4 right-4 w-6 h-6 border-b border-r border-[#c9a96e]" />
-            </div>
+            Pogledaj celu kolekciju
+            <ArrowRight size={10} className="group-hover:translate-x-0.5 transition-transform duration-300" />
+          </Link>
+        </motion.div>
 
-            <div className="absolute -bottom-6 -left-6 bg-[#1a1a1a] px-8 py-6 hidden lg:block">
-              <p
-                className="text-[9px] tracking-[0.3em] uppercase text-[#c9a96e] mb-1"
-                style={{ fontFamily: 'var(--font-sans)' }}
-              >
-                Od
-              </p>
-              <p
-                className="text-2xl font-light text-[#faf7f4] italic"
-                style={{ fontFamily: 'var(--font-serif)' }}
-              >
-                2018. godine
-              </p>
-              <p
-                className="text-[9px] tracking-wide text-[#faf7f4]/40 mt-1"
-                style={{ fontFamily: 'var(--font-sans)' }}
-              >
-                u srcu Beograda
-              </p>
-            </div>
-          </motion.div>
-        </div>
+        <motion.div
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-50px' }}
+        >
+          {haljine.map((haljina) => (
+            <motion.div key={haljina.id} variants={itemVariants}>
+              <HaljinaCard haljina={haljina} />
+            </motion.div>
+          ))}
+        </motion.div>
+
+        <motion.div
+          className="mt-14 flex flex-col sm:flex-row items-center justify-center gap-5"
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.01 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          <Link
+            href="/katalog"
+            className="group inline-flex items-center gap-3 border border-[#1a1a1a] px-10 py-4 text-[10px] tracking-[0.35em] uppercase text-[#1a1a1a] hover:bg-[#1a1a1a] hover:text-white transition-all duration-500"
+            style={{ fontFamily: 'var(--font-sans)' }}
+          >
+            Pogledaj celu kolekciju
+            <ArrowRight size={12} className="transition-transform duration-300 group-hover:translate-x-1" />
+          </Link>
+        </motion.div>
+
       </div>
     </section>
   )

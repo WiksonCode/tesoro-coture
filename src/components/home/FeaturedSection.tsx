@@ -8,6 +8,7 @@ import type { Haljina } from '@/types'
 
 interface FeaturedSectionProps {
   haljine: Haljina[]
+  isFallback?: boolean
 }
 
 const containerVariants = {
@@ -20,7 +21,7 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 }
 
-export default function FeaturedSection({ haljine }: FeaturedSectionProps) {
+export default function FeaturedSection({ haljine, isFallback }: FeaturedSectionProps) {
   if (!haljine.length) return null
 
   return (
@@ -39,14 +40,13 @@ export default function FeaturedSection({ haljine }: FeaturedSectionProps) {
               className="text-[9px] tracking-[0.5em] uppercase text-[#c9a96e] mb-4"
               style={{ fontFamily: 'var(--font-sans)' }}
             >
-              Istaknuta kolekcija
+              Nova kolekcija
             </p>
             <h2
               className="text-[clamp(28px,4vw,48px)] font-light text-[#1a1a1a] leading-tight"
               style={{ fontFamily: 'var(--font-serif)' }}
             >
-              Odabrane haljine<br />
-              <span className="italic">za posebne trenutke</span>
+              Najnovije haljine<br /><span className="italic">iz kolekcije</span>
             </h2>
           </div>
 
@@ -55,7 +55,7 @@ export default function FeaturedSection({ haljine }: FeaturedSectionProps) {
             className="group hidden sm:inline-flex items-center gap-2 text-[10px] tracking-[0.3em] uppercase text-[#8a8a8a] hover:text-[#c9a96e] transition-colors duration-300 border-b border-[#e8e0d8] hover:border-[#c9a96e] pb-1 shrink-0"
             style={{ fontFamily: 'var(--font-sans)' }}
           >
-            Ceo katalog
+            Pogledaj celu kolekciju
             <ArrowRight size={10} className="group-hover:translate-x-0.5 transition-transform duration-300" />
           </Link>
         </motion.div>
@@ -85,7 +85,7 @@ export default function FeaturedSection({ haljine }: FeaturedSectionProps) {
             className="inline-flex items-center gap-2 text-[10px] tracking-[0.3em] uppercase text-[#8a8a8a] border-b border-[#e8e0d8] pb-1"
             style={{ fontFamily: 'var(--font-sans)' }}
           >
-            Ceo katalog
+            Pogledaj celu kolekciju
             <ArrowRight size={10} />
           </Link>
         </motion.div>

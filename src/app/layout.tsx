@@ -19,6 +19,7 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://tesorocouture.rs"),
   title: {
     default: "TESORO Couture — Salon haljina Beograd",
     template: "%s | TESORO Couture",
@@ -26,10 +27,23 @@ export const metadata: Metadata = {
   description:
     "Elegantne ženske haljine za svaku priliku. Vjenčane, koktel, svečane i maturske haljine. Rezervišite termin u našem salonu u Beogradu.",
   keywords: ["haljine", "salon haljina", "Beograd", "vjenčane haljine", "maturske haljine"],
+  icons: {
+    icon: [
+      { url: "/icon.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
+  },
   openGraph: {
     type: "website",
     locale: "sr_RS",
     siteName: "TESORO Couture",
+    url: "https://tesorocouture.rs",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true },
   },
 };
 

@@ -1,9 +1,9 @@
 'use client'
 
-import { useRef, useEffect, useState } from 'react'
+import { useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { motion, useInView } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { ArrowRight, Phone, Mail, MapPin, Clock } from 'lucide-react'
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
@@ -26,27 +26,12 @@ function IconFacebook({ className }: { className?: string }) {
   )
 }
 
-// ─── Count-up ─────────────────────────────────────────────────────────────────
-
-function CountUp({ to, suffix = '', duration = 2200 }: { to: number; suffix?: string; duration?: number }) {
-  const ref = useRef<HTMLSpanElement>(null)
-  const inView = useInView(ref, { once: true, margin: '-60px' })
-  const [count, setCount] = useState(0)
-
-  useEffect(() => {
-    if (!inView) return
-    const start = Date.now()
-    const tick = () => {
-      const elapsed = Date.now() - start
-      const progress = Math.min(elapsed / duration, 1)
-      const eased = 1 - Math.pow(1 - progress, 3)
-      setCount(Math.floor(eased * to))
-      if (progress < 1) requestAnimationFrame(tick)
-    }
-    requestAnimationFrame(tick)
-  }, [inView, to, duration])
-
-  return <span ref={ref}>{count}{suffix}</span>
+function IconTikTok({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
+      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z" />
+    </svg>
+  )
 }
 
 // ─── Foto Placeholder ─────────────────────────────────────────────────────────
@@ -91,29 +76,24 @@ function FotoPlaceholder({ initial = 'T', label }: { initial?: string; label?: s
 const VREDNOSTI = [
   {
     broj: '01',
-    naziv: 'Individualni pristup',
-    opis: 'Svaka klijentkinja je jedinstvena. Posvećujemo vam puno vreme i pažnju kako biste pronašli haljinu koja govori upravo vašim jezikom.',
+    naziv: 'Šivenje po meri',
+    opis: 'Kako su nam bitni krojevi i znamo da se svaka žena ne uklapa u standardne krojeve, nudimo vam izradu po vašim ličnim merama.',
   },
   {
     broj: '02',
-    naziv: 'Ekskluzivna kolekcija',
-    opis: 'Biramo samo najlepše kreacije od proverenih dizajnera. Naša kolekcija se stalno obnavlja, donoseći najnovije trendove i večne klasike.',
+    naziv: 'Izbor materijala i boja',
+    opis: 'U našoj ponudi možete pronaći veliki izbor različitih materijala i izradu haljina u boji po želji.',
   },
   {
     broj: '03',
-    naziv: 'Krojenje po meri',
-    opis: 'Savršen kroj je naša opsesija. Nudimo uslugu krojenja po meri za sve prilike — od venčanja do maturskih večeri.',
+    naziv: 'Individualan pristup',
+    opis: 'Svaka klijentkinja je jedinstvena. Posvećujemo vam puno vreme i pažnju kako biste pronašli haljinu koja govori upravo vašim jezikom.',
   },
   {
     broj: '04',
-    naziv: 'Iskustvo koje traje',
-    opis: 'Dolazak u TESORO nije samo kupovina — to je iskustvo. Topla atmosfera i tim koji iskreno brine o vama.',
+    naziv: 'Besprekorna izrada',
+    opis: 'Za vas biramo najkvalitetnije materijale i obraćamo pažnju na svaki detalj.',
   },
-]
-
-const MARQUEE_ITEMS = [
-  'Individualnost', 'Elegancija', 'Kvalitet', 'Beograd', '2018',
-  'Couture', 'Savršenstvo', 'Stil', 'Lepota', 'Ženstvenost',
 ]
 
 const fadeUp = {
@@ -168,10 +148,13 @@ export default function ONamaContent() {
             </h1>
             <div className="w-12 h-[1.5px] bg-[#c9a96e] mb-8" />
             <p className="text-[13px] text-[#8a8a8a] leading-relaxed mb-4 max-w-sm" style={{ fontFamily: 'var(--font-sans)' }}>
-              TESORO Couture je beogradski salon koji od 2018. godine pomaže ženama da pronađu haljinu koja ih čini neponovljivim.
+              TESORO je domaći brend osnovan 2020. godine u Beogradu sa ciljem da se svaka žena oseća glamurozno, ženstveno i samouvereno. Naš dizajn se ogleda u neprolaznoj eleganciji, preciznim krojevima i kvalitetnim materijalima u kojima će se svaka žena osećati zadovoljno i samouvereno.
+            </p>
+            <p className="text-[13px] text-[#8a8a8a] leading-relaxed mb-4 max-w-sm" style={{ fontFamily: 'var(--font-sans)' }}>
+              U Tesoru možete pronaći haljine koje su idealne za različite prilike, bilo da je u pitanju proslava, večernji izlazak, matura, rođendan ili venčanje. Naša ponuda uključuje izradu po merama, određene korekcije haljina, kao i veliki izbor različitih materijala i boja.
             </p>
             <p className="text-[13px] text-[#8a8a8a] leading-relaxed max-w-sm" style={{ fontFamily: 'var(--font-sans)' }}>
-              Naše ime znači "blago" na italijanskom — jer verujemo da je svaka žena dragocena, a savršena haljina samo naglašava tu istinu.
+              U našem studiu verujemo da ćete pronaći idealnu haljinu za vašu posebnu priliku koja će biti u skladu sa vašim željama i potrebama. Naše haljine nisu birane da budu samo lepe već i da pristaju svakoj građi, da traju i da se pamte.
             </p>
           </motion.div>
 
@@ -202,13 +185,13 @@ export default function ONamaContent() {
                 className="text-[9px] tracking-[0.3em] uppercase text-[#c9a96e] mb-1.5"
                 style={{ fontFamily: 'var(--font-sans)' }}
               >
-                Beogradski salon
+                u Beogradu
               </p>
               <p
                 className="text-[22px] font-light text-[#faf7f4] italic leading-none"
                 style={{ fontFamily: 'var(--font-serif)' }}
               >
-                Od 2018.
+                Od 2020.
               </p>
             </motion.div>
           </motion.div>
@@ -252,7 +235,7 @@ export default function ONamaContent() {
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.01 }}
             transition={{ duration: 0.9 }}
           >
             <p
@@ -275,30 +258,6 @@ export default function ONamaContent() {
         </div>
       </section>
 
-      {/* ── Marquee ───────────────────────────────────────────────────────── */}
-      <div className="bg-[#c9a96e] py-3 overflow-hidden">
-        <motion.div
-          className="flex whitespace-nowrap"
-          animate={{ x: ['0%', '-50%'] }}
-          transition={{ duration: 28, repeat: Infinity, ease: 'linear' }}
-        >
-          {[0, 1].map((i) => (
-            <div key={i} className="flex shrink-0">
-              {MARQUEE_ITEMS.map((item) => (
-                <span key={item} className="inline-flex items-center gap-6">
-                  <span
-                    className="text-[10px] tracking-[0.5em] uppercase text-[#1a1a1a] px-6"
-                    style={{ fontFamily: 'var(--font-sans)' }}
-                  >
-                    {item}
-                  </span>
-                  <span className="text-[#1a1a1a]/30 text-xs">·</span>
-                </span>
-              ))}
-            </div>
-          ))}
-        </motion.div>
-      </div>
 
       {/* ── Vrednosti — horizontal rows with huge watermark numbers ──────── */}
       <section className="py-16 lg:py-24 bg-white border-b border-[#e8e0d8]">
@@ -307,7 +266,7 @@ export default function ONamaContent() {
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.01 }}
             transition={{ duration: 0.7 }}
             className="mb-10 lg:mb-14"
           >
@@ -332,7 +291,7 @@ export default function ONamaContent() {
                 variants={fadeUp}
                 initial="hidden"
                 whileInView="visible"
-                viewport={{ once: true }}
+                viewport={{ once: true, amount: 0.01 }}
                 transition={{ duration: 0.5, delay: i * 0.07 }}
                 className="relative py-9 lg:py-11 flex flex-col sm:flex-row items-start sm:items-center gap-5 lg:gap-14 group overflow-hidden"
               >
@@ -388,7 +347,7 @@ export default function ONamaContent() {
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.01 }}
             transition={{ duration: 0.7 }}
           >
             <p
@@ -421,7 +380,7 @@ export default function ONamaContent() {
               variants={fadeUp}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true }}
+              viewport={{ once: true, amount: 0.01 }}
               transition={{ duration: 0.7, delay: 0.1 }}
               className="flex-1 flex flex-col gap-6"
             >
@@ -459,120 +418,6 @@ export default function ONamaContent() {
         </div>
       </section>
 
-      {/* ── O vlasnici ────────────────────────────────────────────────────── */}
-      <section className="py-20 lg:py-28 px-6 bg-white border-b border-[#e8e0d8]">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start">
-
-            {/* Photo */}
-            <motion.div
-              variants={fadeUp}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="relative"
-            >
-              <div className="relative aspect-[3/4] overflow-hidden">
-                <Image
-                  src="/haljina1.jpg"
-                  alt="Milica Janković, osnivačica TESORO Couture"
-                  fill
-                  className="object-cover object-top"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                />
-              </div>
-              <div className="absolute -bottom-5 -right-5 bg-[#c9a96e] px-6 py-4 hidden lg:block">
-                <p
-                  className="text-[8px] tracking-[0.4em] uppercase text-[#1a1a1a] mb-0.5"
-                  style={{ fontFamily: 'var(--font-sans)' }}
-                >
-                  Osnivačica
-                </p>
-                <p
-                  className="text-base font-light text-[#1a1a1a] italic"
-                  style={{ fontFamily: 'var(--font-serif)' }}
-                >
-                  TESORO Couture
-                </p>
-              </div>
-            </motion.div>
-
-            {/* Text + dramatic stats */}
-            <motion.div
-              variants={fadeUp}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.15 }}
-            >
-              <p
-                className="text-[9px] tracking-[0.5em] uppercase text-[#c9a96e] mb-6"
-                style={{ fontFamily: 'var(--font-sans)' }}
-              >
-                Vlasnica salona
-              </p>
-              <h2
-                className="text-[clamp(28px,4vw,50px)] font-light text-[#1a1a1a] leading-tight mb-2"
-                style={{ fontFamily: 'var(--font-serif)' }}
-              >
-                Milica Janković
-              </h2>
-              <p
-                className="text-sm italic text-[#c9a96e] mb-8"
-                style={{ fontFamily: 'var(--font-serif)' }}
-              >
-                Stilistkinja & Osnivačica
-              </p>
-              <div className="w-10 h-[1.5px] bg-[#c9a96e] mb-8" />
-
-              <div
-                className="flex flex-col gap-5 text-[13px] text-[#8a8a8a] leading-relaxed mb-6"
-                style={{ fontFamily: 'var(--font-sans)' }}
-              >
-                <p>
-                  Milica je svoju ljubav prema modi pretvorila u poziv još kao tinejdžerka, prativi kolekcije iz Pariza i Milana. Nakon studija dizajna u Beogradu i stažiranja u Italiji, 2018. osnovala je TESORO Couture.
-                </p>
-                <p>
-                  Ono što je izdvaja nije samo impresivno oko za detalje — već iskrena posvećenost svakoj klijentkinji. Za Milicu, pronalaženje savršene haljine nije transakcija, već razgovor.
-                </p>
-              </div>
-
-              <p
-                className="text-[16px] lg:text-[18px] italic text-[#1a1a1a]/65 leading-[1.5] mb-10"
-                style={{ fontFamily: 'var(--font-serif)' }}
-              >
-                "Žena ne treba da se uklopi u haljinu — haljina treba da se uklopi u nju."
-              </p>
-
-              {/* Dramatic stat block */}
-              <div className="grid grid-cols-3 border border-[#e8e0d8] divide-x divide-[#e8e0d8]">
-                {[
-                  { to: 500, suffix: '+', label: 'Klijentkinja' },
-                  { to: 15, suffix: '+', label: 'God. iskustva' },
-                  { to: 3, suffix: '', label: 'Nagrade' },
-                ].map((stat) => (
-                  <div key={stat.label} className="flex flex-col items-center text-center py-7 px-4">
-                    <span
-                      className="text-[38px] lg:text-[52px] font-light leading-none text-[#1a1a1a] tabular-nums"
-                      style={{ fontFamily: 'var(--font-serif)' }}
-                    >
-                      <CountUp to={stat.to} suffix={stat.suffix} duration={2200} />
-                    </span>
-                    <span className="w-5 h-px bg-[#c9a96e] my-3" />
-                    <span
-                      className="text-[9px] tracking-[0.3em] uppercase text-[#8a8a8a]"
-                      style={{ fontFamily: 'var(--font-sans)' }}
-                    >
-                      {stat.label}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
 
       {/* ── Kontakt + Mapa ────────────────────────────────────────────────── */}
       <section className="py-20 lg:py-28 px-6 bg-[#faf7f4] border-b border-[#e8e0d8]">
@@ -581,7 +426,7 @@ export default function ONamaContent() {
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.01 }}
             transition={{ duration: 0.7 }}
             className="mb-14"
           >
@@ -606,7 +451,7 @@ export default function ONamaContent() {
               variants={fadeUp}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true }}
+              viewport={{ once: true, amount: 0.01 }}
               transition={{ duration: 0.7, delay: 0.1 }}
               className="flex flex-col gap-8"
             >
@@ -676,7 +521,8 @@ export default function ONamaContent() {
                 <div className="flex items-center gap-3">
                   {[
                     { href: 'https://www.instagram.com/tesoro_couture/', icon: IconInstagram, label: 'Instagram' },
-                    { href: 'https://www.facebook.com', icon: IconFacebook, label: 'Facebook' },
+                    { href: 'https://www.facebook.com/Tesoro.couture/', icon: IconFacebook, label: 'Facebook' },
+                    { href: 'https://www.tiktok.com/@tesoro_couture', icon: IconTikTok, label: 'TikTok' },
                   ].map(({ href, icon: Icon, label }) => (
                     <a
                       key={label}
@@ -703,7 +549,7 @@ export default function ONamaContent() {
               variants={fadeUp}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true }}
+              viewport={{ once: true, amount: 0.01 }}
               transition={{ duration: 0.7, delay: 0.2 }}
               className="relative"
             >
@@ -731,7 +577,7 @@ export default function ONamaContent() {
           variants={fadeUp}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true }}
+          viewport={{ once: true, amount: 0.01 }}
           transition={{ duration: 0.7 }}
           className="max-w-2xl mx-auto text-center"
         >

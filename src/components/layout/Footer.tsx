@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 const footerLinks = [
-  { href: '/katalog', label: 'Katalog' },
+  { href: '/katalog', label: 'Kolekcija' },
   { href: '/o-nama', label: 'O nama' },
   { href: '/rezervacija', label: 'Rezervacija' },
   { href: '/vodic-za-velicine', label: 'Vodič za veličine' },
@@ -53,7 +53,7 @@ export default function Footer() {
             </svg>
           </a>
           <a
-            href="https://www.facebook.com/tesorocouture"
+            href="https://www.facebook.com/Tesoro.couture/"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Facebook"
@@ -61,6 +61,17 @@ export default function Footer() {
           >
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+            </svg>
+          </a>
+          <a
+            href="https://www.tiktok.com/@tesoro_couture"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="TikTok"
+            className="w-8 h-8 border border-[#faf7f4]/10 flex items-center justify-center text-[#faf7f4]/35 hover:border-[#c9a96e]/50 hover:text-[#c9a96e] transition-all duration-300 cursor-pointer"
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z" />
             </svg>
           </a>
         </div>
@@ -71,7 +82,7 @@ export default function Footer() {
 
       {/* Columns */}
       <div className="max-w-7xl mx-auto px-6 lg:px-10 pb-10">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 lg:gap-12">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-8 lg:gap-12">
 
           {/* Navigation */}
           <div>
@@ -105,9 +116,9 @@ export default function Footer() {
             >
               Kontakt
             </h4>
-            <ul className="flex flex-col gap-2.5">
+            <ul className="flex flex-col gap-3">
               <li
-                className="text-[11px] tracking-wide text-[#faf7f4]/40 leading-relaxed"
+                className="text-[12px] tracking-wide text-[#faf7f4]/40 leading-relaxed"
                 style={{ fontFamily: 'var(--font-sans)' }}
               >
                 Jurija Gagarina 151a<br />
@@ -116,7 +127,7 @@ export default function Footer() {
               <li>
                 <a
                   href="tel:+381654033795"
-                  className="text-[11px] tracking-wide text-[#faf7f4]/40 hover:text-[#c9a96e] transition-colors duration-300 cursor-pointer"
+                  className="text-[12px] tracking-wide text-[#faf7f4]/40 hover:text-[#c9a96e] transition-colors duration-300 cursor-pointer"
                   style={{ fontFamily: 'var(--font-sans)' }}
                 >
                   065 403 3795
@@ -125,7 +136,7 @@ export default function Footer() {
               <li>
                 <a
                   href="mailto:info@tesorocouture.rs"
-                  className="text-[11px] tracking-wide text-[#faf7f4]/40 hover:text-[#c9a96e] transition-colors duration-300 cursor-pointer"
+                  className="text-[12px] tracking-wide text-[#faf7f4]/40 hover:text-[#c9a96e] transition-colors duration-300 cursor-pointer"
                   style={{ fontFamily: 'var(--font-sans)' }}
                 >
                   info@tesorocouture.rs
@@ -135,22 +146,24 @@ export default function Footer() {
           </div>
 
           {/* Radno vreme */}
-          <div>
+          <div className="col-span-2 sm:col-span-1">
             <h4
               className="text-[8px] tracking-[0.5em] uppercase text-[#c9a96e] mb-4"
               style={{ fontFamily: 'var(--font-sans)' }}
             >
               Radno vreme
             </h4>
-            <ul className="flex flex-col gap-2.5">
-              <li
-                className="text-[11px] tracking-wide text-[#faf7f4]/40 leading-relaxed"
-                style={{ fontFamily: 'var(--font-sans)' }}
-              >
-                Pon – Pet: 10:00 – 20:00<br />
-                Subota: 10:00 – 18:00<br />
-                Nedeljom: po dogovoru
-              </li>
+            <ul className="flex flex-row justify-between sm:flex-col sm:gap-2">
+              {[
+                { label: 'Pon – Pet', vreme: '10:00 – 20:00' },
+                { label: 'Subota', vreme: '10:00 – 18:00' },
+                { label: 'Nedeljom', vreme: 'po dogovoru' },
+              ].map(({ label, vreme }) => (
+                <li key={label} className="flex flex-col sm:flex-row sm:items-center sm:justify-between sm:gap-4" style={{ fontFamily: 'var(--font-sans)' }}>
+                  <span className="text-[12px] text-[#faf7f4]/40">{label}</span>
+                  <span className="text-[12px] text-[#faf7f4]/25">{vreme}</span>
+                </li>
+              ))}
             </ul>
           </div>
         </div>

@@ -345,7 +345,8 @@ export default function Filteri({
         <div className="max-w-7xl mx-auto px-4 lg:px-10" style={{ overflow: 'visible' }}>
 
           {/* Category tabs — all screens */}
-          <div className="flex items-center overflow-x-auto scrollbar-hide py-3 border-b border-[#e8e0d8]/60">
+          <div className="relative">
+            <div className="flex items-center overflow-x-auto scrollbar-hide py-3 border-b border-[#e8e0d8]/60">
             {KATEGORIJE.map(k => (
               <button key={k.value} type="button"
                 onClick={() => {
@@ -366,6 +367,10 @@ export default function Filteri({
                 {k.label}
               </button>
             ))}
+            </div>
+            {/* Fade right edge — mobile only */}
+            <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-10 lg:hidden"
+              style={{ background: 'linear-gradient(to right, transparent, #faf7f4)' }} />
           </div>
 
           {/* Desktop filter row */}
