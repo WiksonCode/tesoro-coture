@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { createClient as createServiceClient } from '@supabase/supabase-js'
+import { v2 as cloudinary } from 'cloudinary'
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+})
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
@@ -14,18 +20,19 @@ export async function POST(req: NextRequest) {
   const file = formData.get('file') as File | null
   if (!file) return NextResponse.json({ error: 'Nema fajla' }, { status: 400 })
 
-  const serviceClient = createServiceClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+  const isVideo = file.type.startsWith('video/')
+  const bytes = await file.arrayBuffer()
+  const buffer = Buffer.from(bytes)
 
-  const ext = file.name.split('.').pop()
-  const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+  const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
+    cloudinary.uploader.upload_stream(
+      {
+        folder: 'tesoro-couture',
+        resource_type: isVideo ? 'video' : 'image',
+      },
+      (err, res) => err ? reject(err) : resolve(res as { secure_url: string })
+    ).end(buffer)
+  })
 
-  const { data, error } = await serviceClient.storage.from('haljine-slike').upload(path, file)
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-
-  const { data: { publicUrl } } = serviceClient.storage.from('haljine-slike').getPublicUrl(data.path)
-
-  return NextResponse.json({ url: publicUrl })
+  return NextResponse.json({ url: result.secure_url })
 }

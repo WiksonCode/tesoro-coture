@@ -47,103 +47,17 @@ function nadjiPreporuku(g: string, s: string, b: string): { velicina: string; ko
   return { velicina: recommended, konflikt: unique.length > 1 }
 }
 
-// ─── Compact SVG figure for modal ────────────────────────────────────────────
+// ─── Figure image for modal ───────────────────────────────────────────────────
 
-function FiguraSVG({ active, mjere }: {
-  active: MjeraKey | null
-  mjere: { grudi: string; struk: string; bokovi: string }
-}) {
-  const op = (key: MjeraKey) =>
-    active === null ? 0.7 : active === key ? 1 : 0.18
-
-  const GRUDI_Y = 111
-  const STRUK_Y = 165
-  const BOKOVI_Y = 201
-
-  const val = (key: MjeraKey) => {
-    const n = parseFloat(mjere[key])
-    return !isNaN(n) ? `${n}` : ''
-  }
-
+function FiguraSlika() {
   return (
-    <svg viewBox="0 0 210 420" fill="none" xmlns="http://www.w3.org/2000/svg"
-      className="w-full" style={{ maxWidth: 180, maxHeight: 340 }} aria-hidden>
-
-      {/* Head */}
-      <ellipse cx="100" cy="34" rx="22" ry="26" fill="#2a2a2a" stroke="#3a3a3a" strokeWidth="1.2" />
-      <path d="M 80 22 C 78 8 90 4 100 6 C 110 4 122 8 120 22 C 114 14 104 12 100 12 C 96 12 86 14 80 22 Z"
-        fill="#c9a96e" opacity="0.2" />
-
-      {/* Body */}
-      <path d="
-        M 78 58 C 60 64 46 76 44 88 C 40 98 36 108 34 120
-        C 32 132 36 144 40 155 C 42 161 44 165 44 170
-        C 40 180 30 190 24 206 C 20 218 22 230 26 242
-        C 32 260 34 280 36 304 C 38 322 36 342 36 358
-        L 30 374 L 50 374 L 53 290
-        C 56 272 62 260 70 252 C 76 246 84 244 94 244
-        C 98 244 100 244 100 244
-        C 104 244 108 246 114 250 C 122 258 128 270 132 288
-        L 136 374 L 156 374 L 150 358
-        C 150 342 148 322 150 304 C 152 280 154 260 160 242
-        C 164 230 166 218 162 206 C 156 190 146 180 142 170
-        C 142 165 144 161 146 155 C 150 144 154 132 152 120
-        C 150 108 146 98 142 88 C 140 76 126 64 108 58
-        L 108 72 C 106 76 104 78 100 78 C 96 78 94 76 92 72 Z"
-        fill="#2a2a2a" stroke="#3a3a3a" strokeWidth="1.3" />
-
-      {/* ── GRUDI ── */}
-      <motion.g animate={{ opacity: op('grudi') }} transition={{ duration: 0.25 }}>
-        <rect x="16" y={GRUDI_Y - 5} width="136" height="10" fill="#c9a96e" opacity="0.08" />
-        <line x1="28" y1={GRUDI_Y - 5} x2="28" y2={GRUDI_Y + 5} stroke="#c9a96e" strokeWidth="2" strokeLinecap="round" />
-        <line x1="28" y1={GRUDI_Y} x2="172" y2={GRUDI_Y} stroke="#c9a96e" strokeWidth="1.2" strokeDasharray="4 3" />
-        <line x1="172" y1={GRUDI_Y - 5} x2="172" y2={GRUDI_Y + 5} stroke="#c9a96e" strokeWidth="2" strokeLinecap="round" />
-        <circle cx="28"  cy={GRUDI_Y} r="3.5" fill="#c9a96e" />
-        <circle cx="172" cy={GRUDI_Y} r="3.5" fill="#c9a96e" />
-        {val('grudi') && (
-          <text x="100" y={GRUDI_Y - 8} fontFamily="DM Sans, sans-serif" fontSize="8" fill="#c9a96e" textAnchor="middle" letterSpacing="1">
-            {val('grudi')} cm
-          </text>
-        )}
-      </motion.g>
-
-      {/* ── STRUK ── */}
-      <motion.g animate={{ opacity: op('struk') }} transition={{ duration: 0.25 }}>
-        <rect x="30" y={STRUK_Y - 5} width="120" height="10" fill="#c9a96e" opacity="0.08" />
-        <line x1="40" y1={STRUK_Y - 5} x2="40" y2={STRUK_Y + 5} stroke="#c9a96e" strokeWidth="2" strokeLinecap="round" />
-        <line x1="40" y1={STRUK_Y} x2="160" y2={STRUK_Y} stroke="#c9a96e" strokeWidth="1.2" strokeDasharray="4 3" />
-        <line x1="160" y1={STRUK_Y - 5} x2="160" y2={STRUK_Y + 5} stroke="#c9a96e" strokeWidth="2" strokeLinecap="round" />
-        <circle cx="40"  cy={STRUK_Y} r="3.5" fill="#c9a96e" />
-        <circle cx="160" cy={STRUK_Y} r="3.5" fill="#c9a96e" />
-        {val('struk') && (
-          <text x="100" y={STRUK_Y - 8} fontFamily="DM Sans, sans-serif" fontSize="8" fill="#c9a96e" textAnchor="middle" letterSpacing="1">
-            {val('struk')} cm
-          </text>
-        )}
-      </motion.g>
-
-      {/* ── BOKOVI ── */}
-      <motion.g animate={{ opacity: op('bokovi') }} transition={{ duration: 0.25 }}>
-        <rect x="14" y={BOKOVI_Y - 5} width="142" height="10" fill="#c9a96e" opacity="0.08" />
-        <line x1="24" y1={BOKOVI_Y - 5} x2="24" y2={BOKOVI_Y + 5} stroke="#c9a96e" strokeWidth="2" strokeLinecap="round" />
-        <line x1="24" y1={BOKOVI_Y} x2="176" y2={BOKOVI_Y} stroke="#c9a96e" strokeWidth="1.2" strokeDasharray="4 3" />
-        <line x1="176" y1={BOKOVI_Y - 5} x2="176" y2={BOKOVI_Y + 5} stroke="#c9a96e" strokeWidth="2" strokeLinecap="round" />
-        <circle cx="24"  cy={BOKOVI_Y} r="3.5" fill="#c9a96e" />
-        <circle cx="176" cy={BOKOVI_Y} r="3.5" fill="#c9a96e" />
-        {val('bokovi') && (
-          <text x="100" y={BOKOVI_Y - 8} fontFamily="DM Sans, sans-serif" fontSize="8" fill="#c9a96e" textAnchor="middle" letterSpacing="1">
-            {val('bokovi')} cm
-          </text>
-        )}
-      </motion.g>
-
-      {/* Height indicator */}
-      <g opacity="0.2">
-        <line x1="8" y1="8" x2="8" y2="374" stroke="#faf7f4" strokeWidth="0.8" />
-        <path d="M 5 15 L 8 7 L 11 15" fill="none" stroke="#faf7f4" strokeWidth="0.8" />
-        <path d="M 5 367 L 8 375 L 11 367" fill="none" stroke="#faf7f4" strokeWidth="0.8" />
-      </g>
-    </svg>
+    <img
+      src="/figura-lutka.png"
+      alt=""
+      aria-hidden
+      className="w-full scale-125 origin-top"
+      style={{ width: 'calc(100% + 64px)', marginLeft: '-32px', marginRight: '-32px' }}
+    />
   )
 }
 
@@ -151,7 +65,6 @@ function FiguraSVG({ active, mjere }: {
 
 export default function VodicZaVelicineModal({ open, onClose }: Props) {
   const [mjere, setMjere] = useState({ grudi: '', struk: '', bokovi: '' })
-  const [active, setActive] = useState<MjeraKey | null>(null)
 
   const preporuka = useMemo(
     () => nadjiPreporuku(mjere.grudi, mjere.struk, mjere.bokovi),
@@ -168,10 +81,7 @@ export default function VodicZaVelicineModal({ open, onClose }: Props) {
 
   // Reset on close
   useEffect(() => {
-    if (!open) {
-      setMjere({ grudi: '', struk: '', bokovi: '' })
-      setActive(null)
-    }
+    if (!open) setMjere({ grudi: '', struk: '', bokovi: '' })
   }, [open])
 
   return (
@@ -214,44 +124,47 @@ export default function VodicZaVelicineModal({ open, onClose }: Props) {
             >
 
               {/* ── Left — dark figure panel ── */}
-              <div className="bg-[#1a1a1a] flex flex-col items-center px-8 pt-10 pb-8 lg:w-[260px] lg:min-h-full shrink-0">
-                <p
-                  className="text-[8px] tracking-[0.65em] uppercase text-[#c9a96e]/75 mb-3"
-                  style={{ fontFamily: 'var(--font-sans)' }}
-                >
-                  Tesoro Couture
-                </p>
-                <h2
-                  className="text-[22px] font-light italic text-[#faf7f4] leading-snug text-center mb-6"
-                  style={{ fontFamily: 'var(--font-serif)' }}
-                >
-                  Vodič za<br />veličine
-                </h2>
-                <div className="w-6 h-px bg-[#c9a96e]/40 mb-6" />
+              <div className="bg-[#1a1a1a] shrink-0 lg:w-[260px] lg:min-h-full lg:flex lg:flex-col lg:items-center lg:px-8 lg:pt-10 lg:pb-8">
 
-                <FiguraSVG active={active} mjere={mjere} />
+                {/* Mobile: title + image capped height */}
+                <div className="lg:hidden flex flex-col items-center px-8 pt-7 pb-0">
+                  <p
+                    className="text-[7px] tracking-[0.55em] uppercase text-[#c9a96e]/75 mb-1.5"
+                    style={{ fontFamily: 'var(--font-sans)' }}
+                  >
+                    Tesoro Couture
+                  </p>
+                  <h2
+                    className="text-[20px] font-light italic text-[#faf7f4] leading-none mb-4"
+                    style={{ fontFamily: 'var(--font-serif)' }}
+                  >
+                    Vodič za veličine
+                  </h2>
+                  <img
+                    src="/figura-lutka.png"
+                    alt=""
+                    aria-hidden
+                    className="w-full"
+                    style={{ width: 'calc(100% + 64px)', marginLeft: '-32px', marginRight: '-32px' }}
+                  />
+                </div>
 
-                {/* Measure labels */}
-                <div className="mt-5 w-full flex flex-col gap-2">
-                  {(['grudi', 'struk', 'bokovi'] as MjeraKey[]).map(key => (
-                    <button
-                      key={key}
-                      type="button"
-                      onClick={() => setActive(active === key ? null : key)}
-                      className="flex items-center gap-2.5 cursor-pointer group"
-                    >
-                      <span className="w-5 h-px bg-[#c9a96e] opacity-60 group-hover:opacity-100 transition-opacity" />
-                      <span
-                        className="text-[8px] tracking-[0.35em] uppercase transition-colors"
-                        style={{
-                          fontFamily: 'var(--font-sans)',
-                          color: active === key ? '#c9a96e' : 'rgba(250,247,244,0.65)',
-                        }}
-                      >
-                        {key.charAt(0).toUpperCase() + key.slice(1)}
-                      </span>
-                    </button>
-                  ))}
+                {/* Desktop: full layout with image */}
+                <div className="hidden lg:contents">
+                  <p
+                    className="text-[8px] tracking-[0.65em] uppercase text-[#c9a96e]/75 mb-3"
+                    style={{ fontFamily: 'var(--font-sans)' }}
+                  >
+                    Tesoro Couture
+                  </p>
+                  <h2
+                    className="text-[22px] font-light italic text-[#faf7f4] leading-snug text-center mb-6"
+                    style={{ fontFamily: 'var(--font-serif)' }}
+                  >
+                    Vodič za<br />veličine
+                  </h2>
+                  <div className="w-6 h-px bg-[#c9a96e]/40 mb-6" />
+                  <FiguraSlika />
                 </div>
               </div>
 
@@ -281,8 +194,6 @@ export default function VodicZaVelicineModal({ open, onClose }: Props) {
                             inputMode="numeric"
                             value={mjere[key]}
                             onChange={e => setMjera(key, e.target.value)}
-                            onFocus={() => setActive(key)}
-                            onBlur={() => setActive(null)}
                             placeholder="0"
                             min={40}
                             max={180}
@@ -292,20 +203,6 @@ export default function VodicZaVelicineModal({ open, onClose }: Props) {
                           <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[9px] text-[#a0988e]"
                             style={{ fontFamily: 'var(--font-sans)' }}>cm</span>
                         </div>
-                        <AnimatePresence>
-                          {active === key && (
-                            <motion.p
-                              initial={{ opacity: 0, height: 0 }}
-                              animate={{ opacity: 1, height: 'auto' }}
-                              exit={{ opacity: 0, height: 0 }}
-                              transition={{ duration: 0.18 }}
-                              className="text-[9px] text-[#8a8a8a] mt-1.5 overflow-hidden leading-snug"
-                              style={{ fontFamily: 'var(--font-sans)' }}
-                            >
-                              {TIPS[key]}
-                            </motion.p>
-                          )}
-                        </AnimatePresence>
                       </div>
                     ))}
                   </div>

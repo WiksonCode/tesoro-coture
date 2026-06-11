@@ -1,6 +1,6 @@
 # TESORO Couture — Plan Rada
 
-## Status projekta
+## Status projekta (~80% gotovo, 2026-06-10)
 
 ```
 FAZA 1 → Setup & Infrastruktura        ✅ ZAVRŠENO
@@ -89,21 +89,19 @@ FAZA 9 → Polishing & Deploy            🔄 U TOKU
 
 ## Preostalo
 
-### Faza 8 — i18n & Višejezičnost ⏳
-- Instalirati `next-intl`
-- Kreirati `messages/sr.json` i `messages/en.json`
-- LanguageSwitcher u Navbar
+### Faza 9 — Polishing & Deploy 🔄 (dogovoreni redoslijed)
 
-### Faza 9 — Polishing & Deploy 🔄
-- [ ] Loading.tsx i error.tsx na ključnim rutama
-- [ ] generateMetadata na svim stranicama
-- [ ] Mobile testiranje (sve stranice)
-- [ ] Favicon i og:image sa TESORO logom
-- [ ] robots.txt i sitemap.xml
-- [ ] Rate limiting na API routes
-- [ ] Verifikovati domen na Resend → postaviti `RESEND_FROM_EMAIL`
-- [ ] Environment varijable na Vercel
-- [ ] Deploy na Vercel
+- [ ] 1. Dizajn review + responzivnost (mobile testiranje svih stranica)
+- [ ] 2. Favicon + og:image (logo već postoji u /public)
+- [ ] 3. Loading.tsx i error.tsx na ključnim rutama
+- [ ] 4. i18n — srpski + engleski (next-intl, messages/sr.json + en.json, LanguageSwitcher u Navbar)
+- [ ] 5. generateMetadata na svim stranicama (SEO)
+- [ ] 6. robots.txt i sitemap.xml
+- [ ] 7. Rate limiting na API routes (rezervacije endpoint)
+- [ ] 8. Verifikovati domen na Resend → odkomentarisati `RESEND_FROM_EMAIL` u .env.local
+- [ ] 9. Environment varijable na Vercel
+- [ ] 10. Deploy na Vercel
+- [ ] 11. Klijent ubacuje haljine kroz admin panel
 
 ### Deploy komande:
 ```bash

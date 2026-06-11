@@ -52,6 +52,11 @@ export default function HaljinaForma({ haljina, kategorije }: Props) {
 
   async function handleImageUpload(files: FileList | null) {
     if (!files || files.length === 0) return
+    const oversized = Array.from(files).find((f) => f.size > 10 * 1024 * 1024)
+    if (oversized) {
+      setServerError(`Slika "${oversized.name}" je prevelika. Maksimalna veličina je 10MB.`)
+      return
+    }
     setUploading(true)
     setServerError(null)
     const newUrls: string[] = []
@@ -87,6 +92,10 @@ export default function HaljinaForma({ haljina, kategorije }: Props) {
 
   async function handleVideoUpload(files: FileList | null) {
     if (!files || files.length === 0) return
+    if (files[0].size > 100 * 1024 * 1024) {
+      setServerError(`Video je prevelik. Maksimalna veličina je 100MB.`)
+      return
+    }
     setUploadingVideo(true)
     setServerError(null)
     try {
