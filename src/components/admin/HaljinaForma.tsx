@@ -50,11 +50,24 @@ export default function HaljinaForma({ haljina, kategorije }: Props) {
     }
   }, [naziv_sr, slugManual])
 
+  async function getUploadSignature() {
+    const res = await fetch('/api/upload-signature')
+    if (!res.ok) throw new Error('Greška pri autorizaciji uploada.')
+    return res.json() as Promise<{
+      signature: string
+      timestamp: number
+      folder: string
+      quality: string
+      cloudName: string
+      apiKey: string
+    }>
+  }
+
   async function handleImageUpload(files: FileList | null) {
     if (!files || files.length === 0) return
-    const oversized = Array.from(files).find((f) => f.size > 4 * 1024 * 1024)
+    const oversized = Array.from(files).find((f) => f.size > 50 * 1024 * 1024)
     if (oversized) {
-      setServerError(`Slika "${oversized.name}" je prevelika. Maksimalna veličina je 4MB.`)
+      setServerError(`Slika "${oversized.name}" je prevelika. Maksimalna veličina je 50MB.`)
       return
     }
     setUploading(true)
@@ -62,32 +75,37 @@ export default function HaljinaForma({ haljina, kategorije }: Props) {
     const newUrls: string[] = []
 
     try {
+      const { signature, timestamp, folder, quality, cloudName, apiKey } = await getUploadSignature()
+
       for (const file of Array.from(files)) {
         const fd = new FormData()
         fd.append('file', file)
-        const res = await fetch('/api/upload', { method: 'POST', body: fd })
+        fd.append('api_key', apiKey)
+        fd.append('timestamp', String(timestamp))
+        fd.append('signature', signature)
+        fd.append('folder', folder)
+        fd.append('quality', quality)
 
-        if (res.status === 413) {
-          setServerError('Slika je prevelika. Maksimalna veličina je 4MB.')
-          setUploading(false)
-          return
-        }
+        const res = await fetch(
+          `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+          { method: 'POST', body: fd }
+        )
 
-        let json: { url?: string; error?: string }
+        let json: { secure_url?: string; error?: { message: string } }
         try {
           json = await res.json()
         } catch {
-          setServerError(`Upload greška: Server nije vratio validan odgovor (status ${res.status})`)
+          setServerError(`Upload greška: neočekivan odgovor (status ${res.status})`)
           setUploading(false)
           return
         }
 
-        if (!res.ok) {
-          setServerError(`Upload greška: ${json.error ?? res.statusText}`)
+        if (!res.ok || json.error) {
+          setServerError(`Upload greška: ${json.error?.message ?? res.statusText}`)
           setUploading(false)
           return
         }
-        newUrls.push(json.url!)
+        newUrls.push(json.secure_url!)
       }
       setSlike((prev) => [...prev, ...newUrls])
     } catch (err) {
@@ -107,22 +125,41 @@ export default function HaljinaForma({ haljina, kategorije }: Props) {
 
   async function handleVideoUpload(files: FileList | null) {
     if (!files || files.length === 0) return
-    if (files[0].size > 100 * 1024 * 1024) {
-      setServerError(`Video je prevelik. Maksimalna veličina je 100MB.`)
+    if (files[0].size > 500 * 1024 * 1024) {
+      setServerError('Video je prevelik. Maksimalna veličina je 500MB.')
       return
     }
     setUploadingVideo(true)
     setServerError(null)
     try {
+      const { signature, timestamp, folder, quality, cloudName, apiKey } = await getUploadSignature()
+
       const fd = new FormData()
       fd.append('file', files[0])
-      const res = await fetch('/api/upload', { method: 'POST', body: fd })
-      const json = await res.json()
-      if (!res.ok) {
-        setServerError(`Upload greška: ${json.error ?? res.statusText}`)
+      fd.append('api_key', apiKey)
+      fd.append('timestamp', String(timestamp))
+      fd.append('signature', signature)
+      fd.append('folder', folder)
+      fd.append('quality', quality)
+
+      const res = await fetch(
+        `https://api.cloudinary.com/v1_1/${cloudName}/video/upload`,
+        { method: 'POST', body: fd }
+      )
+
+      let json: { secure_url?: string; error?: { message: string } }
+      try {
+        json = await res.json()
+      } catch {
+        setServerError(`Upload greška: neočekivan odgovor (status ${res.status})`)
         return
       }
-      setVideoUrl(json.url)
+
+      if (!res.ok || json.error) {
+        setServerError(`Upload greška: ${json.error?.message ?? res.statusText}`)
+        return
+      }
+      setVideoUrl(json.secure_url!)
     } catch (err) {
       setServerError(`Upload greška: ${err instanceof Error ? err.message : 'Nepoznata greška'}`)
     } finally {
