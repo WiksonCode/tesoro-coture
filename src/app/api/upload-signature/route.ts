@@ -17,8 +17,10 @@ export async function GET() {
   if (profil?.uloga !== 'admin') return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const timestamp = Math.round(Date.now() / 1000)
+  const eager = 'q_auto:good,f_auto'
   const paramsToSign = {
     folder: 'tesoro-couture',
+    eager,
     timestamp,
   }
 
@@ -31,6 +33,7 @@ export async function GET() {
     signature,
     timestamp,
     folder: paramsToSign.folder,
+    eager,
     cloudName: process.env.CLOUDINARY_CLOUD_NAME,
     apiKey: process.env.CLOUDINARY_API_KEY,
   })

@@ -57,6 +57,7 @@ export default function HaljinaForma({ haljina, kategorije }: Props) {
       signature: string
       timestamp: number
       folder: string
+      eager: string
       cloudName: string
       apiKey: string
     }>
@@ -74,7 +75,7 @@ export default function HaljinaForma({ haljina, kategorije }: Props) {
     const newUrls: string[] = []
 
     try {
-      const { signature, timestamp, folder, cloudName, apiKey } = await getUploadSignature()
+      const { signature, timestamp, folder, eager, cloudName, apiKey } = await getUploadSignature()
 
       for (const file of Array.from(files)) {
         const fd = new FormData()
@@ -83,13 +84,14 @@ export default function HaljinaForma({ haljina, kategorije }: Props) {
         fd.append('timestamp', String(timestamp))
         fd.append('signature', signature)
         fd.append('folder', folder)
+        fd.append('eager', eager)
 
         const res = await fetch(
           `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
           { method: 'POST', body: fd }
         )
 
-        let json: { secure_url?: string; error?: { message: string } }
+        let json: { secure_url?: string; eager?: { secure_url: string }[]; error?: { message: string } }
         try {
           json = await res.json()
         } catch {
@@ -103,7 +105,7 @@ export default function HaljinaForma({ haljina, kategorije }: Props) {
           setUploading(false)
           return
         }
-        newUrls.push(json.secure_url!)
+        newUrls.push(json.eager?.[0]?.secure_url ?? json.secure_url!)
       }
       setSlike((prev) => [...prev, ...newUrls])
     } catch (err) {
@@ -130,7 +132,7 @@ export default function HaljinaForma({ haljina, kategorije }: Props) {
     setUploadingVideo(true)
     setServerError(null)
     try {
-      const { signature, timestamp, folder, cloudName, apiKey } = await getUploadSignature()
+      const { signature, timestamp, folder, eager, cloudName, apiKey } = await getUploadSignature()
 
       const fd = new FormData()
       fd.append('file', files[0])
@@ -138,13 +140,14 @@ export default function HaljinaForma({ haljina, kategorije }: Props) {
       fd.append('timestamp', String(timestamp))
       fd.append('signature', signature)
       fd.append('folder', folder)
+      fd.append('eager', eager)
 
       const res = await fetch(
         `https://api.cloudinary.com/v1_1/${cloudName}/video/upload`,
         { method: 'POST', body: fd }
       )
 
-      let json: { secure_url?: string; error?: { message: string } }
+      let json: { secure_url?: string; eager?: { secure_url: string }[]; error?: { message: string } }
       try {
         json = await res.json()
       } catch {
@@ -156,7 +159,7 @@ export default function HaljinaForma({ haljina, kategorije }: Props) {
         setServerError(`Upload greška: ${json.error?.message ?? res.statusText}`)
         return
       }
-      setVideoUrl(json.secure_url!)
+      setVideoUrl(json.eager?.[0]?.secure_url ?? json.secure_url!)
     } catch (err) {
       setServerError(`Upload greška: ${err instanceof Error ? err.message : 'Nepoznata greška'}`)
     } finally {
