@@ -52,9 +52,9 @@ export default function HaljinaForma({ haljina, kategorije }: Props) {
 
   async function handleImageUpload(files: FileList | null) {
     if (!files || files.length === 0) return
-    const oversized = Array.from(files).find((f) => f.size > 10 * 1024 * 1024)
+    const oversized = Array.from(files).find((f) => f.size > 4 * 1024 * 1024)
     if (oversized) {
-      setServerError(`Slika "${oversized.name}" je prevelika. Maksimalna veličina je 10MB.`)
+      setServerError(`Slika "${oversized.name}" je prevelika. Maksimalna veličina je 4MB.`)
       return
     }
     setUploading(true)
@@ -66,13 +66,28 @@ export default function HaljinaForma({ haljina, kategorije }: Props) {
         const fd = new FormData()
         fd.append('file', file)
         const res = await fetch('/api/upload', { method: 'POST', body: fd })
-        const json = await res.json()
+
+        if (res.status === 413) {
+          setServerError('Slika je prevelika. Maksimalna veličina je 4MB.')
+          setUploading(false)
+          return
+        }
+
+        let json: { url?: string; error?: string }
+        try {
+          json = await res.json()
+        } catch {
+          setServerError(`Upload greška: Server nije vratio validan odgovor (status ${res.status})`)
+          setUploading(false)
+          return
+        }
+
         if (!res.ok) {
           setServerError(`Upload greška: ${json.error ?? res.statusText}`)
           setUploading(false)
           return
         }
-        newUrls.push(json.url)
+        newUrls.push(json.url!)
       }
       setSlike((prev) => [...prev, ...newUrls])
     } catch (err) {
