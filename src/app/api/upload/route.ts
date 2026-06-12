@@ -26,10 +26,19 @@ export async function POST(req: NextRequest) {
 
   const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
     cloudinary.uploader.upload_stream(
-      {
-        folder: 'tesoro-couture',
-        resource_type: isVideo ? 'video' : 'image',
-      },
+      isVideo
+        ? {
+            folder: 'tesoro-couture',
+            resource_type: 'video',
+            quality: 'auto:good',
+          }
+        : {
+            folder: 'tesoro-couture',
+            resource_type: 'image',
+            quality: 'auto:good',
+            fetch_format: 'auto',
+            flags: 'progressive',
+          },
       (err, res) => err ? reject(err) : resolve(res as { secure_url: string })
     ).end(buffer)
   })

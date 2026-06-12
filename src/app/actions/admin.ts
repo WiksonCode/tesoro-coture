@@ -36,6 +36,18 @@ export async function createHaljina(formData: FormData): Promise<{ error: string
     return { error: 'Nemate pristup.' }
   }
   const data = extractHaljinaData(formData)
+
+  // Osiguraj unikatan slug
+  let slug = data.slug
+  let suffix = 1
+  while (true) {
+    const { data: existing } = await supabase.from('haljine').select('id').eq('slug', slug).maybeSingle()
+    if (!existing) break
+    suffix++
+    slug = `${data.slug}-${suffix}`
+  }
+  data.slug = slug
+
   const { error } = await supabase.from('haljine').insert(data)
   if (error) return { error: error.message }
   revalidatePath('/admin/haljine')
