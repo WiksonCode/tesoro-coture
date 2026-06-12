@@ -57,7 +57,6 @@ export default function HaljinaForma({ haljina, kategorije }: Props) {
       signature: string
       timestamp: number
       folder: string
-      quality: string
       cloudName: string
       apiKey: string
     }>
@@ -75,7 +74,7 @@ export default function HaljinaForma({ haljina, kategorije }: Props) {
     const newUrls: string[] = []
 
     try {
-      const { signature, timestamp, folder, quality, cloudName, apiKey } = await getUploadSignature()
+      const { signature, timestamp, folder, cloudName, apiKey } = await getUploadSignature()
 
       for (const file of Array.from(files)) {
         const fd = new FormData()
@@ -84,7 +83,6 @@ export default function HaljinaForma({ haljina, kategorije }: Props) {
         fd.append('timestamp', String(timestamp))
         fd.append('signature', signature)
         fd.append('folder', folder)
-        fd.append('quality', quality)
 
         const res = await fetch(
           `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
@@ -132,7 +130,7 @@ export default function HaljinaForma({ haljina, kategorije }: Props) {
     setUploadingVideo(true)
     setServerError(null)
     try {
-      const { signature, timestamp, folder, quality, cloudName, apiKey } = await getUploadSignature()
+      const { signature, timestamp, folder, cloudName, apiKey } = await getUploadSignature()
 
       const fd = new FormData()
       fd.append('file', files[0])
@@ -140,7 +138,6 @@ export default function HaljinaForma({ haljina, kategorije }: Props) {
       fd.append('timestamp', String(timestamp))
       fd.append('signature', signature)
       fd.append('folder', folder)
-      fd.append('quality', quality)
 
       const res = await fetch(
         `https://api.cloudinary.com/v1_1/${cloudName}/video/upload`,

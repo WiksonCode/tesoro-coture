@@ -19,7 +19,6 @@ export async function GET() {
   const timestamp = Math.round(Date.now() / 1000)
   const paramsToSign = {
     folder: 'tesoro-couture',
-    quality: 'auto:good',
     timestamp,
   }
 
@@ -32,7 +31,6 @@ export async function GET() {
     signature,
     timestamp,
     folder: paramsToSign.folder,
-    quality: paramsToSign.quality,
     cloudName: process.env.CLOUDINARY_CLOUD_NAME,
     apiKey: process.env.CLOUDINARY_API_KEY,
   })
