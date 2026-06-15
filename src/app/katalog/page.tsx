@@ -153,7 +153,7 @@ export default async function KatalogPage({
         </div>
       </div>
 
-      <KatalogClient haljine={haljine} activeParams={{ ...params, naPopustu: params.naPopustu }} />
+      <KatalogClient haljine={haljine} activeParams={params} />
     </main>
   )
 }
