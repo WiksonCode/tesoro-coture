@@ -16,6 +16,7 @@ interface SearchParams {
   q?: string
   boje?: string
   velicine?: string
+  naPopustu?: string
 }
 
 const KATEGORIJE_NAZIVI: Record<string, string> = {
@@ -53,8 +54,8 @@ export default async function KatalogPage({
 
   let query = supabase
     .from('haljine')
-    .select('id, slug, naziv_sr, naziv_en, opis_sr, slike, video_url, featured, created_at, redoslijed, kategorija_id, kategorija:kategorije(id, slug, naziv_sr, naziv_en, redosled), inventar(id, sifra, boja_naziv, boja_hex, velicina, cijena_rsd, cijena_eur, slike, dostupna, arhivirana)')
-    .eq('arhivirana', false)
+    .select('id, slug, naziv_sr, naziv_en, opis_sr, slike, video_url, featured, created_at, redoslijed, kategorija_id, kategorija:kategorije(id, slug, naziv_sr, naziv_en, redosled), inventar(id, sifra, boja_naziv, boja_hex, velicina, cijena_rsd, cijena_eur, na_akciji, cijena_akcija_rsd, cijena_akcija_eur, slike, dostupna, arhivirana)')
+    .or('arhivirana.eq.false,arhivirana.is.null')
 
   if (params.q) {
     query = query.ilike('naziv_sr', `%${params.q}%`)
@@ -152,7 +153,7 @@ export default async function KatalogPage({
         </div>
       </div>
 
-      <KatalogClient haljine={haljine} activeParams={params} />
+      <KatalogClient haljine={haljine} activeParams={{ ...params, naPopustu: params.naPopustu }} />
     </main>
   )
 }
