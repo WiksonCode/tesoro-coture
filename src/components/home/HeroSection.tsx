@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 
-const HERO_IMAGE = '/hero-bg-v2.png'
+const HERO_IMAGE = '/hero-bg-v3.png'
 
 export default function HeroSection() {
   return (
