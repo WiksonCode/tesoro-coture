@@ -313,13 +313,13 @@ function InventarEditRow({
                 type="button"
                 onClick={() => setNaAkciji((v) => !v)}
                 className={cn(
-                  'relative w-9 h-5 rounded-full overflow-hidden transition-colors duration-200 shrink-0 cursor-pointer',
+                  'relative w-10 h-[22px] rounded-full transition-colors duration-200 shrink-0 cursor-pointer',
                   naAkciji ? 'bg-red-500' : 'bg-[#e8e0d8]'
                 )}
               >
                 <span className={cn(
-                  'absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200',
-                  naAkciji ? 'translate-x-4' : 'translate-x-0.5'
+                  'absolute top-[3px] w-4 h-4 rounded-full bg-white shadow-sm transition-all duration-200',
+                  naAkciji ? 'left-[21px]' : 'left-[3px]'
                 )} />
               </button>
               <span className="text-[10px] tracking-[0.2em] uppercase text-[#8a8a8a]" style={{ fontFamily: 'var(--font-sans)' }}>
@@ -415,7 +415,7 @@ function InventarAddForm({
               type="button"
               onClick={() => setNaAkciji((v) => !v)}
               className={cn(
-                'relative w-9 h-5 rounded-full overflow-hidden transition-colors duration-200 shrink-0 cursor-pointer',
+                'relative w-10 h-[22px] rounded-full transition-colors duration-200 shrink-0 cursor-pointer',
                 naAkciji ? 'bg-red-500' : 'bg-[#e8e0d8]'
               )}
             >
@@ -642,7 +642,7 @@ export default function HaljineTableClient({ haljine }: Props) {
                 </tr>
               )}
               {filtered.map((h) => {
-                const ukupno = h.inventar?.length ?? 0
+                const ukupno = h.inventar?.filter((i) => !i.arhivirana && !hiddenIds.has(i.id)).length ?? 0
                 const dostupno = h.inventar?.filter((i) => i.dostupna && !i.arhivirana && !hiddenIds.has(i.id)).length ?? 0
                 const isExpanded = expandedId === h.id
 

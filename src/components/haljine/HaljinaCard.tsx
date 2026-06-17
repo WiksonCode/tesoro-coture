@@ -14,7 +14,7 @@ export function formatCijena(cijena: number): string {
     style: 'decimal',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-  }).format(cijena) + ' RSD'
+  }).format(cijena) + ' RSD'
 }
 
 function getBojeIzInventara(inventar: InventarStavka[]) {
@@ -43,6 +43,11 @@ export default function HaljinaCard({ haljina, className }: { haljina: Haljina; 
   const saleStavke = dostupniInventar.filter((i) => i.na_akciji && i.cijena_akcija_rsd != null)
   const minSaleCijena = saleStavke.length > 0
     ? Math.min(...saleStavke.map((i) => i.cijena_akcija_rsd!))
+    : null
+  const maxPopust = saleStavke.length > 0
+    ? Math.max(...saleStavke.map((i) =>
+        i.popust_procenat ?? Math.round((1 - i.cijena_akcija_rsd! / i.cijena_rsd) * 100)
+      ))
     : null
 
   const boje = getBojeIzInventara(dostupniInventar)
@@ -155,8 +160,8 @@ export default function HaljinaCard({ haljina, className }: { haljina: Haljina; 
 
         {isNaAkciji && (
           <div className="absolute top-3 left-3 bg-red-600 px-2.5 py-1.5">
-            <span className="text-[11px] font-medium text-white tracking-[0.15em]" style={{ fontFamily: 'var(--font-sans)' }}>
-              Sale
+            <span className="text-[11px] font-medium text-white tracking-[0.1em]" style={{ fontFamily: 'var(--font-sans)' }}>
+              {maxPopust ? `-${maxPopust}%` : 'Sale'}
             </span>
           </div>
         )}
@@ -301,13 +306,13 @@ export default function HaljinaCard({ haljina, className }: { haljina: Haljina; 
         <div className="flex items-center justify-between">
           {minCijena > 0 && (
             isNaAkciji && minSaleCijena ? (
-              <div className="flex flex-col gap-0.5">
-                <span className="line-through text-[#8a8a8a] text-[11px] whitespace-nowrap" style={{ fontFamily: 'var(--font-sans)' }}>
+              <div style={{ flexShrink: 0 }}>
+                <div className="line-through text-[#8a8a8a] text-[11px]" style={{ fontFamily: 'var(--font-sans)', whiteSpace: 'nowrap' }}>
                   {formatCijena(minCijena)}
-                </span>
-                <span className="text-[15px] font-semibold text-red-600 whitespace-nowrap" style={{ fontFamily: 'var(--font-sans)' }}>
+                </div>
+                <div className="text-[15px] font-semibold text-red-600" style={{ fontFamily: 'var(--font-sans)', whiteSpace: 'nowrap' }}>
                   {formatCijena(minSaleCijena)}
-                </span>
+                </div>
               </div>
             ) : (
               <span className="text-[15px] font-semibold text-[#c9a96e]" style={{ fontFamily: 'var(--font-sans)' }}>

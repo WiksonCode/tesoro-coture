@@ -19,7 +19,7 @@ function formatRSD(cijena: number) {
     style: 'decimal',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-  }).format(cijena) + ' RSD'
+  }).format(cijena) + ' RSD'
 }
 
 function formatEUR(cijenaRSD: number) {
@@ -96,8 +96,13 @@ export default function HaljinaDetalji({ haljina }: { haljina: Haljina }) {
     [dostupniInventar, odabranaBoja, odabranaVelicina]
   )
 
-  const cijena = odabraniInventar?.cijena_rsd
+  const originalCijena = odabraniInventar?.cijena_rsd
     ?? (dostupniInventar[0]?.cijena_rsd ?? 0)
+  const isNaAkciji = odabraniInventar?.na_akciji ?? false
+  const cijenaAkcija = isNaAkciji && odabraniInventar?.cijena_akcija_rsd != null
+    ? odabraniInventar.cijena_akcija_rsd
+    : null
+  const cijena = cijenaAkcija ?? originalCijena
 
   const dostupnostInfo = useMemo(() => {
     if (isRasprodato) return null
@@ -148,8 +153,12 @@ export default function HaljinaDetalji({ haljina }: { haljina: Haljina }) {
       boja_naziv: inventarItem.boja_naziv,
       boja_hex: inventarItem.boja_hex,
       velicina: odabranaVelicina as import('@/types').Velicina,
-      cijena_rsd: inventarItem.cijena_rsd,
-      cijena_eur: inventarItem.cijena_eur,
+      cijena_rsd: inventarItem.na_akciji && inventarItem.cijena_akcija_rsd != null
+        ? inventarItem.cijena_akcija_rsd
+        : inventarItem.cijena_rsd,
+      cijena_eur: inventarItem.na_akciji && inventarItem.cijena_akcija_eur != null
+        ? inventarItem.cijena_akcija_eur
+        : inventarItem.cijena_eur,
     })
     setDodano(true)
     setTimeout(() => setDodano(false), 2000)
@@ -203,18 +212,32 @@ export default function HaljinaDetalji({ haljina }: { haljina: Haljina }) {
             </h1>
 
             <div className="flex items-baseline gap-4 mb-3 pb-4 border-b border-[#e8e0d8]">
-              {cijena > 0 && (
-                <>
-                  <span
-                    className={cn('text-2xl font-light', isRasprodato ? 'text-[#8a8a8a]' : 'text-[#1a1a1a]')}
-                    style={{ fontFamily: 'var(--font-sans)' }}
-                  >
-                    {formatRSD(cijena)}
-                  </span>
-                  <span className="text-sm text-[#8a8a8a]" style={{ fontFamily: 'var(--font-sans)' }}>
-                    {formatEUR(cijena)}
-                  </span>
-                </>
+              {originalCijena > 0 && (
+                cijenaAkcija ? (
+                  <>
+                    <span className="text-2xl font-light text-red-600" style={{ fontFamily: 'var(--font-sans)', whiteSpace: 'nowrap' }}>
+                      {formatRSD(cijenaAkcija)}
+                    </span>
+                    <span className="line-through text-[#8a8a8a] text-base" style={{ fontFamily: 'var(--font-sans)', whiteSpace: 'nowrap' }}>
+                      {formatRSD(originalCijena)}
+                    </span>
+                    <span className="text-sm text-[#8a8a8a]" style={{ fontFamily: 'var(--font-sans)' }}>
+                      ≈ {Math.round(cijenaAkcija / KURS)} €
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span
+                      className={cn('text-2xl font-light', isRasprodato ? 'text-[#8a8a8a]' : 'text-[#1a1a1a]')}
+                      style={{ fontFamily: 'var(--font-sans)' }}
+                    >
+                      {formatRSD(originalCijena)}
+                    </span>
+                    <span className="text-sm text-[#8a8a8a]" style={{ fontFamily: 'var(--font-sans)' }}>
+                      {formatEUR(originalCijena)}
+                    </span>
+                  </>
+                )
               )}
               {dostupnostInfo && (
                 <span
@@ -322,9 +345,16 @@ export default function HaljinaDetalji({ haljina }: { haljina: Haljina }) {
             {odabranaBoja || haljina.naziv_sr}
           </p>
           <div className="flex items-center gap-2 mt-0.5">
-            <p className={cn('text-[15px] font-light', isRasprodato ? 'text-[#8a8a8a]' : 'text-[#1a1a1a]')} style={{ fontFamily: 'var(--font-sans)' }}>
-              {isRasprodato ? 'Rasprodato' : cijena > 0 ? formatRSD(cijena) : ''}
-            </p>
+            {isRasprodato ? (
+              <p className="text-[15px] font-light text-[#8a8a8a]" style={{ fontFamily: 'var(--font-sans)' }}>Rasprodato</p>
+            ) : cijenaAkcija && originalCijena > 0 ? (
+              <>
+                <p className="text-[15px] font-light text-red-600" style={{ fontFamily: 'var(--font-sans)' }}>{formatRSD(cijenaAkcija)}</p>
+                <p className="text-[12px] line-through text-[#8a8a8a]" style={{ fontFamily: 'var(--font-sans)' }}>{formatRSD(originalCijena)}</p>
+              </>
+            ) : (
+              <p className="text-[15px] font-light text-[#1a1a1a]" style={{ fontFamily: 'var(--font-sans)' }}>{originalCijena > 0 ? formatRSD(originalCijena) : ''}</p>
+            )}
             {dostupnostInfo && dostupnostInfo.tip !== 'dostupno' && (
               <span className={cn(
                 'text-[9px] flex items-center gap-1',
