@@ -83,6 +83,12 @@ export default async function KatalogPage({
   const { data } = await query
   let haljine = (data as unknown as Haljina[]) || []
 
+  if (params.naPopustu === 'true') {
+    haljine = haljine.filter(h =>
+      h.inventar?.some(i => i.na_akciji && i.dostupna && !i.arhivirana)
+    )
+  }
+
   // Client-side sort by price (min inventar price)
   if (params.sort === 'cijena_rastuce') {
     haljine = [...haljine].sort((a, b) => {
