@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 
-const HERO_IMAGE = 'https://images.unsplash.com/photo-1774976626858-75cf588233f0?w=1920&q=85&fit=crop&auto=format'
+const HERO_IMAGE = '/hero-bg.png'
 
 export default function HeroSection() {
   return (
