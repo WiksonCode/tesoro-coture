@@ -313,7 +313,7 @@ function InventarEditRow({
                 type="button"
                 onClick={() => setNaAkciji((v) => !v)}
                 className={cn(
-                  'relative w-9 h-5 rounded-full transition-colors duration-200 shrink-0 cursor-pointer',
+                  'relative w-9 h-5 rounded-full overflow-hidden transition-colors duration-200 shrink-0 cursor-pointer',
                   naAkciji ? 'bg-red-500' : 'bg-[#e8e0d8]'
                 )}
               >
@@ -415,7 +415,7 @@ function InventarAddForm({
               type="button"
               onClick={() => setNaAkciji((v) => !v)}
               className={cn(
-                'relative w-9 h-5 rounded-full transition-colors duration-200 shrink-0 cursor-pointer',
+                'relative w-9 h-5 rounded-full overflow-hidden transition-colors duration-200 shrink-0 cursor-pointer',
                 naAkciji ? 'bg-red-500' : 'bg-[#e8e0d8]'
               )}
             >
