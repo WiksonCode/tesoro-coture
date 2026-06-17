@@ -39,6 +39,12 @@ export default function HaljinaCard({ haljina, className }: { haljina: Haljina; 
     ? Math.min(...dostupniInventar.map((i) => i.cijena_rsd))
     : sviInventar.length > 0 ? Math.min(...sviInventar.map((i) => i.cijena_rsd)) : 0
 
+  const isNaAkciji = dostupniInventar.some((i) => i.na_akciji)
+  const saleStavke = dostupniInventar.filter((i) => i.na_akciji && i.cijena_akcija_rsd != null)
+  const minSaleCijena = saleStavke.length > 0
+    ? Math.min(...saleStavke.map((i) => i.cijena_akcija_rsd!))
+    : null
+
   const boje = getBojeIzInventara(dostupniInventar)
   const velicine = getVelicineIzInventara(dostupniInventar)
   const swatchBoje = boje.slice(0, 5)
@@ -72,8 +78,12 @@ export default function HaljinaCard({ haljina, className }: { haljina: Haljina; 
       boja_naziv: inventarItem.boja_naziv,
       boja_hex: inventarItem.boja_hex,
       velicina: inventarItem.velicina,
-      cijena_rsd: inventarItem.cijena_rsd,
-      cijena_eur: inventarItem.cijena_eur,
+      cijena_rsd: inventarItem.na_akciji && inventarItem.cijena_akcija_rsd != null
+        ? inventarItem.cijena_akcija_rsd
+        : inventarItem.cijena_rsd,
+      cijena_eur: inventarItem.na_akciji && inventarItem.cijena_akcija_eur != null
+        ? inventarItem.cijena_akcija_eur
+        : inventarItem.cijena_eur,
     })
     setQuickOpen(false)
     setAdded(true)
@@ -143,7 +153,15 @@ export default function HaljinaCard({ haljina, className }: { haljina: Haljina; 
           </div>
         )}
 
-        {isNovo && (
+        {isNaAkciji && (
+          <div className="absolute top-3 left-3 bg-red-600 px-2.5 py-1.5">
+            <span className="text-[11px] font-medium text-white tracking-[0.15em]" style={{ fontFamily: 'var(--font-sans)' }}>
+              Sale
+            </span>
+          </div>
+        )}
+
+        {!isNaAkciji && isNovo && (
           <div className="absolute top-3 left-3 bg-[#c9a96e] px-2.5 py-1.5">
             <span className="text-[11px] font-medium text-[#1a1a1a]" style={{ fontFamily: 'var(--font-sans)' }}>
               Novo
@@ -282,9 +300,20 @@ export default function HaljinaCard({ haljina, className }: { haljina: Haljina; 
         </h3>
         <div className="flex items-center justify-between">
           {minCijena > 0 && (
-            <span className="text-[15px] font-semibold text-[#c9a96e]" style={{ fontFamily: 'var(--font-sans)' }}>
-              {formatCijena(minCijena)}
-            </span>
+            isNaAkciji && minSaleCijena ? (
+              <div className="flex flex-col gap-0.5">
+                <span className="line-through text-[#8a8a8a] text-[11px] whitespace-nowrap" style={{ fontFamily: 'var(--font-sans)' }}>
+                  {formatCijena(minCijena)}
+                </span>
+                <span className="text-[15px] font-semibold text-red-600 whitespace-nowrap" style={{ fontFamily: 'var(--font-sans)' }}>
+                  {formatCijena(minSaleCijena)}
+                </span>
+              </div>
+            ) : (
+              <span className="text-[15px] font-semibold text-[#c9a96e]" style={{ fontFamily: 'var(--font-sans)' }}>
+                {formatCijena(minCijena)}
+              </span>
+            )
           )}
           {swatchBoje.length > 0 && (
             <div className="flex items-center gap-1.5 ml-auto">
