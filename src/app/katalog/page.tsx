@@ -108,9 +108,7 @@ export default async function KatalogPage({
     ? (KATEGORIJE_NAZIVI[params.kategorija] ?? 'Kolekcija haljina')
     : 'Kolekcija haljina'
   const opis = params.kategorija ? (KATEGORIJE_OPISI[params.kategorija] ?? null) : null
-  const bannerSlika = params.kategorija
-    ? (KATEGORIJE_SLIKE[params.kategorija] ?? DEFAULT_BANNER)
-    : DEFAULT_BANNER
+  const bannerSlika = DEFAULT_BANNER
 
   return (
     <main className="min-h-screen bg-[#faf7f4] pt-16 lg:pt-20">
