@@ -31,7 +31,7 @@ export default async function AdminRezervacijePage({
 
   let dataQuery = supabase
     .from('rezervacije')
-    .select('id, ime, prezime, email, telefon, status, created_at, datum_termina, vreme_termina, inventar:inventar(sifra, boja_naziv, velicina, haljina:haljine(naziv_sr))')
+    .select('id, ime, prezime, email, telefon, status, created_at, datum_termina, vreme_termina, inventar:inventar(sifra, boja_naziv, velicina, cijena_rsd, na_akciji, cijena_akcija_rsd, haljina:haljine(naziv_sr))')
     .order('created_at', { ascending: false })
 
   if (activeStatus) {

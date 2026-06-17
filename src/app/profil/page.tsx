@@ -35,6 +35,9 @@ type RezervacijaSaInventarom = {
   inventar: {
     boja_naziv: string
     velicina: string
+    cijena_rsd: number
+    na_akciji: boolean
+    cijena_akcija_rsd: number | null
     haljina: { naziv_sr: string; slike: string[] } | null
   } | null
 }
@@ -49,7 +52,7 @@ export default async function ProfilPage() {
     supabase.from('korisnici').select('*').eq('auth_id', user.id).single(),
     supabase
       .from('rezervacije')
-      .select('id, status, datum_termina, created_at, inventar:inventar(boja_naziv, velicina, haljina:haljine(naziv_sr, slike))')
+      .select('id, status, datum_termina, created_at, inventar:inventar(boja_naziv, velicina, cijena_rsd, na_akciji, cijena_akcija_rsd, haljina:haljine(naziv_sr, slike))')
       .order('created_at', { ascending: false }),
   ])
 
@@ -235,6 +238,18 @@ export default async function ProfilPage() {
                             </span>
                           )}
                         </div>
+                        {r.inventar?.cijena_rsd != null && (
+                          <div className="flex items-center gap-2 mt-2">
+                            <span className="text-[13px] font-light text-[#1a1a1a]" style={{ fontFamily: 'var(--font-sans)', whiteSpace: 'nowrap' }}>
+                              {(r.inventar.na_akciji && r.inventar.cijena_akcija_rsd ? r.inventar.cijena_akcija_rsd : r.inventar.cijena_rsd).toLocaleString('sr-RS')}&nbsp;RSD
+                            </span>
+                            {r.inventar.na_akciji && r.inventar.cijena_akcija_rsd && (
+                              <span className="text-[11px] line-through text-[#8a8a8a]" style={{ fontFamily: 'var(--font-sans)', whiteSpace: 'nowrap' }}>
+                                {r.inventar.cijena_rsd.toLocaleString('sr-RS')}&nbsp;RSD
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
                   )

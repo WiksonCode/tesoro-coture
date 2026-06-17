@@ -48,6 +48,10 @@ type RezervacijaDetalji = Rezervacija & {
     boja_hex: string
     velicina: string
     cijena_rsd: number
+    cijena_eur: number
+    na_akciji: boolean
+    cijena_akcija_rsd: number | null
+    cijena_akcija_eur: number | null
     haljina: { naziv_sr: string; slike: string[] } | null
   } | null
 }
@@ -58,7 +62,7 @@ export default async function RezervacijaDetailPage({ params }: { params: Promis
 
   const { data: rezervacija } = await supabase
     .from('rezervacije')
-    .select('*, inventar:inventar(sifra, boja_naziv, boja_hex, velicina, cijena_rsd, haljina:haljine(naziv_sr, slike))')
+    .select('*, inventar:inventar(sifra, boja_naziv, boja_hex, velicina, cijena_rsd, cijena_eur, na_akciji, cijena_akcija_rsd, cijena_akcija_eur, haljina:haljine(naziv_sr, slike))')
     .eq('id', id)
     .single()
 
@@ -120,6 +124,16 @@ export default async function RezervacijaDetailPage({ params }: { params: Promis
                   <p className="text-[11px] text-[#8a8a8a]" style={{ fontFamily: 'var(--font-sans)' }}>
                     {r.inventar.boja_naziv} · {r.inventar.velicina} · {r.inventar.sifra}
                   </p>
+                </div>
+                <div className="flex items-center gap-2 mt-2">
+                  <span className="text-[14px] font-light text-[#1a1a1a]" style={{ fontFamily: 'var(--font-sans)', whiteSpace: 'nowrap' }}>
+                    {(r.inventar.na_akciji && r.inventar.cijena_akcija_rsd ? r.inventar.cijena_akcija_rsd : r.inventar.cijena_rsd).toLocaleString('sr-RS')}&nbsp;RSD
+                  </span>
+                  {r.inventar.na_akciji && r.inventar.cijena_akcija_rsd && (
+                    <span className="text-[11px] line-through text-[#8a8a8a]" style={{ fontFamily: 'var(--font-sans)', whiteSpace: 'nowrap' }}>
+                      {r.inventar.cijena_rsd.toLocaleString('sr-RS')}&nbsp;RSD
+                    </span>
+                  )}
                 </div>
               </div>
             </div>

@@ -20,6 +20,9 @@ export type RezervacijaSaInventarom = {
     sifra: string
     boja_naziv: string
     velicina: string
+    cijena_rsd: number
+    na_akciji: boolean
+    cijena_akcija_rsd: number | null
     haljina: { naziv_sr: string } | null
   } | null
 }
@@ -121,6 +124,11 @@ export default function RezervacijeTableClient({ rezervacije }: { rezervacije: R
                   {r.inventar?.haljina?.naziv_sr ?? '—'}
                   {r.inventar?.boja_naziv ? ` · ${r.inventar.boja_naziv} · ${r.inventar.velicina}` : ''}
                 </p>
+                {r.inventar?.cijena_rsd != null && (
+                  <p className="text-[10px] font-medium text-[#c9a96e] mt-0.5" style={{ fontFamily: 'var(--font-sans)', whiteSpace: 'nowrap' }}>
+                    {(r.inventar.na_akciji && r.inventar.cijena_akcija_rsd ? r.inventar.cijena_akcija_rsd : r.inventar.cijena_rsd).toLocaleString('sr-RS')} RSD
+                  </p>
+                )}
                 <p className="text-[10px] text-[#b0a898] mt-0.5" style={{ fontFamily: 'var(--font-sans)' }}>
                   {formatDatum(r.created_at)}
                   {r.datum_termina ? ` · Termin: ${formatDatum(r.datum_termina)}${r.vreme_termina ? ' u ' + r.vreme_termina.slice(0, 5) : ''}` : ''}
@@ -170,6 +178,11 @@ export default function RezervacijeTableClient({ rezervacije }: { rezervacije: R
                       </p>
                       {r.inventar?.sifra && (
                         <p className="text-[10px] text-[#8a8a8a] font-mono">{r.inventar.sifra}</p>
+                      )}
+                      {r.inventar?.cijena_rsd != null && (
+                        <p className="text-[10px] font-medium text-[#c9a96e] mt-0.5" style={{ fontFamily: 'var(--font-sans)', whiteSpace: 'nowrap' }}>
+                          {(r.inventar.na_akciji && r.inventar.cijena_akcija_rsd ? r.inventar.cijena_akcija_rsd : r.inventar.cijena_rsd).toLocaleString('sr-RS')} RSD
+                        </p>
                       )}
                     </td>
                     <td className="px-5 py-3">
