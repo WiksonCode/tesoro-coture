@@ -221,7 +221,7 @@ export default function HaljinaDetalji({ haljina }: { haljina: Haljina }) {
                     <span className="line-through text-[#8a8a8a] text-base" style={{ fontFamily: 'var(--font-sans)', whiteSpace: 'nowrap' }}>
                       {formatRSD(originalCijena)}
                     </span>
-                    <span className="text-sm text-[#8a8a8a]" style={{ fontFamily: 'var(--font-sans)' }}>
+                    <span className="text-sm text-[#8a8a8a]" style={{ fontFamily: 'var(--font-sans)', whiteSpace: 'nowrap' }}>
                       ≈ {Math.round(cijenaAkcija / KURS)} €
                     </span>
                   </>
