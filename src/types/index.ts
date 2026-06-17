@@ -42,7 +42,10 @@ export interface InventarStavka {
   velicina: Velicina
   cijena_rsd: number
   cijena_eur: number
-
+  na_akciji: boolean
+  popust_procenat: number | null
+  cijena_akcija_rsd: number | null
+  cijena_akcija_eur: number | null
   slike: string[]
   dostupna: boolean
   napomena: string | null

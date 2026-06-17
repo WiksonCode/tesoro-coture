@@ -196,9 +196,20 @@ function InventarViewRow({
         </span>
       </td>
       <td className="px-3 py-2">
-        <span className="text-[11px] text-[#1a1a1a]" style={{ fontFamily: 'var(--font-sans)' }}>
-          {stavka.cijena_rsd.toLocaleString('sr-RS')} din
-        </span>
+        {stavka.na_akciji && stavka.cijena_akcija_rsd != null ? (
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[11px] text-red-600 font-medium" style={{ fontFamily: 'var(--font-sans)' }}>
+              {stavka.cijena_akcija_rsd.toLocaleString('sr-RS')} din
+            </span>
+            <span className="text-[10px] line-through text-[#8a8a8a]" style={{ fontFamily: 'var(--font-sans)' }}>
+              {stavka.cijena_rsd.toLocaleString('sr-RS')} din
+            </span>
+          </div>
+        ) : (
+          <span className="text-[11px] text-[#1a1a1a]" style={{ fontFamily: 'var(--font-sans)' }}>
+            {stavka.cijena_rsd.toLocaleString('sr-RS')} din
+          </span>
+        )}
       </td>
       <td className="px-3 py-2">
         <button
@@ -252,6 +263,9 @@ function InventarEditRow({
   onSave: (fd: FormData) => void
   pending: boolean
 }) {
+  const [naAkciji, setNaAkciji] = useState(stavka.na_akciji ?? false)
+  const [popustProcenat, setPopustProcenat] = useState<number>(stavka.popust_procenat ?? 10)
+
   return (
     <tr className="bg-amber-50/40">
       <td className="px-3 py-2 font-mono text-[10px] text-[#8a8a8a]">{stavka.sifra}</td>
@@ -287,6 +301,53 @@ function InventarEditRow({
               </button>
             </div>
           </div>
+          {/* Akcijska cijena */}
+          <div className="mt-3 pl-1">
+            <label className="flex items-center gap-2 cursor-pointer mb-2">
+              <input
+                type="hidden"
+                name="na_akciji"
+                value={String(naAkciji)}
+              />
+              <button
+                type="button"
+                onClick={() => setNaAkciji((v) => !v)}
+                className={cn(
+                  'relative w-9 h-5 rounded-full transition-colors duration-200 shrink-0 cursor-pointer',
+                  naAkciji ? 'bg-red-500' : 'bg-[#e8e0d8]'
+                )}
+              >
+                <span className={cn(
+                  'absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200',
+                  naAkciji ? 'translate-x-4' : 'translate-x-0.5'
+                )} />
+              </button>
+              <span className="text-[10px] tracking-[0.2em] uppercase text-[#8a8a8a]" style={{ fontFamily: 'var(--font-sans)' }}>
+                Na akciji
+              </span>
+            </label>
+            {naAkciji && (
+              <div className="flex items-center gap-2 mt-1 flex-wrap">
+                <select
+                  name="popust_procenat"
+                  value={popustProcenat}
+                  onChange={(e) => setPopustProcenat(Number(e.target.value))}
+                  className="text-[11px] px-2 py-1 border border-red-300 bg-red-50 outline-none focus:border-red-500 cursor-pointer"
+                  style={{ fontFamily: 'var(--font-sans)' }}
+                >
+                  {[5, 10, 15, 20, 25, 30, 40, 50].map((p) => (
+                    <option key={p} value={p}>{p}% popusta</option>
+                  ))}
+                </select>
+                <span className="text-[11px] text-red-600 font-medium">
+                  → {Math.round(stavka.cijena_rsd * (1 - popustProcenat / 100)).toLocaleString('sr-RS')} din
+                </span>
+                <span className="text-[10px] text-[#8a8a8a] line-through">
+                  {stavka.cijena_rsd.toLocaleString('sr-RS')} din
+                </span>
+              </div>
+            )}
+          </div>
           <div className="mt-2 pl-1">
             <p className="text-[9px] tracking-[0.25em] uppercase text-[#8a8a8a] mb-1.5" style={{ fontFamily: 'var(--font-sans)' }}>Slike za ovu boju</p>
             <InventarSlikeEditor initial={stavka.slike ?? []} />
@@ -306,6 +367,10 @@ function InventarAddForm({
   onSave: (fd: FormData) => void
   pending: boolean
 }) {
+  const [naAkciji, setNaAkciji] = useState(false)
+  const [popustProcenat, setPopustProcenat] = useState<number>(10)
+  const [cijenaRsd, setCijenaRsd] = useState<number>(0)
+
   return (
     <div className="border border-dashed border-[#c9a96e]/50 bg-white/70 p-4 mt-2 mx-4 mb-4">
       <p className="text-[9px] tracking-[0.35em] uppercase text-[#c9a96e] mb-3" style={{ fontFamily: 'var(--font-sans)' }}>
@@ -320,7 +385,7 @@ function InventarAddForm({
           <select name="velicina" required className="text-[11px] px-2 py-1.5 border border-[#e8e0d8] bg-white outline-none focus:border-[#c9a96e]" style={{ fontFamily: 'var(--font-sans)' }}>
             {VELICINE.map((v) => <option key={v} value={v}>{v === 'po_mjeri' ? 'Po meri' : v}</option>)}
           </select>
-          <input type="number" name="cijena_rsd" placeholder="RSD *" required step="100" min="0" className="w-24 text-[11px] px-2 py-1.5 border border-[#e8e0d8] bg-white outline-none focus:border-[#c9a96e]" style={{ fontFamily: 'var(--font-sans)' }} />
+          <input type="number" name="cijena_rsd" placeholder="RSD *" required step="100" min="0" onChange={(e) => setCijenaRsd(parseFloat(e.target.value) || 0)} className="w-24 text-[11px] px-2 py-1.5 border border-[#e8e0d8] bg-white outline-none focus:border-[#c9a96e]" style={{ fontFamily: 'var(--font-sans)' }} />
           <input type="number" name="cijena_eur" placeholder="EUR *" required step="1" min="0" className="w-16 text-[11px] px-2 py-1.5 border border-[#e8e0d8] bg-white outline-none focus:border-[#c9a96e]" style={{ fontFamily: 'var(--font-sans)' }} />
           <div className="flex gap-2 mt-1">
             <button
@@ -341,10 +406,57 @@ function InventarAddForm({
               Otkaži
             </button>
           </div>
-          <div className="mt-3">
-            <p className="text-[9px] tracking-[0.25em] uppercase text-[#8a8a8a] mb-1.5" style={{ fontFamily: 'var(--font-sans)' }}>Slike za ovu boju (opciono)</p>
-            <InventarSlikeEditor />
-          </div>
+        </div>
+        {/* Akcijska cijena */}
+        <div className="mt-3">
+          <label className="flex items-center gap-2 cursor-pointer mb-2">
+            <input type="hidden" name="na_akciji" value={String(naAkciji)} />
+            <button
+              type="button"
+              onClick={() => setNaAkciji((v) => !v)}
+              className={cn(
+                'relative w-9 h-5 rounded-full transition-colors duration-200 shrink-0 cursor-pointer',
+                naAkciji ? 'bg-red-500' : 'bg-[#e8e0d8]'
+              )}
+            >
+              <span className={cn(
+                'absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200',
+                naAkciji ? 'translate-x-4' : 'translate-x-0.5'
+              )} />
+            </button>
+            <span className="text-[10px] tracking-[0.2em] uppercase text-[#8a8a8a]" style={{ fontFamily: 'var(--font-sans)' }}>
+              Na akciji
+            </span>
+          </label>
+          {naAkciji && (
+            <div className="flex items-center gap-2 flex-wrap mt-1">
+              <select
+                name="popust_procenat"
+                value={popustProcenat}
+                onChange={(e) => setPopustProcenat(Number(e.target.value))}
+                className="text-[11px] px-2 py-1 border border-red-300 bg-red-50 outline-none focus:border-red-500 cursor-pointer"
+                style={{ fontFamily: 'var(--font-sans)' }}
+              >
+                {[5, 10, 15, 20, 25, 30, 40, 50].map((p) => (
+                  <option key={p} value={p}>{p}% popusta</option>
+                ))}
+              </select>
+              {cijenaRsd > 0 && (
+                <>
+                  <span className="text-[11px] text-red-600 font-medium">
+                    → {Math.round(cijenaRsd * (1 - popustProcenat / 100)).toLocaleString('sr-RS')} din
+                  </span>
+                  <span className="text-[10px] text-[#8a8a8a] line-through">
+                    {cijenaRsd.toLocaleString('sr-RS')} din
+                  </span>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+        <div className="mt-3">
+          <p className="text-[9px] tracking-[0.25em] uppercase text-[#8a8a8a] mb-1.5" style={{ fontFamily: 'var(--font-sans)' }}>Slike za ovu boju (opciono)</p>
+          <InventarSlikeEditor />
         </div>
       </form>
     </div>

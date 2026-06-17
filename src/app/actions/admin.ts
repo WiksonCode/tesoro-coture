@@ -140,12 +140,20 @@ export async function deleteInventarStavka(id: string): Promise<{ error: string 
 export async function updateInventarStavka(id: string, formData: FormData): Promise<{ error: string } | void> {
   let supabase
   try { supabase = await adminClient() } catch { return { error: 'Nemate pristup.' } }
+  const naAkciji = formData.get('na_akciji') === 'true'
+  const cijenaRsd = parseFloat(formData.get('cijena_rsd') as string)
+  const cijenaEur = parseFloat(formData.get('cijena_eur') as string)
+  const popustProcenat = naAkciji ? parseInt(formData.get('popust_procenat') as string) || null : null
   const data = {
     boja_naziv: formData.get('boja_naziv') as string,
     boja_hex: formData.get('boja_hex') as string,
     velicina: formData.get('velicina') as string,
-    cijena_rsd: parseFloat(formData.get('cijena_rsd') as string),
-    cijena_eur: parseFloat(formData.get('cijena_eur') as string),
+    cijena_rsd: cijenaRsd,
+    cijena_eur: cijenaEur,
+    na_akciji: naAkciji,
+    popust_procenat: popustProcenat,
+    cijena_akcija_rsd: naAkciji && popustProcenat ? Math.round(cijenaRsd * (1 - popustProcenat / 100)) : null,
+    cijena_akcija_eur: naAkciji && popustProcenat ? Math.round(cijenaEur * (1 - popustProcenat / 100) * 100) / 100 : null,
     slike: JSON.parse((formData.get('slike') as string) || '[]'),
     dostupna: formData.get('dostupna') === 'true',
     updated_at: new Date().toISOString(),
@@ -160,14 +168,22 @@ export async function createInventarStavka(haljina_id: string, formData: FormDat
   let supabase
   try { supabase = await adminClient() } catch { return { error: 'Nemate pristup.' } }
   const sifra = `INV-${Date.now().toString(36).toUpperCase()}`
+  const naAkciji = formData.get('na_akciji') === 'true'
+  const cijenaRsd = parseFloat(formData.get('cijena_rsd') as string)
+  const cijenaEur = parseFloat(formData.get('cijena_eur') as string)
+  const popustProcenat = naAkciji ? parseInt(formData.get('popust_procenat') as string) || null : null
   const data = {
     haljina_id,
     sifra,
     boja_naziv: formData.get('boja_naziv') as string,
     boja_hex: formData.get('boja_hex') as string,
     velicina: formData.get('velicina') as string,
-    cijena_rsd: parseFloat(formData.get('cijena_rsd') as string),
-    cijena_eur: parseFloat(formData.get('cijena_eur') as string),
+    cijena_rsd: cijenaRsd,
+    cijena_eur: cijenaEur,
+    na_akciji: naAkciji,
+    popust_procenat: popustProcenat,
+    cijena_akcija_rsd: naAkciji && popustProcenat ? Math.round(cijenaRsd * (1 - popustProcenat / 100)) : null,
+    cijena_akcija_eur: naAkciji && popustProcenat ? Math.round(cijenaEur * (1 - popustProcenat / 100) * 100) / 100 : null,
     slike: JSON.parse((formData.get('slike') as string) || '[]'),
     dostupna: true,
   }
