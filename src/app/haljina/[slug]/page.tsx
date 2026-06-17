@@ -5,6 +5,8 @@ import HaljinaDetalji from '@/components/haljine/HaljinaDetalji'
 import SrodneHaljine from '@/components/haljine/SrodneHaljine'
 import type { Haljina } from '@/types'
 
+export const dynamic = 'force-dynamic'
+
 const HALJINA_SELECT = 'id, slug, naziv_sr, naziv_en, opis_sr, opis_en, slike, video_url, featured, created_at, updated_at, kategorija_id, kategorija:kategorije(id, slug, naziv_sr, naziv_en, redosled), inventar(id, sifra, boja_naziv, boja_hex, velicina, cijena_rsd, cijena_eur, na_akciji, popust_procenat, cijena_akcija_rsd, cijena_akcija_eur, slike, dostupna, arhivirana)'
 
 interface Props {

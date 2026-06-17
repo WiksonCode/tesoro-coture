@@ -5,6 +5,8 @@ import { createClient } from '@/lib/supabase/server'
 import KatalogClient from '@/components/haljine/KatalogClient'
 import type { Haljina } from '@/types'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Katalog',
   description: 'Pregledajte našu ekskluzivnu kolekciju elegantnih haljina — venčane, koktel, svečane i maturske.',
