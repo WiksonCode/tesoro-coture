@@ -42,7 +42,7 @@ const KATEGORIJE_SLIKE: Record<string, string> = {
   casual:   'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1920&q=85&fit=crop&auto=format',
   maturska: 'https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=1920&q=85&fit=crop&auto=format',
 }
-const DEFAULT_BANNER = 'https://images.unsplash.com/photo-1774976626858-75cf588233f0?w=1920&q=85&fit=crop&auto=format'
+const DEFAULT_BANNER = '/hero-bg.png'
 
 export default async function KatalogPage({
   searchParams,
@@ -108,7 +108,7 @@ export default async function KatalogPage({
     <main className="min-h-screen bg-[#faf7f4] pt-16 lg:pt-20">
 
       <div className="relative h-[220px] lg:h-[320px] overflow-hidden bg-[#1a1a1a]">
-        <Image src={bannerSlika} alt={naslov} fill priority sizes="100vw" className="object-cover object-center animate-ken-burns" />
+        <Image src={bannerSlika} alt={naslov} fill priority sizes="100vw" className="object-cover object-[center_30%] animate-ken-burns" />
         <div className="absolute inset-0 bg-black/50" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
         <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-black/30 to-transparent" />
