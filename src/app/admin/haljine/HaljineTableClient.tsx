@@ -562,14 +562,24 @@ export default function HaljineTableClient({ haljine }: Props) {
 
   function handleUpdateInventar(id: string, fd: FormData) {
     startInvTransition(async () => {
-      await updateInventarStavka(id, fd)
+      const result = await updateInventarStavka(id, fd)
+      if (result && 'error' in result) {
+        setErrorMsg(result.error)
+        setTimeout(() => setErrorMsg(null), 7000)
+        return
+      }
       setEditingInventarId(null)
     })
   }
 
   function handleCreateInventar(haljinaId: string, fd: FormData) {
     startInvTransition(async () => {
-      await createInventarStavka(haljinaId, fd)
+      const result = await createInventarStavka(haljinaId, fd)
+      if (result && 'error' in result) {
+        setErrorMsg(result.error)
+        setTimeout(() => setErrorMsg(null), 7000)
+        return
+      }
       setAddingToHaljinaId(null)
     })
   }
