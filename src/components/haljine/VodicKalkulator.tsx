@@ -418,7 +418,6 @@ export default function VodicKalkulator() {
                             <span>
                               <span className="text-[#c9a96e]">B</span> {row.bokovi[0]}–{row.bokovi[1]} cm
                             </span>
-                            <span className="text-[#8a8a8a]/50">{row.visina} cm visina</span>
                           </div>
                         ) : null
                       })()}
@@ -529,7 +528,7 @@ export default function VodicKalkulator() {
           <table className="w-full border-collapse">
             <thead>
               <tr className="border-b-2 border-[#e8e0d8]">
-                {['Veličina', 'Grudi (cm)', 'Struk (cm)', 'Bokovi (cm)', 'Visina (cm)'].map((col) => (
+                {['Veličina', 'Grudi (cm)', 'Struk (cm)', 'Bokovi (cm)'].map((col) => (
                   <th
                     key={col}
                     className="text-left pb-4 pr-6 text-[9px] tracking-[0.3em] uppercase text-[#c9a96e] font-normal"
@@ -589,7 +588,6 @@ export default function VodicKalkulator() {
                       `${row.grudi[0]}–${row.grudi[1]}`,
                       `${row.struk[0]}–${row.struk[1]}`,
                       `${row.bokovi[0]}–${row.bokovi[1]}`,
-                      row.visina,
                     ].map((val, j) => (
                       <td
                         key={j}
