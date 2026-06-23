@@ -61,7 +61,7 @@ export default function CTASection() {
         <div className="flex flex-col items-center gap-5">
           <Link
             href="/rezervacija"
-            className="group inline-flex items-center gap-4 bg-[#1a1a1a] px-12 py-5 text-[11px] tracking-[0.35em] uppercase text-white hover:shadow-[0_0_0_1px_#c9a96e] transition-all duration-400"
+            className="group inline-flex items-center gap-4 bg-[#1a1a1a] px-8 sm:px-12 py-5 text-[11px] tracking-[0.35em] uppercase text-white hover:shadow-[0_0_0_1px_#c9a96e] transition-all duration-400"
             style={{ fontFamily: 'var(--font-sans)' }}
           >
             Zakaži termin

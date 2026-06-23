@@ -94,7 +94,7 @@ export default function AboutSection({ haljine }: AboutSectionProps) {
             {pages.map((pageItems, pageIdx) => (
               <div
                 key={pageIdx}
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-7 flex-shrink-0"
+                className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-7 flex-shrink-0"
                 style={{ width: `${100 / totalPages}%` }}
               >
                 {pageItems.map((haljina) => (

@@ -26,20 +26,20 @@ export default function HeroSection() {
         <div className="flex flex-col items-center text-center">
 
           <motion.h1
-            className="mb-8 leading-[0.9]"
+            className="mb-8 leading-[1.05]"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, delay: 0.2, ease: 'easeOut' }}
           >
             <span
               className="block text-[clamp(48px,10vw,100px)] tracking-[-0.01em] font-light text-white uppercase"
-              style={{ fontFamily: 'var(--font-serif)', textShadow: '0 2px 24px rgba(0,0,0,0.85), 0 8px 48px rgba(0,0,0,0.6)' }}
+              style={{ fontFamily: 'var(--font-serif)', textShadow: '0 0 40px rgba(0,0,0,0.9), 0 2px 8px rgba(0,0,0,0.95), 0 8px 60px rgba(0,0,0,0.8)' }}
             >
               Elegancija
             </span>
             <span
               className="block text-[clamp(34px,7.5vw,72px)] italic font-light text-white"
-              style={{ fontFamily: 'var(--font-serif)', textShadow: '0 2px 24px rgba(0,0,0,0.85), 0 8px 48px rgba(0,0,0,0.6)' }}
+              style={{ fontFamily: 'var(--font-serif)', textShadow: '0 0 40px rgba(0,0,0,0.9), 0 2px 8px rgba(0,0,0,0.95), 0 8px 60px rgba(0,0,0,0.8)' }}
             >
               koja traje
             </span>

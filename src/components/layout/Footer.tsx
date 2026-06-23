@@ -24,14 +24,14 @@ export default function Footer() {
       {/* Brand — full width centered */}
       <div className="max-w-7xl mx-auto px-6 lg:px-10 pt-14 pb-10 text-center">
         <h3
-          className="text-[48px] tracking-[0.5em] font-light leading-none mb-1"
-          style={{ fontFamily: 'var(--font-serif)' }}
+          className="text-[48px] font-light leading-none mb-1"
+          style={{ fontFamily: 'var(--font-serif)', letterSpacing: '0.5em', marginRight: '-0.5em' }}
         >
           TESORO
         </h3>
         <p
           className="text-[8px] tracking-[0.7em] text-[#c9a96e] uppercase mb-5"
-          style={{ fontFamily: 'var(--font-sans)' }}
+          style={{ fontFamily: 'var(--font-sans)', marginRight: '-0.7em' }}
         >
           Couture
         </p>
