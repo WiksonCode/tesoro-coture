@@ -9,7 +9,7 @@ const HERO_IMAGE = '/hero-bg.png'
 
 export default function HeroSection() {
   return (
-    <section className="relative min-h-screen flex items-center lg:items-end overflow-hidden">
+    <section className="relative min-h-screen flex items-end overflow-hidden">
       <Image
         src={HERO_IMAGE}
         alt="TESORO Couture — elegantna haljina"
@@ -19,8 +19,8 @@ export default function HeroSection() {
         className="object-cover object-center"
       />
 
-      <div className="absolute top-0 left-0 right-0 h-28 bg-gradient-to-b from-black/45 to-transparent" />
-      <div className="absolute bottom-0 left-0 right-0 h-96 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+      <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-black/30 to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 h-[400px] bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
 
       <div className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-10 py-28">
         <div className="flex flex-col items-center text-center">

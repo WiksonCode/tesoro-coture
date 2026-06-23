@@ -123,7 +123,7 @@ export default function ONamaContent() {
 
       {/* ── Hero ──────────────────────────────────────────────────────────── */}
       <section className="relative border-b border-[#e8e0d8] overflow-hidden">
-        <div className="grid grid-cols-1 lg:grid-cols-[42%_58%] min-h-[580px] lg:min-h-[700px]">
+        <div className="grid grid-cols-1 lg:grid-cols-[42%_58%] lg:items-stretch">
 
           {/* Left — text */}
           <motion.div
@@ -137,24 +137,24 @@ export default function ONamaContent() {
               className="text-[9px] tracking-[0.55em] uppercase text-[#c9a96e] mb-7"
               style={{ fontFamily: 'var(--font-sans)' }}
             >
-              O salonu
+              O nama
             </p>
             <h1
-              className="text-[clamp(40px,5.5vw,72px)] font-light text-[#1a1a1a] leading-[1.02] mb-8"
+              className="text-[clamp(40px,5.5vw,72px)] font-light text-[#1a1a1a] leading-[1.1] mb-8"
               style={{ fontFamily: 'var(--font-serif)' }}
             >
-              Više od haljine —<br />
-              <span className="italic">priča o<br />ženstvenosti</span>
+              Gde elegancija<br />
+              <span className="italic">postaje osećaj</span>
             </h1>
             <div className="w-12 h-[1.5px] bg-[#c9a96e] mb-8" />
             <p className="text-[13px] text-[#8a8a8a] leading-relaxed mb-4 max-w-sm" style={{ fontFamily: 'var(--font-sans)' }}>
-              TESORO je domaći brend osnovan 2020. godine u Beogradu sa ciljem da se svaka žena oseća glamurozno, ženstveno i samouvereno. Naš dizajn se ogleda u neprolaznoj eleganciji, preciznim krojevima i kvalitetnim materijalima u kojima će se svaka žena osećati zadovoljno i samouvereno.
+              TESORO je domaći brend osnovan 2020. godine u Beogradu, nastao sa željom da se svaka žena oseća glamurozno, ženstveno i samouvereno. Naš prepoznatljiv stil ogleda se u bezvremenskoj eleganciji, preciznim krojevima i pažljivo odabranim materijalima koji pružaju osećaj udobnosti i ističu lepotu svake žene.
             </p>
             <p className="text-[13px] text-[#8a8a8a] leading-relaxed mb-4 max-w-sm" style={{ fontFamily: 'var(--font-sans)' }}>
-              U Tesoru možete pronaći haljine koje su idealne za različite prilike, bilo da je u pitanju proslava, večernji izlazak, matura, rođendan ili venčanje. Naša ponuda uključuje izradu po merama, određene korekcije haljina, kao i veliki izbor različitih materijala i boja.
+              U Tesoru možete pronaći haljine za različite prilike – od večernjih izlazaka i proslava, do matura, rođendana i venčanja. Pored gotovih modela, nudimo i izradu po meri, određene korekcije, kao i veliki izbor materijala i boja, kako bi svaka haljina bila prilagođena vašim željama.
             </p>
             <p className="text-[13px] text-[#8a8a8a] leading-relaxed max-w-sm" style={{ fontFamily: 'var(--font-sans)' }}>
-              U našem studiu verujemo da ćete pronaći idealnu haljinu za vašu posebnu priliku koja će biti u skladu sa vašim željama i potrebama. Naše haljine nisu birane da budu samo lepe već i da pristaju svakoj građi, da traju i da se pamte.
+              Verujemo da prava haljina nije samo lepa, već i ona u kojoj se osećate posebno. Zato biramo modele koji pristaju različitim građama, odolevaju prolaznim trendovima i ostaju deo najlepših uspomena. Jer u Tesoru, elegancija nije samo stil – ona je osećaj koji traje.
             </p>
           </motion.div>
 
@@ -163,7 +163,7 @@ export default function ONamaContent() {
             initial={{ opacity: 0, scale: 1.03 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.1, ease: 'easeOut', delay: 0.15 }}
-            className="relative min-h-[420px] lg:min-h-0"
+            className="relative min-h-[420px] lg:min-h-full"
           >
             <Image
               src="/o-nama.jpeg"
@@ -174,26 +174,6 @@ export default function ONamaContent() {
               priority
             />
 
-            {/* "Od 2018" badge overlaps left edge */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.7, delay: 0.5 }}
-              className="absolute bottom-8 -left-3 lg:-left-6 bg-[#1a1a1a] px-7 py-5 z-10 shadow-2xl"
-            >
-              <p
-                className="text-[9px] tracking-[0.3em] uppercase text-[#c9a96e] mb-1.5"
-                style={{ fontFamily: 'var(--font-sans)' }}
-              >
-                u Beogradu
-              </p>
-              <p
-                className="text-[22px] font-light text-[#faf7f4] italic leading-none"
-                style={{ fontFamily: 'var(--font-serif)' }}
-              >
-                Od 2020.
-              </p>
-            </motion.div>
           </motion.div>
         </div>
       </section>
@@ -427,21 +407,19 @@ export default function ONamaContent() {
             className="text-[9px] tracking-[0.5em] uppercase text-[#c9a96e] mb-6"
             style={{ fontFamily: 'var(--font-sans)' }}
           >
-            Poseta salonu
+            Posetite nas
           </p>
           <h2
             className="text-[clamp(28px,4vw,50px)] font-light text-[#1a1a1a] mb-6 leading-tight"
             style={{ fontFamily: 'var(--font-serif)' }}
           >
-            Upoznajte nas<br />
-            <span className="italic">lično</span>
+            Doživite <span className="italic">TESORO iskustvo</span>
           </h2>
           <p
             className="text-[13px] text-[#8a8a8a] leading-relaxed mb-10"
             style={{ fontFamily: 'var(--font-sans)' }}
           >
-            Rezervišite besplatan termin i doživite TESORO iskustvo.<br />
-            Čekaju vas naše konsultantkinje i cela kolekcija.
+            Rezervišite svoj termin i uz individualne konsultacije pronađite haljinu koja će obeležiti vaše posebne trenutke.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
@@ -449,7 +427,7 @@ export default function ONamaContent() {
               className="group inline-flex items-center gap-3 bg-[#1a1a1a] text-[#faf7f4] px-10 py-4 text-[10px] tracking-[0.35em] uppercase hover:bg-[#c9a96e] hover:text-[#1a1a1a] transition-all duration-500"
               style={{ fontFamily: 'var(--font-sans)' }}
             >
-              Zakaži termin
+              Rezerviši termin
               <ArrowRight size={11} className="group-hover:translate-x-0.5 transition-transform duration-300" />
             </Link>
             <Link

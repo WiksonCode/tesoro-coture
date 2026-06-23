@@ -7,7 +7,6 @@ const footerLinks = [
   { href: '/katalog', label: 'Shop' },
   { href: '/o-nama', label: 'O nama' },
   { href: '/rezervacija', label: 'Rezervacija' },
-  { href: '/vodic-za-velicine', label: 'Vodič za veličine' },
 ]
 
 export default function Footer() {

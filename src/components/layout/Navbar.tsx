@@ -105,11 +105,11 @@ export default function Navbar() {
           onClick={() => { if (pathname === '/') window.scrollTo({ top: 0, behavior: 'smooth' }) }}
         >
           <Image
-            src={isHero ? '/logo.png' : '/logo-dark.png'}
+            src={isHero ? '/tesoro-logo-outline.png' : '/tesoro2-logo.png'}
             alt="TESORO Couture"
-            width={140}
-            height={70}
-            className="object-contain transition-opacity duration-500 w-[110px] lg:w-[140px]"
+            width={802}
+            height={311}
+            className="object-contain transition-opacity duration-500 w-[110px] lg:w-[130px]"
             priority
           />
         </Link>
@@ -293,7 +293,7 @@ export default function Navbar() {
                 {/* Mobile logo */}
                 <div className="mb-10">
                   <Image
-                    src="/logo-dark.png"
+                    src="/tesoro2-logo.png"
                     alt="TESORO Couture"
                     width={120}
                     height={60}

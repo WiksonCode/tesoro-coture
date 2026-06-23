@@ -109,9 +109,9 @@ export default async function KatalogPage({
 
       <div className="relative h-[220px] lg:h-[320px] overflow-hidden bg-[#1a1a1a]">
         <Image src={bannerSlika} alt={naslov} fill priority sizes="100vw" className="object-cover object-[center_30%] animate-ken-burns" />
-        <div className="absolute inset-0 bg-black/50" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-        <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-black/30 to-transparent" />
+        <div className="absolute inset-0 bg-black/25" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-black/20 to-transparent" />
 
         <div className="relative z-10 h-full flex flex-col justify-between max-w-7xl mx-auto px-6 lg:px-10 py-5 lg:py-7">
           <nav>

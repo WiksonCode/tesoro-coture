@@ -90,12 +90,6 @@ export default function CategorySection() {
 
                 {/* Tekst */}
                 <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-5 lg:p-6">
-                  <p
-                    className="text-[8px] tracking-[0.4em] uppercase text-[#c9a96e] mb-1.5"
-                    style={{ fontFamily: 'var(--font-sans)' }}
-                  >
-                    {kat.opis}
-                  </p>
                   <div className="flex items-center justify-between">
                     <h3
                       className="text-[clamp(18px,2.5vw,26px)] font-light text-white leading-none"
