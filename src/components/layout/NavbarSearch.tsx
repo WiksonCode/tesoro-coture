@@ -7,6 +7,8 @@ import Link from 'next/link'
 import { Search, X, ArrowRight } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
+import { useJezik } from '@/store/jezik'
+import { t } from '@/messages'
 import type { Haljina } from '@/types'
 
 interface Props {
@@ -28,6 +30,8 @@ function formatCijena(c: number) {
 }
 
 export default function NavbarSearch({ isHero, mobileInline = false }: Props) {
+  const { jezik } = useJezik()
+  const tr = t[jezik].search
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<Haljina[]>([])
@@ -35,6 +39,8 @@ export default function NavbarSearch({ isHero, mobileInline = false }: Props) {
   const [loading, setLoading] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
+
+  const getNaziv = (h: Haljina) => (jezik === 'en' && h.naziv_en) ? h.naziv_en : h.naziv_sr
 
   const close = useCallback(() => {
     setOpen(false)
@@ -103,7 +109,7 @@ export default function NavbarSearch({ isHero, mobileInline = false }: Props) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Pretraži haljine..."
+            placeholder={tr.placeholder}
             className="flex-1 bg-transparent text-[11px] tracking-[0.15em] text-[#1a1a1a] placeholder:text-[#8a8a8a]/50 pb-3 pt-1 outline-none caret-[#c9a96e]"
             style={{ fontFamily: 'var(--font-sans)' }}
             autoComplete="off"
@@ -122,11 +128,11 @@ export default function NavbarSearch({ isHero, mobileInline = false }: Props) {
                 >
                   <div className="w-7 h-9 flex-shrink-0 overflow-hidden bg-[#f0ebe5]">
                     {Array.isArray(h.slike) && h.slike[0]
-                      ? <img src={h.slike[0]} alt={h.naziv_sr} className="w-full h-full object-cover" /> // eslint-disable-line
+                      ? <img src={h.slike[0]} alt={getNaziv(h)} className="w-full h-full object-cover" /> // eslint-disable-line
                       : <div className="w-full h-full bg-[#e8e0d8]" />}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[11px] text-[#1a1a1a] truncate" style={{ fontFamily: 'var(--font-serif)' }}>{h.naziv_sr}</p>
+                    <p className="text-[11px] text-[#1a1a1a] truncate" style={{ fontFamily: 'var(--font-serif)' }}>{getNaziv(h)}</p>
                     {getMinCijena(h) !== null && (
                       <p className="text-[10px] font-semibold text-[#c9a96e] mt-0.5" style={{ fontFamily: 'var(--font-sans)' }}>{formatCijena(getMinCijena(h)!)}</p>
                     )}
@@ -141,7 +147,7 @@ export default function NavbarSearch({ isHero, mobileInline = false }: Props) {
                 className="flex items-center justify-between px-4 py-3 border-t border-[#e8e0d8] text-[9px] tracking-[0.25em] uppercase text-[#8a8a8a] hover:text-[#c9a96e] transition-colors duration-150"
                 style={{ fontFamily: 'var(--font-sans)' }}
               >
-                Svi rezultati <ArrowRight size={10} strokeWidth={1.5} />
+                {tr.sviRezultati} <ArrowRight size={10} strokeWidth={1.5} />
               </Link>
             </li>
           </ul>
@@ -160,7 +166,7 @@ export default function NavbarSearch({ isHero, mobileInline = false }: Props) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        aria-label="Pretraži haljine"
+        aria-label={tr.placeholder}
         className={cn(
           'p-1.5 transition-colors duration-300 cursor-pointer',
           isHero ? 'text-white/80 hover:text-white' : 'text-[#1a1a1a] hover:text-[#c9a96e]'
@@ -180,16 +186,16 @@ export default function NavbarSearch({ isHero, mobileInline = false }: Props) {
               className="text-[8px] tracking-[0.55em] uppercase text-[#c9a96e]"
               style={{ fontFamily: 'var(--font-sans)' }}
             >
-              Tesoro Couture — Pretraga
+              {tr.header}
             </span>
             <button
               type="button"
               onClick={() => close()}
-              aria-label="Zatvori pretragu"
+              aria-label={tr.zatvori}
               className="flex items-center gap-2.5 px-3 py-2 border border-white/15 hover:border-white/40 text-white/60 hover:text-white transition-all duration-200 cursor-pointer"
             >
               <span className="text-[9px] tracking-[0.3em] uppercase hidden sm:inline" style={{ fontFamily: 'var(--font-sans)' }}>
-                Zatvori
+                {tr.zatvori}
               </span>
               <X size={14} strokeWidth={1.5} />
             </button>
@@ -209,7 +215,7 @@ export default function NavbarSearch({ isHero, mobileInline = false }: Props) {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Pretražite haljine..."
+                  placeholder={tr.placeholder}
                   className="w-full bg-transparent text-white text-[clamp(28px,4.5vw,50px)] font-light pb-5 pr-12 outline-none placeholder:text-white/30 caret-[#c9a96e]"
                   style={{ fontFamily: 'var(--font-serif)', letterSpacing: '-0.01em' }}
                   autoComplete="off"
@@ -226,7 +232,7 @@ export default function NavbarSearch({ isHero, mobileInline = false }: Props) {
                 }
               </div>
               <p className="text-[8px] tracking-[0.35em] text-white/25 mt-3 uppercase" style={{ fontFamily: 'var(--font-sans)' }}>
-                Enter — pretraži &nbsp;·&nbsp; Esc — zatvori
+                {tr.hint}
               </p>
             </div>
 
@@ -237,9 +243,9 @@ export default function NavbarSearch({ isHero, mobileInline = false }: Props) {
                 {/* Section label */}
                 <div className="mb-5 flex items-center justify-between" style={{ padding: '0 clamp(24px, 4vw, 80px)' }}>
                   <p className="text-[9px] tracking-[0.5em] uppercase text-white/65" style={{ fontFamily: 'var(--font-sans)' }}>
-                    {isSearching ? 'Rezultati' : 'Preporučujemo'}
+                    {isSearching ? tr.rezultati : tr.preporucujemo}
                     {isSearching && results.length > 0 && (
-                      <span className="ml-3 text-[#c9a96e]">{results.length} {results.length === 1 ? 'rezultat' : 'rezultata'}</span>
+                      <span className="ml-3 text-[#c9a96e]">{results.length} {results.length === 1 ? tr.rezultat1 : tr.rezultataN}</span>
                     )}
                   </p>
                   <Link
@@ -248,7 +254,7 @@ export default function NavbarSearch({ isHero, mobileInline = false }: Props) {
                     className="flex items-center gap-1.5 text-[9px] tracking-[0.35em] uppercase text-white/55 hover:text-[#c9a96e] transition-colors duration-200 cursor-pointer group"
                     style={{ fontFamily: 'var(--font-sans)' }}
                   >
-                    {isSearching ? 'Svi rezultati' : 'Cela kolekcija'}
+                    {isSearching ? tr.sviRezultati : tr.celaKolekcija}
                     <ArrowRight size={9} strokeWidth={1.5} className="group-hover:text-[#c9a96e] transition-colors" />
                   </Link>
                 </div>
@@ -268,7 +274,7 @@ export default function NavbarSearch({ isHero, mobileInline = false }: Props) {
                                 // eslint-disable-next-line @next/next/no-img-element
                                 <img
                                   src={img1}
-                                  alt={h.naziv_sr}
+                                  alt={getNaziv(h)}
                                   className={cn(
                                     'absolute inset-0 w-full h-full object-cover transition-opacity duration-500',
                                     img2 ? 'group-hover:opacity-0' : ''
@@ -279,7 +285,7 @@ export default function NavbarSearch({ isHero, mobileInline = false }: Props) {
                                 // eslint-disable-next-line @next/next/no-img-element
                                 <img
                                   src={img2}
-                                  alt={h.naziv_sr}
+                                  alt={getNaziv(h)}
                                   className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                                 />
                               )}
@@ -293,7 +299,7 @@ export default function NavbarSearch({ isHero, mobileInline = false }: Props) {
                                 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(11px, 1.25vw, 20px)' }}
                                 className="text-white font-light leading-snug truncate"
                               >
-                                {h.naziv_sr}
+                                {getNaziv(h)}
                               </p>
                               <p
                                 style={{ fontFamily: 'var(--font-sans)', fontSize: 'clamp(7px, 0.65vw, 11px)', letterSpacing: '0.35em' }}
@@ -323,7 +329,7 @@ export default function NavbarSearch({ isHero, mobileInline = false }: Props) {
             {noResults && (
               <div className="max-w-2xl mx-auto px-6 mt-12 animate-fade-up">
                 <p className="text-white/60 text-[clamp(16px,2.5vw,26px)] font-light italic" style={{ fontFamily: 'var(--font-serif)' }}>
-                  Nema rezultata za &ldquo;{query}&rdquo;
+                  {tr.nemaRezultata} &ldquo;{query}&rdquo;
                 </p>
                 <Link
                   href="/katalog"
@@ -331,7 +337,7 @@ export default function NavbarSearch({ isHero, mobileInline = false }: Props) {
                   className="inline-flex items-center gap-2.5 mt-5 text-[8px] tracking-[0.4em] uppercase text-[#c9a96e] hover:text-white transition-colors duration-200 cursor-pointer"
                   style={{ fontFamily: 'var(--font-sans)' }}
                 >
-                  Pogledajte celu kolekciju <ArrowRight size={10} strokeWidth={1.5} />
+                  {tr.pogledajKolekciju} <ArrowRight size={10} strokeWidth={1.5} />
                 </Link>
               </div>
             )}
@@ -353,7 +359,7 @@ export default function NavbarSearch({ isHero, mobileInline = false }: Props) {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Pretražite haljine..."
+                  placeholder={tr.placeholder}
                   className="flex-1 bg-transparent text-white text-[15px] font-light outline-none placeholder:text-white/30 caret-[#c9a96e]"
                   style={{ fontFamily: 'var(--font-sans)' }}
                   autoComplete="off"
@@ -375,7 +381,7 @@ export default function NavbarSearch({ isHero, mobileInline = false }: Props) {
                     className="text-[8px] tracking-[0.5em] uppercase text-white/30 mb-5"
                     style={{ fontFamily: 'var(--font-sans)' }}
                   >
-                    {isSearching ? `Rezultati (${results.length})` : 'Preporučujemo'}
+                    {isSearching ? `${tr.rezultati} (${results.length})` : tr.preporucujemo}
                   </p>
                   <ul className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-5">
                     {displayList.map((h) => (
@@ -383,12 +389,12 @@ export default function NavbarSearch({ isHero, mobileInline = false }: Props) {
                         <Link href={`/haljina/${h.slug}`} onClick={close} className="group flex flex-col cursor-pointer">
                           <div className="relative w-full aspect-[3/4] overflow-hidden bg-white/5">
                             {firstImage(h)
-                              ? <img src={firstImage(h)!} alt={h.naziv_sr} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" /> // eslint-disable-line
+                              ? <img src={firstImage(h)!} alt={getNaziv(h)} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" /> // eslint-disable-line
                               : <div className="w-full h-full bg-white/8" />}
                           </div>
                           <div className="mt-2.5 sm:mt-3 flex flex-col gap-0.5">
                             <p className="text-white text-[13px] sm:text-[14px] font-light leading-snug truncate" style={{ fontFamily: 'var(--font-serif)' }}>
-                              {h.naziv_sr}
+                              {getNaziv(h)}
                             </p>
                             <p className="text-[8px] tracking-[0.3em] uppercase text-white/35" style={{ fontFamily: 'var(--font-sans)' }}>
                               {h.kategorija?.naziv_sr ?? ''}
@@ -410,7 +416,7 @@ export default function NavbarSearch({ isHero, mobileInline = false }: Props) {
                       className="inline-flex items-center gap-2 text-[8px] tracking-[0.4em] uppercase text-white/35 hover:text-[#c9a96e] transition-colors duration-200 cursor-pointer"
                       style={{ fontFamily: 'var(--font-sans)' }}
                     >
-                      {isSearching ? 'Svi rezultati u katalogu' : 'Cela kolekcija'}
+                      {isSearching ? tr.sviRezultatiKatalog : tr.celaKolekcija}
                       <ArrowRight size={10} strokeWidth={1.5} />
                     </Link>
                   </div>
@@ -420,7 +426,7 @@ export default function NavbarSearch({ isHero, mobileInline = false }: Props) {
               {noResults && (
                 <div className="py-12 animate-fade-up">
                   <p className="text-white/60 text-[18px] font-light italic" style={{ fontFamily: 'var(--font-serif)' }}>
-                    Nema rezultata za &ldquo;{query}&rdquo;
+                    {tr.nemaRezultata} &ldquo;{query}&rdquo;
                   </p>
                   <Link
                     href="/katalog"
@@ -428,7 +434,7 @@ export default function NavbarSearch({ isHero, mobileInline = false }: Props) {
                     className="inline-flex items-center gap-2 mt-4 text-[8px] tracking-[0.4em] uppercase text-[#c9a96e] hover:text-white transition-colors duration-200 cursor-pointer"
                     style={{ fontFamily: 'var(--font-sans)' }}
                   >
-                    Cela kolekcija <ArrowRight size={10} strokeWidth={1.5} />
+                    {tr.celaKolekcija} <ArrowRight size={10} strokeWidth={1.5} />
                   </Link>
                 </div>
               )}
