@@ -10,6 +10,7 @@ import VelicineSelector from '@/components/haljine/VelicineSelector'
 import VodicZaVelicineModal from '@/components/haljine/VodicZaVelicineModal'
 import { cn } from '@/lib/utils'
 import { useKorpa } from '@/store/korpa'
+import { useJezik } from '@/store/jezik'
 import type { Haljina } from '@/types'
 
 const KURS = 117
@@ -29,6 +30,8 @@ function formatEUR(cijenaRSD: number) {
 const WHATSAPP_BROJ = process.env.NEXT_PUBLIC_WHATSAPP_BROJ ?? ''
 
 export default function HaljinaDetalji({ haljina }: { haljina: Haljina }) {
+  const { jezik } = useJezik()
+  const naziv = (jezik === 'en' && haljina.naziv_en) ? haljina.naziv_en : haljina.naziv_sr
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -181,7 +184,7 @@ export default function HaljinaDetalji({ haljina }: { haljina: Haljina }) {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-5 lg:gap-16">
-          <HaljinaGalerija slike={galerija} naziv={haljina.naziv_sr} videoUrl={haljina.video_url} />
+          <HaljinaGalerija slike={galerija} naziv={naziv} videoUrl={haljina.video_url} />
 
           <div className="lg:sticky lg:top-24 lg:self-start">
             <div className="flex items-center gap-3 mb-4 flex-wrap">
@@ -208,7 +211,7 @@ export default function HaljinaDetalji({ haljina }: { haljina: Haljina }) {
               className="text-[clamp(28px,3.5vw,44px)] font-light text-[#1a1a1a] leading-tight mb-6"
               style={{ fontFamily: 'var(--font-serif)' }}
             >
-              {haljina.naziv_sr}
+              {naziv}
             </h1>
 
             <div className="flex items-baseline gap-4 mb-3 pb-4 border-b border-[#e8e0d8]">
@@ -342,7 +345,7 @@ export default function HaljinaDetalji({ haljina }: { haljina: Haljina }) {
       <div className="fixed bottom-0 left-0 right-0 lg:hidden z-40 bg-[#faf7f4]/95 backdrop-blur-sm border-t border-[#e8e0d8] px-5 py-3.5 flex items-center gap-3">
         <div className="flex-1 min-w-0">
           <p className="text-[10px] tracking-[0.2em] uppercase text-[#8a8a8a] truncate" style={{ fontFamily: 'var(--font-sans)' }}>
-            {odabranaBoja || haljina.naziv_sr}
+            {odabranaBoja || naziv}
           </p>
           <div className="flex items-center gap-2 mt-0.5">
             {isRasprodato ? (

@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Eye, ShoppingBag, Check, Play } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useKorpa } from '@/store/korpa'
+import { useJezik } from '@/store/jezik'
 import type { Haljina, InventarStavka } from '@/types'
 
 export function formatCijena(cijena: number): string {
@@ -31,6 +32,8 @@ function getVelicineIzInventara(inventar: InventarStavka[]) {
 }
 
 export default function HaljinaCard({ haljina, className }: { haljina: Haljina; className?: string }) {
+  const { jezik } = useJezik()
+  const naziv = (jezik === 'en' && haljina.naziv_en) ? haljina.naziv_en : haljina.naziv_sr
   const dostupniInventar = haljina.inventar?.filter((i) => i.dostupna && !i.arhivirana) ?? []
   const sviInventar = haljina.inventar ?? []
 
@@ -126,7 +129,7 @@ export default function HaljinaCard({ haljina, className }: { haljina: Haljina; 
           <>
             <Image
               src={slika}
-              alt={haljina.naziv_sr}
+              alt={naziv}
               fill
               sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
               className={cn(
@@ -138,7 +141,7 @@ export default function HaljinaCard({ haljina, className }: { haljina: Haljina; 
             {slika2 && (
               <Image
                 src={slika2}
-                alt={`${haljina.naziv_sr} — drugi ugao`}
+                alt={`${naziv} — drugi ugao`}
                 fill
                 sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                 className={cn(
@@ -301,7 +304,7 @@ export default function HaljinaCard({ haljina, className }: { haljina: Haljina; 
           className="font-normal text-[#1a1a1a] leading-tight mb-2 group-hover:text-[#c9a96e] transition-colors duration-300"
           style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(16px, 1.3vw, 21px)' }}
         >
-          {haljina.naziv_sr}
+          {naziv}
         </h3>
         <div className="flex items-center justify-between">
           {minCijena > 0 && (
