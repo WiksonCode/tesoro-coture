@@ -1,5 +1,15 @@
 export const t = {
   sr: {
+    nav: {
+      links: [
+        { href: '/', label: 'Početna' },
+        { href: '/katalog', label: 'Shop' },
+        { href: '/o-nama', label: 'O nama' },
+      ],
+      korpa: 'Korpa',
+      profil: 'Moj profil',
+      odjava: 'Odjava',
+    },
     hero: {
       naslov1: 'Elegancija',
       naslov2: 'koja traje',
@@ -34,6 +44,16 @@ export const t = {
     },
   },
   en: {
+    nav: {
+      links: [
+        { href: '/', label: 'Home' },
+        { href: '/katalog', label: 'Shop' },
+        { href: '/o-nama', label: 'About' },
+      ],
+      korpa: 'Cart',
+      profil: 'My profile',
+      odjava: 'Log out',
+    },
     hero: {
       naslov1: 'Elegance',
       naslov2: 'that lasts',

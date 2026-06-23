@@ -18,12 +18,6 @@ import { useJezik } from '@/store/jezik'
 import { t } from '@/messages'
 import { createClient } from '@/lib/supabase/client'
 
-const navLinks = [
-  { href: '/', label: 'Početna' },
-  { href: '/katalog', label: 'Shop' },
-  { href: '/o-nama', label: 'O nama' },
-]
-
 // Text shadow protects white text against variable hero images
 const heroTextShadow = { textShadow: '0 1px 12px rgba(0,0,0,0.45)' }
 
@@ -40,6 +34,8 @@ export default function Navbar() {
   const isAuthPage = pathname === '/login' || pathname === '/registracija' || pathname.startsWith('/admin')
   const korpaCount = useKorpa((s) => s.artikli.length)
   const { jezik, setJezik } = useJezik()
+  const tr = t[jezik].nav
+  const navLinks = tr.links
 
   useEffect(() => setMounted(true), [])
 
@@ -211,7 +207,7 @@ export default function Navbar() {
                         style={{ fontFamily: 'var(--font-sans)' }}
                       >
                         <User size={11} strokeWidth={1.5} />
-                        Moj profil
+                        {tr.profil}
                       </Link>
                       {isAdmin && (
                         <Link
@@ -243,7 +239,7 @@ export default function Navbar() {
                         style={{ fontFamily: 'var(--font-sans)' }}
                       >
                         <LogOut size={11} strokeWidth={1.5} />
-                        Odjava
+                        {tr.odjava}
                       </button>
                     </div>
                   )}
@@ -358,7 +354,7 @@ export default function Navbar() {
                     style={{ fontFamily: 'var(--font-sans)' }}
                   >
                     <ShoppingBag size={16} strokeWidth={1.5} />
-                    Korpa
+                    {tr.korpa}
                   </Link>
                 </div>
 
@@ -375,7 +371,7 @@ export default function Navbar() {
                           style={{ fontFamily: 'var(--font-sans)' }}
                         >
                           <User size={14} strokeWidth={1.5} />
-                          Moj profil
+                          {tr.profil}
                         </Link>
                         <button
                           type="button"
@@ -384,7 +380,7 @@ export default function Navbar() {
                           style={{ fontFamily: 'var(--font-sans)' }}
                         >
                           <LogOut size={14} strokeWidth={1.5} />
-                          Odjava
+                          {tr.odjava}
                         </button>
                       </div>
                     ) : null}
