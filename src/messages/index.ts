@@ -1,0 +1,70 @@
+export const t = {
+  sr: {
+    hero: {
+      naslov1: 'Elegancija',
+      naslov2: 'koja traje',
+      cta1: 'Pogledaj kolekciju',
+      cta2: 'Rezerviši termin',
+    },
+    marquee: ['Od 2020. godine', 'Beograd', 'Individualan pristup', 'Haljine po meri'],
+    kolekcija: {
+      eyebrow: 'Kolekcija',
+      naslov: 'Izdvajamo',
+      podnaslov: 'Trenutno najprodavanije',
+      cta: 'Pogledaj celu kolekciju',
+    },
+    kategorije: {
+      eyebrow: 'Po kategoriji',
+      naslov: 'Pronađi svoju',
+      naslovjItalic: 'savršenu haljinu',
+      stavke: [
+        { naziv: 'Kratke haljine', href: '/katalog?kategorija=kratke', slika: '/kratka.jpeg' },
+        { naziv: 'Midi haljine',   href: '/katalog?kategorija=midi',   slika: '/midi.jpeg' },
+        { naziv: 'Duge haljine',   href: '/katalog?kategorija=duge',   slika: '/duga.jpeg' },
+        { naziv: 'Snižene',        href: '/katalog?naPopustu=true',    slika: '/snizena.jpeg' },
+      ],
+    },
+    cta: {
+      eyebrow: 'Rezervišite termin',
+      naslov1: 'Pronađite haljinu stvorenu',
+      naslov2: 'za vaš poseban trenutak',
+      opis: 'Zakažite besplatnu konsultaciju u našem salonu i zajedno ćemo pronaći model koji će obeležiti vaš poseban trenutak.',
+      dugme: 'Rezerviši termin',
+      link: 'Pogledaj kolekciju',
+    },
+  },
+  en: {
+    hero: {
+      naslov1: 'Elegance',
+      naslov2: 'that lasts',
+      cta1: 'View collection',
+      cta2: 'Book an appointment',
+    },
+    marquee: ['Since 2020', 'Belgrade', 'Personal approach', 'Made to measure'],
+    kolekcija: {
+      eyebrow: 'Collection',
+      naslov: 'Featured',
+      podnaslov: 'Currently bestselling',
+      cta: 'View full collection',
+    },
+    kategorije: {
+      eyebrow: 'By category',
+      naslov: 'Find your',
+      naslovjItalic: 'perfect dress',
+      stavke: [
+        { naziv: 'Short dresses', href: '/katalog?kategorija=kratke', slika: '/kratka.jpeg' },
+        { naziv: 'Midi dresses',  href: '/katalog?kategorija=midi',   slika: '/midi.jpeg' },
+        { naziv: 'Long dresses',  href: '/katalog?kategorija=duge',   slika: '/duga.jpeg' },
+        { naziv: 'Sale',          href: '/katalog?naPopustu=true',    slika: '/snizena.jpeg' },
+      ],
+    },
+    cta: {
+      eyebrow: 'Book your visit',
+      naslov1: 'Find the dress made',
+      naslov2: 'for your special moment',
+      opis: 'Schedule a free consultation at our salon and together we will find the perfect dress for your most memorable moments.',
+      dugme: 'Book an appointment',
+      link: 'View collection',
+    },
+  },
+}

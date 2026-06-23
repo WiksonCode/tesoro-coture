@@ -60,6 +60,8 @@ interface FilteriProps {
   priceRange: [number, number]
   priceBounds: { min: number; max: number }
   onPriceChange: (range: [number, number]) => void
+  naPopustu: boolean
+  onNaPopustuChange: (v: boolean) => void
   onReset: () => void
   totalCount: number
   cols?: number
@@ -123,12 +125,12 @@ function DualSlider({ min, max, value, step = 5000, onChange }: {
       <input type="range" min={min} max={max} step={step} value={value[0]}
         onChange={e => onChange([Math.min(Number(e.target.value), value[1] - step), value[1]])}
         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-        style={{ zIndex: leftPct > 50 ? 5 : 3 }}
+        style={{ zIndex: leftPct > 50 ? 5 : 3, touchAction: 'none' }}
       />
       <input type="range" min={min} max={max} step={step} value={value[1]}
         onChange={e => onChange([value[0], Math.max(Number(e.target.value), value[0] + step)])}
         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-        style={{ zIndex: leftPct > 50 ? 3 : 5 }}
+        style={{ zIndex: leftPct > 50 ? 3 : 5, touchAction: 'none' }}
       />
     </div>
   )
@@ -221,7 +223,8 @@ function DrawerAccordion({ label, value, active, children }: {
 
 export default function Filteri({
   activeParams, sveBoje, sveVelicine, selectedBoje, selectedVelicine,
-  onBojeChange, onVelicineChange, priceRange, priceBounds, onPriceChange, onReset, totalCount,
+  onBojeChange, onVelicineChange, priceRange, priceBounds, onPriceChange,
+  naPopustu, onNaPopustuChange, onReset, totalCount,
   cols = 3, onColsChange,
 }: FilteriProps) {
   const router = useRouter()
@@ -245,7 +248,7 @@ export default function Filteri({
   const displayVelicine = sveVelicine.length > 0 ? sveVelicine : STANDARD_VELICINE
   const displayBoje = sveBoje.length > 0 ? sveBoje : PRESET_BOJE
   const priceActive = priceRange[0] > priceBounds.min || priceRange[1] < priceBounds.max
-  const activeCount = [selectedBoje.length > 0, selectedVelicine.length > 0, priceActive, !!activeParams.naPopustu, !!activeParams.sort].filter(Boolean).length
+  const activeCount = [selectedBoje.length > 0, selectedVelicine.length > 0, priceActive, naPopustu, !!activeParams.sort].filter(Boolean).length
   const hasActive = activeCount > 0 || !!activeParams.kategorija || !!activeParams.q
   const handleReset = () => { onReset(); router.push('/katalog') }
 
@@ -330,7 +333,7 @@ export default function Filteri({
       },
     })),
     ...(priceActive ? [{ key: 'price', label: `${formatRSD(priceRange[0])} – ${formatRSD(priceRange[1])}`, onRemove: () => onPriceChange([priceBounds.min, priceBounds.max]) }] : []),
-    ...(activeParams.naPopustu === 'true' ? [{ key: 'popust', label: 'Na popustu', onRemove: () => updateParam('naPopustu', null) }] : []),
+    ...(naPopustu ? [{ key: 'popust', label: 'Na popustu', onRemove: () => { onNaPopustuChange(false); updateParam('naPopustu', null) } }] : []),
     ...(activeParams.sort ? [{ key: 'sort', label: SORTIRANJA.find(s => s.value === activeParams.sort)?.label ?? activeParams.sort, onRemove: () => updateParam('sort', null) }] : []),
   ]
 
@@ -400,9 +403,13 @@ export default function Filteri({
                 </div>
               </Dropdown>
               <button type="button"
-                onClick={() => updateParam('naPopustu', activeParams.naPopustu === 'true' ? null : 'true')}
+                onClick={() => {
+                  const newVal = !naPopustu
+                  onNaPopustuChange(newVal)
+                  updateParam('naPopustu', newVal ? 'true' : null)
+                }}
                 className={cn('flex items-center gap-2 px-4 py-2.5 text-[10px] tracking-[0.2em] uppercase border transition-all duration-200 whitespace-nowrap shrink-0 cursor-pointer',
-                  activeParams.naPopustu === 'true' ? 'border-[#c9a96e] bg-[#c9a96e]/10 text-[#1a1a1a]' : 'border-[#e8e0d8] text-[#8a8a8a] hover:border-[#1a1a1a] hover:text-[#1a1a1a] bg-white'
+                  naPopustu ? 'border-[#c9a96e] bg-[#c9a96e]/10 text-[#1a1a1a]' : 'border-[#e8e0d8] text-[#8a8a8a] hover:border-[#1a1a1a] hover:text-[#1a1a1a] bg-white'
                 )}
                 style={{ fontFamily: 'var(--font-sans)' }}
               >
@@ -606,13 +613,17 @@ export default function Filteri({
                   <div className="flex items-center justify-between">
                     <p className="text-[10px] tracking-[0.2em] uppercase text-[#1a1a1a]" style={{ fontFamily: 'var(--font-sans)' }}>Na popustu</p>
                     <button type="button"
-                      onClick={() => updateParam('naPopustu', activeParams.naPopustu === 'true' ? null : 'true')}
+                      onClick={() => {
+                        const newVal = !naPopustu
+                        onNaPopustuChange(newVal)
+                        updateParam('naPopustu', newVal ? 'true' : null)
+                      }}
                       className={cn('relative w-12 h-6 rounded-full transition-colors duration-200 shrink-0 cursor-pointer',
-                        activeParams.naPopustu === 'true' ? 'bg-[#c9a96e]' : 'bg-[#e8e0d8]'
+                        naPopustu ? 'bg-[#c9a96e]' : 'bg-[#e8e0d8]'
                       )}
                     >
                       <span className={cn('absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200',
-                        activeParams.naPopustu === 'true' ? 'translate-x-7' : 'translate-x-1'
+                        naPopustu ? 'translate-x-7' : 'translate-x-1'
                       )} />
                     </button>
                   </div>

@@ -38,9 +38,11 @@ export default function KatalogClient({ haljine, activeParams }: KatalogClientPr
 
   const [selectedBoje, setSelectedBoje] = useState<string[]>(() => parseList(activeParams.boje))
   const [selectedVelicine, setSelectedVelicine] = useState<string[]>(() => parseList(activeParams.velicine))
+  const [naPopustu, setNaPopustu] = useState(() => activeParams.naPopustu === 'true')
 
   useEffect(() => { setSelectedBoje(parseList(activeParams.boje)) }, [activeParams.boje])
   useEffect(() => { setSelectedVelicine(parseList(activeParams.velicine)) }, [activeParams.velicine])
+  useEffect(() => { setNaPopustu(activeParams.naPopustu === 'true') }, [activeParams.naPopustu])
 
   const sveBoje = useMemo(() => {
     const map = new Map<string, { naziv: string; hex: string }>()
@@ -96,18 +98,19 @@ export default function KatalogClient({ haljine, activeParams }: KatalogClientPr
         if (minCijena < priceRange[0] || minCijena > priceRange[1]) return false
       }
 
-      if (activeParams.naPopustu === 'true') {
+      if (naPopustu) {
         if (!dostupniInv.some((i) => i.na_akciji)) return false
       }
 
       return true
     })
-  }, [haljine, selectedBoje, selectedVelicine, priceRange, priceBounds, activeParams.naPopustu])
+  }, [haljine, selectedBoje, selectedVelicine, priceRange, priceBounds, naPopustu])
 
   const handleReset = useCallback(() => {
     setSelectedBoje([])
     setSelectedVelicine([])
     setPriceRange([priceBounds.min, priceBounds.max])
+    setNaPopustu(false)
   }, [priceBounds])
 
   const handleFullReset = useCallback(() => {
@@ -118,6 +121,7 @@ export default function KatalogClient({ haljine, activeParams }: KatalogClientPr
   const hasActiveFilters =
     selectedBoje.length > 0 ||
     selectedVelicine.length > 0 ||
+    naPopustu ||
     !!activeParams.kategorija ||
     !!activeParams.sort ||
     !!activeParams.q ||
@@ -137,6 +141,8 @@ export default function KatalogClient({ haljine, activeParams }: KatalogClientPr
         priceRange={priceRange}
         priceBounds={priceBounds}
         onPriceChange={setPriceRange}
+        naPopustu={naPopustu}
+        onNaPopustuChange={setNaPopustu}
         onReset={handleReset}
         totalCount={filtrirane.length}
         cols={cols}

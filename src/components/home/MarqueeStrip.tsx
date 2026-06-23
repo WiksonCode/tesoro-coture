@@ -1,11 +1,9 @@
-const items = [
-  'Od 2020. godine',
-  'Beograd',
-  'Individualan pristup',
-  'Haljine po meri',
-]
+'use client'
 
-function MarqueeItems() {
+import { useJezik } from '@/store/jezik'
+import { t } from '@/messages'
+
+function MarqueeItems({ items }: { items: string[] }) {
   return (
     <>
       {items.map((item, i) => (
@@ -24,15 +22,15 @@ function MarqueeItems() {
 }
 
 export default function MarqueeStrip() {
+  const { jezik } = useJezik()
+  const items = t[jezik].marquee
+
   return (
     <div className="relative bg-[#1a1a1a] py-4 border-y border-[#c9a96e]/15 w-full" style={{ overflow: 'hidden' }}>
       <div className="flex whitespace-nowrap animate-marquee will-change-transform">
-        <MarqueeItems />
-        <MarqueeItems />
-        <MarqueeItems />
-        <MarqueeItems />
-        <MarqueeItems />
-        <MarqueeItems />
+        {Array.from({ length: 6 }).map((_, i) => (
+          <MarqueeItems key={i} items={items} />
+        ))}
       </div>
     </div>
   )

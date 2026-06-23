@@ -6,6 +6,8 @@ import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react'
 import HaljinaCard from '@/components/haljine/HaljinaCard'
 import type { Haljina } from '@/types'
+import { useJezik } from '@/store/jezik'
+import { t } from '@/messages'
 
 const ITEMS_PER_PAGE = 4
 
@@ -14,10 +16,12 @@ interface AboutSectionProps {
 }
 
 export default function AboutSection({ haljine }: AboutSectionProps) {
-  if (!haljine.length) return null
-
+  const { jezik } = useJezik()
+  const tr = t[jezik].kolekcija
   const totalPages = Math.ceil(haljine.length / ITEMS_PER_PAGE)
   const [page, setPage] = useState(0)
+
+  if (!haljine.length) return null
 
   function navigate(newPage: number) {
     setPage(newPage)
@@ -51,7 +55,7 @@ export default function AboutSection({ haljine }: AboutSectionProps) {
             className="text-[9px] tracking-[0.5em] uppercase text-[#c9a96e] mb-5"
             style={{ fontFamily: 'var(--font-sans)' }}
           >
-            Kolekcija
+            {tr.eyebrow}
           </p>
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
             <div>
@@ -59,7 +63,7 @@ export default function AboutSection({ haljine }: AboutSectionProps) {
                 className="text-[clamp(32px,4.5vw,56px)] font-light text-[#1a1a1a] leading-[1.05]"
                 style={{ fontFamily: 'var(--font-serif)' }}
               >
-                <span className="italic">Izdvajamo</span>
+                <span className="italic">{tr.naslov}</span>
               </h2>
               <div className="mt-4 flex items-center gap-4">
                 <span className="w-8 h-px bg-[#c9a96e] shrink-0" />
@@ -67,7 +71,7 @@ export default function AboutSection({ haljine }: AboutSectionProps) {
                   className="text-[10px] tracking-[0.35em] uppercase text-[#8a8a8a]"
                   style={{ fontFamily: 'var(--font-sans)' }}
                 >
-                  Trenutno najprodavanije
+                  {tr.podnaslov}
                 </p>
               </div>
             </div>
@@ -77,7 +81,7 @@ export default function AboutSection({ haljine }: AboutSectionProps) {
               className="group hidden sm:inline-flex items-center gap-2 text-[10px] tracking-[0.3em] uppercase text-[#8a8a8a] hover:text-[#c9a96e] transition-colors duration-300 border-b border-[#e8e0d8] hover:border-[#c9a96e] pb-1 shrink-0 self-end"
               style={{ fontFamily: 'var(--font-sans)' }}
             >
-              Pogledaj celu kolekciju
+              {tr.cta}
               <ArrowRight size={10} className="group-hover:translate-x-0.5 transition-transform duration-300" />
             </Link>
           </div>
@@ -152,7 +156,7 @@ export default function AboutSection({ haljine }: AboutSectionProps) {
             className="inline-flex items-center gap-2 text-[10px] tracking-[0.3em] uppercase text-[#8a8a8a] border-b border-[#e8e0d8] pb-1"
             style={{ fontFamily: 'var(--font-sans)' }}
           >
-            Pogledaj celu kolekciju
+            {tr.cta}
             <ArrowRight size={10} />
           </Link>
         </div>

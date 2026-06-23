@@ -14,6 +14,8 @@ import {
 } from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
 import { useKorpa } from '@/store/korpa'
+import { useJezik } from '@/store/jezik'
+import { t } from '@/messages'
 import { createClient } from '@/lib/supabase/client'
 
 const navLinks = [
@@ -37,6 +39,7 @@ export default function Navbar() {
   const isHero = pathname === '/' && !scrolled
   const isAuthPage = pathname === '/login' || pathname === '/registracija' || pathname.startsWith('/admin')
   const korpaCount = useKorpa((s) => s.artikli.length)
+  const { jezik, setJezik } = useJezik()
 
   useEffect(() => setMounted(true), [])
 
@@ -224,11 +227,11 @@ export default function Navbar() {
                       {/* Language switcher moved here — secondary utility */}
                       <div className="my-1 h-px bg-[#e8e0d8]" />
                       <div className="flex items-center gap-1 px-4 py-3" style={{ fontFamily: 'var(--font-sans)' }}>
-                        <button className="relative px-1.5 py-0.5 text-[9px] tracking-[0.25em] uppercase cursor-pointer text-[#1a1a1a] after:absolute after:bottom-0 after:left-1.5 after:right-1.5 after:h-px after:bg-[#c9a96e]">
+                        <button onClick={() => setJezik('sr')} className={cn('relative px-1.5 py-0.5 text-[9px] tracking-[0.25em] uppercase cursor-pointer transition-colors duration-200', jezik === 'sr' ? 'text-[#1a1a1a] after:absolute after:bottom-0 after:left-1.5 after:right-1.5 after:h-px after:bg-[#c9a96e]' : 'text-[#8a8a8a]/50 hover:text-[#8a8a8a]')}>
                           SR
                         </button>
                         <span className="text-[8px] text-[#1a1a1a] opacity-15">|</span>
-                        <button className="px-1.5 py-0.5 text-[9px] tracking-[0.25em] uppercase cursor-pointer text-[#8a8a8a]/50 hover:text-[#8a8a8a] transition-colors duration-200">
+                        <button onClick={() => setJezik('en')} className={cn('px-1.5 py-0.5 text-[9px] tracking-[0.25em] uppercase cursor-pointer transition-colors duration-200', jezik === 'en' ? 'text-[#1a1a1a] after:absolute after:bottom-0 after:left-1.5 after:right-1.5 after:h-px after:bg-[#c9a96e]' : 'text-[#8a8a8a]/50 hover:text-[#8a8a8a]')}>
                           EN
                         </button>
                       </div>
@@ -253,19 +256,26 @@ export default function Navbar() {
           {mounted && !user && (
             <div className="hidden lg:flex items-center gap-1" style={{ fontFamily: 'var(--font-sans)' }}>
               <button
+                onClick={() => setJezik('sr')}
                 className={cn(
                   'relative px-1.5 py-0.5 text-[9px] tracking-[0.25em] uppercase cursor-pointer transition-colors duration-300',
-                  'after:absolute after:bottom-0 after:left-1.5 after:right-1.5 after:h-px after:bg-[#c9a96e]',
-                  isHero ? 'text-white' : 'text-[#1a1a1a]'
+                  jezik === 'sr' && 'after:absolute after:bottom-0 after:left-1.5 after:right-1.5 after:h-px after:bg-[#c9a96e]',
+                  jezik === 'sr'
+                    ? (isHero ? 'text-white' : 'text-[#1a1a1a]')
+                    : (isHero ? 'text-white/35 hover:text-white/70' : 'text-[#8a8a8a]/50 hover:text-[#8a8a8a]')
                 )}
               >
                 SR
               </button>
               <span className={cn('text-[8px] opacity-20', isHero ? 'text-white' : 'text-[#1a1a1a]')}>|</span>
               <button
+                onClick={() => setJezik('en')}
                 className={cn(
-                  'px-1.5 py-0.5 text-[9px] tracking-[0.25em] uppercase cursor-pointer transition-colors duration-300',
-                  isHero ? 'text-white/35 hover:text-white/70' : 'text-[#8a8a8a]/50 hover:text-[#8a8a8a]'
+                  'relative px-1.5 py-0.5 text-[9px] tracking-[0.25em] uppercase cursor-pointer transition-colors duration-300',
+                  jezik === 'en' && 'after:absolute after:bottom-0 after:left-1.5 after:right-1.5 after:h-px after:bg-[#c9a96e]',
+                  jezik === 'en'
+                    ? (isHero ? 'text-white' : 'text-[#1a1a1a]')
+                    : (isHero ? 'text-white/35 hover:text-white/70' : 'text-[#8a8a8a]/50 hover:text-[#8a8a8a]')
                 )}
               >
                 EN
@@ -333,11 +343,11 @@ export default function Navbar() {
                 {/* Mobile utility row — lang + cart */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1" style={{ fontFamily: 'var(--font-sans)' }}>
-                    <button className="relative min-h-[44px] px-2 text-[11px] tracking-[0.25em] uppercase cursor-pointer text-[#1a1a1a] font-medium after:absolute after:bottom-3 after:left-2 after:right-2 after:h-px after:bg-[#c9a96e]">
+                    <button onClick={() => setJezik('sr')} className={cn('relative min-h-[44px] px-2 text-[11px] tracking-[0.25em] uppercase cursor-pointer transition-colors duration-200', jezik === 'sr' ? 'text-[#1a1a1a] font-medium after:absolute after:bottom-3 after:left-2 after:right-2 after:h-px after:bg-[#c9a96e]' : 'text-[#8a8a8a] hover:text-[#1a1a1a]')}>
                       SR
                     </button>
                     <span className="text-[10px] text-[#1a1a1a] opacity-20">|</span>
-                    <button className="min-h-[44px] px-2 text-[11px] tracking-[0.25em] uppercase cursor-pointer text-[#8a8a8a] hover:text-[#1a1a1a] transition-colors duration-200">
+                    <button onClick={() => setJezik('en')} className={cn('relative min-h-[44px] px-2 text-[11px] tracking-[0.25em] uppercase cursor-pointer transition-colors duration-200', jezik === 'en' ? 'text-[#1a1a1a] font-medium after:absolute after:bottom-3 after:left-2 after:right-2 after:h-px after:bg-[#c9a96e]' : 'text-[#8a8a8a] hover:text-[#1a1a1a]')}>
                       EN
                     </button>
                   </div>
@@ -387,7 +397,7 @@ export default function Navbar() {
                     className="text-[#c9a96e] text-base italic"
                     style={{ fontFamily: 'var(--font-serif)' }}
                   >
-                    Elegancija koja traje
+                    {t[jezik].hero.naslov1} {t[jezik].hero.naslov2}
                   </p>
                 </div>
               </div>

@@ -4,10 +4,15 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
+import { useJezik } from '@/store/jezik'
+import { t } from '@/messages'
 
 const HERO_IMAGE = '/hero-bg.png'
 
 export default function HeroSection() {
+  const { jezik } = useJezik()
+  const tr = t[jezik].hero
+
   return (
     <section className="relative min-h-screen flex items-end overflow-hidden">
       <Image
@@ -35,13 +40,13 @@ export default function HeroSection() {
               className="block text-[clamp(48px,10vw,100px)] tracking-[-0.01em] font-light text-white uppercase"
               style={{ fontFamily: 'var(--font-serif)', textShadow: '0 0 40px rgba(0,0,0,0.9), 0 2px 8px rgba(0,0,0,0.95), 0 8px 60px rgba(0,0,0,0.8)' }}
             >
-              Elegancija
+              {tr.naslov1}
             </span>
             <span
               className="block text-[clamp(34px,7.5vw,72px)] italic font-light text-white"
               style={{ fontFamily: 'var(--font-serif)', textShadow: '0 0 40px rgba(0,0,0,0.9), 0 2px 8px rgba(0,0,0,0.95), 0 8px 60px rgba(0,0,0,0.8)' }}
             >
-              koja traje
+              {tr.naslov2}
             </span>
           </motion.h1>
 
@@ -63,7 +68,7 @@ export default function HeroSection() {
               className="group inline-flex items-center gap-3 border border-white/60 px-8 sm:px-10 py-3.5 sm:py-4 text-[10px] tracking-[0.35em] uppercase text-white hover:bg-[#c9a96e] hover:border-[#c9a96e] hover:text-[#1a1a1a] transition-all duration-500"
               style={{ fontFamily: 'var(--font-sans)' }}
             >
-              Pogledaj kolekciju
+              {tr.cta1}
               <ArrowRight size={12} className="transition-transform duration-300 group-hover:translate-x-1" />
             </Link>
 
@@ -72,7 +77,7 @@ export default function HeroSection() {
               className="group inline-flex items-center gap-2 text-[10px] tracking-[0.35em] uppercase text-white/60 hover:text-[#c9a96e] transition-colors duration-300 border-b border-white/20 hover:border-[#c9a96e] pb-0.5"
               style={{ fontFamily: 'var(--font-sans)' }}
             >
-              Zakaži termin
+              {tr.cta2}
               <ArrowRight size={11} className="transition-transform duration-300 group-hover:translate-x-1" />
             </Link>
           </motion.div>
