@@ -112,25 +112,46 @@ function DualSlider({ min, max, value, step = 5000, onChange }: {
   min: number; max: number; value: [number, number]; step?: number
   onChange: (v: [number, number]) => void
 }) {
+  const trackRef = useRef<HTMLDivElement>(null)
   const range = max - min || 1
   const leftPct = Math.min(100, Math.max(0, ((value[0] - min) / range) * 100))
   const rightPct = Math.min(100, Math.max(0, ((value[1] - min) / range) * 100))
+
+  function pctToValue(clientX: number) {
+    const rect = trackRef.current!.getBoundingClientRect()
+    const pct = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width))
+    return Math.round((min + pct * range) / step) * step
+  }
+
+  function makeHandlers(thumb: 0 | 1) {
+    return {
+      onPointerDown(e: React.PointerEvent<HTMLDivElement>) {
+        e.preventDefault()
+        e.currentTarget.setPointerCapture(e.pointerId)
+      },
+      onPointerMove(e: React.PointerEvent<HTMLDivElement>) {
+        if (!e.currentTarget.hasPointerCapture(e.pointerId)) return
+        const v = pctToValue(e.clientX)
+        if (thumb === 0) onChange([Math.min(v, value[1] - step), value[1]])
+        else onChange([value[0], Math.max(v, value[0] + step)])
+      },
+    }
+  }
+
   return (
-    <div className="relative h-10 flex items-center select-none">
-      <div className="absolute left-0 right-0 h-[3px] bg-[#e8e0d8] rounded-full">
+    <div ref={trackRef} className="relative h-10 flex items-center select-none" style={{ touchAction: 'none' }}>
+      <div className="absolute left-0 right-0 h-[3px] bg-[#e8e0d8] rounded-full pointer-events-none">
         <div className="absolute h-full bg-[#c9a96e] rounded-full" style={{ left: `${leftPct}%`, right: `${100 - rightPct}%` }} />
       </div>
-      <div className="absolute w-5 h-5 rounded-full bg-white border-2 border-[#c9a96e] shadow-md pointer-events-none z-10" style={{ left: `calc(${leftPct}% - 10px)` }} />
-      <div className="absolute w-5 h-5 rounded-full bg-white border-2 border-[#c9a96e] shadow-md pointer-events-none z-10" style={{ left: `calc(${rightPct}% - 10px)` }} />
-      <input type="range" min={min} max={max} step={step} value={value[0]}
-        onChange={e => onChange([Math.min(Number(e.target.value), value[1] - step), value[1]])}
-        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-        style={{ zIndex: leftPct > 50 ? 5 : 3, touchAction: 'none' }}
+      <div
+        {...makeHandlers(0)}
+        className="absolute w-5 h-5 rounded-full bg-white border-2 border-[#c9a96e] shadow-md z-10 cursor-pointer"
+        style={{ left: `calc(${leftPct}% - 10px)`, touchAction: 'none' }}
       />
-      <input type="range" min={min} max={max} step={step} value={value[1]}
-        onChange={e => onChange([value[0], Math.max(Number(e.target.value), value[0] + step)])}
-        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-        style={{ zIndex: leftPct > 50 ? 3 : 5, touchAction: 'none' }}
+      <div
+        {...makeHandlers(1)}
+        className="absolute w-5 h-5 rounded-full bg-white border-2 border-[#c9a96e] shadow-md z-10 cursor-pointer"
+        style={{ left: `calc(${rightPct}% - 10px)`, touchAction: 'none' }}
       />
     </div>
   )
@@ -613,11 +634,7 @@ export default function Filteri({
                   <div className="flex items-center justify-between">
                     <p className="text-[10px] tracking-[0.2em] uppercase text-[#1a1a1a]" style={{ fontFamily: 'var(--font-sans)' }}>Na popustu</p>
                     <button type="button"
-                      onClick={() => {
-                        const newVal = !naPopustu
-                        onNaPopustuChange(newVal)
-                        updateParam('naPopustu', newVal ? 'true' : null)
-                      }}
+                      onClick={() => onNaPopustuChange(!naPopustu)}
                       className={cn('relative w-12 h-6 rounded-full transition-colors duration-200 shrink-0 cursor-pointer',
                         naPopustu ? 'bg-[#c9a96e]' : 'bg-[#e8e0d8]'
                       )}
