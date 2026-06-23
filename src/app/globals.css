@@ -98,7 +98,7 @@
     overflow-x: clip;
     max-width: 100%;
     overscroll-behavior: none;
-    background-color: #1a1a1a;
+    background-color: #faf7f4;
   }
   body {
     @apply bg-background text-foreground;
