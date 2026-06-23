@@ -639,9 +639,10 @@ export default function Filteri({
                         naPopustu ? 'bg-[#c9a96e]' : 'bg-[#e8e0d8]'
                       )}
                     >
-                      <span className={cn('absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200',
-                        naPopustu ? 'translate-x-7' : 'translate-x-1'
-                      )} />
+                      <span
+                        className="absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-[left] duration-200"
+                        style={{ left: naPopustu ? '1.75rem' : '0.25rem' }}
+                      />
                     </button>
                   </div>
                 </div>
