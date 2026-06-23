@@ -1,6 +1,8 @@
 'use client'
 
 import { cn } from '@/lib/utils'
+import { useJezik } from '@/store/jezik'
+import { t } from '@/messages'
 
 type Boja = { naziv: string; hex: string }
 
@@ -11,6 +13,10 @@ interface BojeSelectorProps {
 }
 
 export default function BojeSelector({ boje, odabrana, onChange }: BojeSelectorProps) {
+  const { jezik } = useJezik()
+  const trK = t[jezik].katalog
+  const prevediBoju = (naziv: string) => trK.bojeNazivi[naziv] ?? naziv
+
   if (!boje || boje.length === 0) return null
 
   return (
@@ -20,14 +26,14 @@ export default function BojeSelector({ boje, odabrana, onChange }: BojeSelectorP
           className="text-[9px] tracking-[0.3em] uppercase text-[#8a8a8a]"
           style={{ fontFamily: 'var(--font-sans)' }}
         >
-          Boja
+          {t[jezik].katalog.boja}
         </p>
         {odabrana && (
           <p
             className="text-[10px] text-[#1a1a1a] tracking-wide"
             style={{ fontFamily: 'var(--font-sans)' }}
           >
-            {odabrana}
+            {prevediBoju(odabrana)}
           </p>
         )}
       </div>

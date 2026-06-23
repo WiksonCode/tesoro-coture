@@ -1,8 +1,7 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
-import Image from 'next/image'
 import { createClient } from '@/lib/supabase/server'
 import KatalogClient from '@/components/haljine/KatalogClient'
+import KatalogHeader from '@/components/haljine/KatalogHeader'
 import type { Haljina } from '@/types'
 
 export const dynamic = 'force-dynamic'
@@ -21,24 +20,6 @@ interface SearchParams {
   naPopustu?: string
 }
 
-const KATEGORIJE_NAZIVI: Record<string, string> = {
-  kratke: 'Kratke haljine',
-  midi: 'Midi haljine',
-  duge: 'Duge haljine',
-}
-
-const KATEGORIJE_OPISI: Record<string, string> = {
-  kratke: 'Elegantne kratke haljine za svaku priliku',
-  midi: 'Sofisticirane midi haljine savršene dužine',
-  duge: 'Luksuzne duge haljine za posebne trenutke',
-}
-
-const KATEGORIJE_SLIKE: Record<string, string> = {
-  kratke: '/kratka.jpeg',
-  midi:   '/midi.jpeg',
-  duge:   '/duga.jpeg',
-}
-const DEFAULT_BANNER = '/hero-bg.png'
 
 export default async function KatalogPage({
   searchParams,
@@ -98,61 +79,9 @@ export default async function KatalogPage({
     })
   }
 
-  const naslov = params.kategorija
-    ? (KATEGORIJE_NAZIVI[params.kategorija] ?? 'Kolekcija haljina')
-    : 'Kolekcija haljina'
-  const opis = params.kategorija ? (KATEGORIJE_OPISI[params.kategorija] ?? null) : null
-  const bannerSlika = DEFAULT_BANNER
-
   return (
     <main className="min-h-screen bg-[#faf7f4] pt-16 lg:pt-20">
-
-      <div className="relative h-[220px] lg:h-[320px] overflow-hidden bg-[#1a1a1a]">
-        <Image src={bannerSlika} alt={naslov} fill priority sizes="100vw" className="object-cover object-[center_30%] animate-ken-burns" />
-        <div className="absolute inset-0 bg-black/25" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-        <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-black/20 to-transparent" />
-
-        <div className="relative z-10 h-full flex flex-col justify-between max-w-7xl mx-auto px-6 lg:px-10 py-5 lg:py-7">
-          <nav>
-            <ol className="flex items-center gap-2 text-[8px] tracking-[0.2em] uppercase text-white/40" style={{ fontFamily: 'var(--font-sans)' }}>
-              <li><Link href="/" className="hover:text-white/70 transition-colors duration-200">Početna</Link></li>
-              <li>/</li>
-              <li>
-                <Link href="/katalog" className={params.kategorija ? 'hover:text-white/70 transition-colors duration-200' : 'text-white/70'}>
-                  Kolekcija
-                </Link>
-              </li>
-              {params.kategorija && (
-                <>
-                  <li>/</li>
-                  <li className="text-white/70">{KATEGORIJE_NAZIVI[params.kategorija]}</li>
-                </>
-              )}
-            </ol>
-          </nav>
-
-          <div className="text-center pb-2">
-            <p className="text-[9px] tracking-[0.6em] uppercase text-[#c9a96e] mb-4" style={{ fontFamily: 'var(--font-sans)' }}>
-              Kolekcija 2026
-            </p>
-            <h1 className="text-[clamp(38px,7vw,80px)] font-light text-white leading-tight" style={{ fontFamily: 'var(--font-serif)' }}>
-              {naslov}
-            </h1>
-            <div className="flex items-center justify-center gap-3 mt-4">
-              <span className="block w-10 h-px bg-[#c9a96e]/60" />
-              <span className="block w-1.5 h-1.5 rounded-full bg-[#c9a96e]/60" />
-              <span className="block w-10 h-px bg-[#c9a96e]/60" />
-            </div>
-            {opis && (
-              <p className="text-[11px] tracking-wide text-white/50 mt-3 hidden lg:block" style={{ fontFamily: 'var(--font-sans)' }}>
-                {opis}
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
-
+      <KatalogHeader kategorija={params.kategorija} />
       <KatalogClient haljine={haljine} activeParams={params} />
     </main>
   )

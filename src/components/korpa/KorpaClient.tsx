@@ -7,18 +7,16 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, ArrowRight, Calendar } from 'lucide-react'
 import { useKorpa } from '@/store/korpa'
 import { formatCijena } from '@/components/haljine/HaljinaCard'
+import { useJezik } from '@/store/jezik'
+import { t } from '@/messages'
 
 const KURS = 117
-
-function getVelicinaLabel(v: string) {
-  return v === 'po_mjeri' ? 'Po meri' : v
-}
 
 function formatEUR(rsd: number) {
   return '≈ ' + Math.round(rsd / KURS) + ' €'
 }
 
-function StepBar() {
+function StepBar({ tr }: { tr: typeof t['sr']['korpa'] }) {
   return (
     <div
       className="flex items-center gap-0 mb-8"
@@ -26,12 +24,12 @@ function StepBar() {
     >
       <div className="flex items-center gap-2">
         <span className="w-5 h-5 flex items-center justify-center bg-[#1a1a1a] text-[#faf7f4] text-[8px] tracking-wide">1</span>
-        <span className="text-[8.5px] tracking-[0.25em] uppercase text-[#1a1a1a]">Korpa</span>
+        <span className="text-[8.5px] tracking-[0.25em] uppercase text-[#1a1a1a]">{tr.korak1}</span>
       </div>
       <div className="mx-3 flex-1 max-w-[48px] h-px bg-[#e8e0d8]" />
       <div className="flex items-center gap-2">
         <span className="w-5 h-5 flex items-center justify-center border border-[#e8e0d8] text-[8px] tracking-wide text-[#c8c0b8]">2</span>
-        <span className="text-[8.5px] tracking-[0.25em] uppercase text-[#c8c0b8]">Rezervacija</span>
+        <span className="text-[8.5px] tracking-[0.25em] uppercase text-[#c8c0b8]">{tr.korak2}</span>
       </div>
     </div>
   )
@@ -40,6 +38,8 @@ function StepBar() {
 export default function KorpaClient() {
   const [mounted, setMounted] = useState(false)
   const { artikli, ukloniArtikl } = useKorpa()
+  const { jezik } = useJezik()
+  const tr = t[jezik].korpa
 
   useEffect(() => setMounted(true), [])
 
@@ -76,21 +76,21 @@ export default function KorpaClient() {
           className="text-[clamp(34px,5vw,58px)] font-light italic text-[#1a1a1a] leading-tight mb-4"
           style={{ fontFamily: 'var(--font-serif)' }}
         >
-          Vaša korpa<br />je prazna
+          {tr.praznaGlava}<br />{tr.praznaGlava2}
         </p>
         <div className="w-8 h-px bg-[#c9a96e]/50 mx-auto my-4" />
         <p
           className="text-[10px] tracking-[0.35em] text-[#8a8a8a] mb-10 uppercase"
           style={{ fontFamily: 'var(--font-sans)' }}
         >
-          Otkrijte novu kolekciju
+          {tr.praznaOpis}
         </p>
         <Link
           href="/katalog"
           className="inline-flex items-center gap-3 bg-[#1a1a1a] text-[#faf7f4] px-10 py-4 text-[9px] tracking-[0.35em] uppercase hover:bg-[#c9a96e] hover:text-[#1a1a1a] transition-all duration-300 cursor-pointer"
           style={{ fontFamily: 'var(--font-sans)' }}
         >
-          Pregledaj katalog
+          {tr.praznaBtn}
           <ArrowRight size={11} strokeWidth={1.5} />
         </Link>
       </motion.div>
@@ -100,7 +100,7 @@ export default function KorpaClient() {
   return (
     <div className="max-w-6xl mx-auto px-5 lg:px-10 py-10 lg:py-14">
 
-      <StepBar />
+      <StepBar tr={tr} />
 
       <motion.p
         initial={{ opacity: 0 }}
@@ -109,7 +109,7 @@ export default function KorpaClient() {
         className="mb-8 text-[9px] tracking-[0.3em] uppercase text-[#8a8a8a]"
         style={{ fontFamily: 'var(--font-sans)' }}
       >
-        {artikli.length} {artikli.length === 1 ? 'komad' : 'komada'}
+        {artikli.length} {artikli.length === 1 ? tr.komad : tr.komada}
       </motion.p>
 
       <div className="lg:grid lg:grid-cols-[1fr_300px] lg:gap-14 lg:items-start">
@@ -176,7 +176,7 @@ export default function KorpaClient() {
                         <span className="text-[#c8c0b8]">·</span>
                       )}
                       {artikl.velicina && (
-                        <span>{getVelicinaLabel(artikl.velicina)}</span>
+                        <span>{artikl.velicina === 'po_mjeri' ? tr.poMjeri : artikl.velicina}</span>
                       )}
                     </div>
                   </div>
@@ -202,7 +202,7 @@ export default function KorpaClient() {
                 <button
                   onClick={() => ukloniArtikl(artikl.inventar_id)}
                   className="self-start mt-1.5 w-7 h-7 flex items-center justify-center text-[#6a6a6a] hover:text-[#c9a96e] hover:bg-[#f5ede0] transition-all duration-200 cursor-pointer"
-                  aria-label="Ukloni iz korpe"
+                  aria-label={tr.ukloni}
                 >
                   <X size={13} strokeWidth={1.5} />
                 </button>
@@ -217,7 +217,7 @@ export default function KorpaClient() {
                 className="text-[9px] tracking-[0.35em] uppercase text-[#8a8a8a]"
                 style={{ fontFamily: 'var(--font-sans)' }}
               >
-                Ukupno
+                {tr.ukupno}
               </span>
               <div className="text-right">
                 <p
@@ -241,14 +241,14 @@ export default function KorpaClient() {
                 style={{ fontFamily: 'var(--font-sans)' }}
               >
                 <Calendar size={12} strokeWidth={1.5} />
-                Rezerviši termin
+                {tr.rezervisi}
               </Link>
               <Link
                 href="/katalog"
                 className="flex items-center justify-center w-full border border-[#e8e0d8] text-[#6a6a6a] py-4 text-[9px] tracking-[0.35em] uppercase hover:border-[#1a1a1a] hover:text-[#1a1a1a] transition-all duration-300 cursor-pointer"
                 style={{ fontFamily: 'var(--font-sans)' }}
               >
-                Nastavi kupovinu
+                {tr.nastaviKupovinu}
               </Link>
             </div>
           </div>
@@ -272,7 +272,7 @@ export default function KorpaClient() {
               className="text-[22px] font-light italic text-[#faf7f4] leading-snug mb-7"
               style={{ fontFamily: 'var(--font-serif)' }}
             >
-              Pregled<br />porudžbine
+              {tr.pregledNaslov}<br />{tr.pregledNaslov2}
             </h2>
 
             {/* Item list in summary */}
@@ -297,7 +297,7 @@ export default function KorpaClient() {
                         className="text-[9px] text-[#faf7f4]/65"
                         style={{ fontFamily: 'var(--font-sans)' }}
                       >
-                        {getVelicinaLabel(artikl.velicina)}
+                        {artikl.velicina === 'po_mjeri' ? tr.poMjeri : artikl.velicina}
                         {artikl.boja_naziv ? ` · ${artikl.boja_naziv}` : ''}
                       </p>
                     </div>
@@ -318,7 +318,7 @@ export default function KorpaClient() {
                 className="text-[10px] tracking-[0.35em] uppercase text-[#faf7f4]/65"
                 style={{ fontFamily: 'var(--font-sans)' }}
               >
-                Ukupno
+                {tr.ukupno}
               </span>
               <span
                 className="text-[20px] font-light text-[#faf7f4] tabular-nums"
@@ -340,7 +340,7 @@ export default function KorpaClient() {
               style={{ fontFamily: 'var(--font-sans)' }}
             >
               <Calendar size={12} strokeWidth={1.5} />
-              Rezerviši termin
+              {tr.rezervisi}
             </Link>
 
             <Link
@@ -348,7 +348,7 @@ export default function KorpaClient() {
               className="flex items-center justify-center w-full mt-3 py-3 text-[10px] tracking-[0.25em] uppercase text-[#faf7f4]/65 hover:text-[#faf7f4]/90 transition-colors duration-200 cursor-pointer"
               style={{ fontFamily: 'var(--font-sans)' }}
             >
-              Nastavi kupovinu
+              {tr.nastaviKupovinu}
             </Link>
           </div>
         </motion.div>

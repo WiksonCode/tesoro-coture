@@ -2,6 +2,8 @@
 
 import { cn } from '@/lib/utils'
 import { Ruler } from 'lucide-react'
+import { useJezik } from '@/store/jezik'
+import { t } from '@/messages'
 
 const SVE_VELICINE = ['XS', 'S', 'M', 'L', 'po_mjeri'] as const
 
@@ -18,6 +20,8 @@ export default function VelicineSelector({
   onChange,
   onVodicOpen,
 }: VelicineSelectorProps) {
+  const { jezik } = useJezik()
+  const tr = t[jezik].velicine
   const dostupneSet = new Set(velicine)
 
   return (
@@ -27,7 +31,7 @@ export default function VelicineSelector({
           className="text-[9px] tracking-[0.3em] uppercase text-[#8a8a8a]"
           style={{ fontFamily: 'var(--font-sans)' }}
         >
-          Veličina
+          {tr.velicina}
         </p>
         {onVodicOpen && (
           <button
@@ -37,7 +41,7 @@ export default function VelicineSelector({
             style={{ fontFamily: 'var(--font-sans)' }}
           >
             <Ruler size={11} strokeWidth={1.5} />
-            Vodič za veličine
+            {tr.vodic}
           </button>
         )}
       </div>
@@ -60,7 +64,7 @@ export default function VelicineSelector({
                     : 'border-[#e8e0d8] text-[#d0ccc8] cursor-not-allowed overflow-hidden'
               )}
               style={{ fontFamily: 'var(--font-sans)' }}
-              title={!dostupna ? 'Nije dostupno' : undefined}
+              title={!dostupna ? tr.nijeDestupno : undefined}
             >
               {!dostupna && (
                 <span
@@ -70,7 +74,7 @@ export default function VelicineSelector({
                   <span className="absolute w-[130%] h-px bg-[#d0ccc8] rotate-[-20deg]" />
                 </span>
               )}
-              {v === 'po_mjeri' ? 'Po meri' : v}
+              {v === 'po_mjeri' ? tr.poMjeri : v}
             </button>
           )
         })}

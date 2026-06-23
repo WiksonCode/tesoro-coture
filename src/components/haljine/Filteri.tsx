@@ -5,28 +5,10 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { ChevronDown, X, Check, SlidersHorizontal } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import { useJezik } from '@/store/jezik'
+import { t } from '@/messages'
 
 type Boja = { naziv: string; hex: string }
-
-const KATEGORIJE = [
-  { value: '', label: 'Sve' },
-  { value: 'kratke', label: 'Kratke haljine' },
-  { value: 'midi', label: 'Midi haljine' },
-  { value: 'duge', label: 'Duge haljine' },
-]
-
-const KATEGORIJE_NAZIVI: Record<string, string> = {
-  kratke: 'Kratke haljine',
-  midi: 'Midi haljine',
-  duge: 'Duge haljine',
-}
-
-const SORTIRANJA = [
-  { value: '', label: 'Najnovije' },
-  { value: 'cijena_rastuce', label: 'Cena ↑' },
-  { value: 'cijena_opadajuce', label: 'Cena ↓' },
-  { value: 'po_dostupnosti', label: 'Dostupnost' },
-]
 
 const STANDARD_VELICINE = ['XS', 'S', 'M', 'L', 'po_mjeri']
 
@@ -251,6 +233,12 @@ export default function Filteri({
   const router = useRouter()
   const searchParams = useSearchParams()
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const { jezik } = useJezik()
+  const tr = t[jezik].katalog
+  const KATEGORIJE = tr.kategorije
+  const KATEGORIJE_NAZIVI = Object.fromEntries(tr.kategorije.filter(k => k.value).map(k => [k.value, k.label]))
+  const SORTIRANJA = tr.sortiranja
+  const prevediBoju = (naziv: string) => tr.bojeNazivi[naziv] ?? naziv
 
   const updateParam = useCallback((key: string, value: string | null, replace = false) => {
     const params = new URLSearchParams(searchParams.toString())
@@ -289,7 +277,7 @@ export default function Filteri({
             )}
             style={{ fontFamily: 'var(--font-sans)' }}
           >
-            {v === 'po_mjeri' ? 'Po meri' : v}
+            {v === 'po_mjeri' ? tr.poMjeri : v}
           </button>
         )
       })}
@@ -323,7 +311,7 @@ export default function Filteri({
               className={cn('text-[10px] tracking-wide leading-none transition-colors duration-150', sel ? 'text-[#1a1a1a]' : 'text-[#8a8a8a]')}
               style={{ fontFamily: 'var(--font-sans)' }}
             >
-              {boja.naziv}
+              {prevediBoju(boja.naziv)}
             </span>
           </button>
         )
@@ -337,7 +325,7 @@ export default function Filteri({
     ...(activeParams.kategorija ? [{ key: 'kat', label: KATEGORIJE_NAZIVI[activeParams.kategorija] ?? activeParams.kategorija, onRemove: () => updateParam('kategorija', null) }] : []),
     ...selectedVelicine.map(v => ({
       key: `v-${v}`,
-      label: v === 'po_mjeri' ? 'Po meri' : v,
+      label: v === 'po_mjeri' ? tr.poMjeri : v,
       onRemove: () => {
         const newV = selectedVelicine.filter(x => x !== v)
         onVelicineChange(newV)
@@ -346,7 +334,7 @@ export default function Filteri({
     })),
     ...selectedBoje.map(b => ({
       key: `b-${b}`,
-      label: b,
+      label: prevediBoju(b),
       onRemove: () => {
         const newBoje = selectedBoje.filter(x => x !== b)
         onBojeChange(newBoje)
@@ -354,7 +342,7 @@ export default function Filteri({
       },
     })),
     ...(priceActive ? [{ key: 'price', label: `${formatRSD(priceRange[0])} – ${formatRSD(priceRange[1])}`, onRemove: () => onPriceChange([priceBounds.min, priceBounds.max]) }] : []),
-    ...(naPopustu ? [{ key: 'popust', label: 'Na popustu', onRemove: () => { onNaPopustuChange(false); updateParam('naPopustu', null) } }] : []),
+    ...(naPopustu ? [{ key: 'popust', label: tr.naPopustu, onRemove: () => { onNaPopustuChange(false); updateParam('naPopustu', null) } }] : []),
     ...(activeParams.sort ? [{ key: 'sort', label: SORTIRANJA.find(s => s.value === activeParams.sort)?.label ?? activeParams.sort, onRemove: () => updateParam('sort', null) }] : []),
   ]
 
@@ -396,15 +384,15 @@ export default function Filteri({
           {/* Desktop filter row */}
           <div className="hidden lg:flex items-center justify-between gap-4 py-3" style={{ overflow: 'visible' }}>
             <div className="flex items-center gap-2" style={{ overflow: 'visible' }}>
-              <Dropdown label="Veličina" active={selectedVelicine.length > 0} badge={selectedVelicine.length || undefined}>
+              <Dropdown label={tr.velicina} active={selectedVelicine.length > 0} badge={selectedVelicine.length || undefined}>
                 <div className="p-4">
-                  <p className="text-[9px] tracking-[0.3em] uppercase text-[#c9a96e] mb-3" style={{ fontFamily: 'var(--font-sans)' }}>Odaberite veličinu</p>
+                  <p className="text-[9px] tracking-[0.3em] uppercase text-[#c9a96e] mb-3" style={{ fontFamily: 'var(--font-sans)' }}>{tr.odaberiteVelicinu}</p>
                   <SizePills />
                 </div>
               </Dropdown>
-              <Dropdown label="Cena" active={priceActive}>
+              <Dropdown label={tr.cena} active={priceActive}>
                 <div className="p-4" style={{ width: 280 }}>
-                  <p className="text-[9px] tracking-[0.3em] uppercase text-[#c9a96e] mb-5" style={{ fontFamily: 'var(--font-sans)' }}>Cenovni opseg</p>
+                  <p className="text-[9px] tracking-[0.3em] uppercase text-[#c9a96e] mb-5" style={{ fontFamily: 'var(--font-sans)' }}>{tr.cenovniOpseg}</p>
                   <DualSlider min={priceBounds.min} max={priceBounds.max} value={priceRange} onChange={onPriceChange} />
                   <div className="flex items-center gap-2 mt-4">
                     <div className="flex-1 border border-[#e8e0d8] px-3 py-2 text-center">
@@ -417,9 +405,9 @@ export default function Filteri({
                   </div>
                 </div>
               </Dropdown>
-              <Dropdown label="Boja" active={selectedBoje.length > 0} badge={selectedBoje.length || undefined}>
+              <Dropdown label={tr.boja} active={selectedBoje.length > 0} badge={selectedBoje.length || undefined}>
                 <div className="p-4">
-                  <p className="text-[9px] tracking-[0.3em] uppercase text-[#c9a96e] mb-3" style={{ fontFamily: 'var(--font-sans)' }}>Odaberite boju</p>
+                  <p className="text-[9px] tracking-[0.3em] uppercase text-[#c9a96e] mb-3" style={{ fontFamily: 'var(--font-sans)' }}>{tr.odaberiteBoju}</p>
                   <ColorGrid />
                 </div>
               </Dropdown>
@@ -434,7 +422,7 @@ export default function Filteri({
                 )}
                 style={{ fontFamily: 'var(--font-sans)' }}
               >
-                Na popustu
+                {tr.naPopustu}
               </button>
               <AnimatePresence>
                 {hasActive && (
@@ -445,7 +433,7 @@ export default function Filteri({
                     className="flex items-center gap-1.5 px-3 py-2.5 text-[10px] tracking-[0.2em] uppercase text-[#8a8a8a] hover:text-[#1a1a1a] transition-colors shrink-0 cursor-pointer"
                     style={{ fontFamily: 'var(--font-sans)' }}
                   >
-                    <X size={11} /> Poništi
+                    <X size={11} /> {tr.ponisti}
                   </motion.button>
                 )}
               </AnimatePresence>
@@ -453,9 +441,9 @@ export default function Filteri({
 
             <div className="flex items-center gap-3 shrink-0" style={{ overflow: 'visible' }}>
               <p className="text-[10px] text-[#8a8a8a]" style={{ fontFamily: 'var(--font-sans)' }}>
-                {totalCount} {totalCount === 1 ? 'haljina' : 'haljine'}
+                {totalCount} {totalCount === 1 ? tr.haljina : tr.haljinaPlural}
               </p>
-              <Dropdown label={SORTIRANJA.find(s => (s.value || '') === (activeParams.sort || ''))?.label ?? 'Sortiranje'} active={!!activeParams.sort}>
+              <Dropdown label={SORTIRANJA.find(s => (s.value || '') === (activeParams.sort || ''))?.label ?? tr.sortiranje} active={!!activeParams.sort}>
                 <div className="py-1" style={{ minWidth: 180 }}>
                   {SORTIRANJA.map(s => (
                     <button key={s.value} type="button"
@@ -479,7 +467,7 @@ export default function Filteri({
                       key={n}
                       type="button"
                       onClick={() => onColsChange(n)}
-                      title={`${n} kolone`}
+                      title={`${n} ${tr.sortiranje}`}
                       className={cn(
                         'w-8 h-9 flex items-center justify-center transition-colors duration-150 cursor-pointer',
                         cols === n ? 'bg-[#1a1a1a] text-[#faf7f4]' : 'bg-white text-[#8a8a8a] hover:text-[#1a1a1a]'
@@ -515,7 +503,7 @@ export default function Filteri({
           {/* Mobile row — count + filter button */}
           <div className="flex lg:hidden items-center justify-between py-3">
             <p className="text-[10px] text-[#8a8a8a]" style={{ fontFamily: 'var(--font-sans)' }}>
-              {totalCount} {totalCount === 1 ? 'haljina' : 'haljine'}
+              {totalCount} {totalCount === 1 ? tr.haljina : tr.haljinaPlural}
             </p>
             <button type="button" onClick={() => setDrawerOpen(true)}
               className={cn(
@@ -525,7 +513,7 @@ export default function Filteri({
               style={{ fontFamily: 'var(--font-sans)' }}
             >
               <SlidersHorizontal size={12} strokeWidth={1.5} />
-              Filteri
+              {tr.filteri}
               {activeCount > 0 && (
                 <span className="w-4 h-4 rounded-full bg-[#c9a96e] text-[#1a1a1a] text-[8px] flex items-center justify-center font-medium">
                   {activeCount}
@@ -563,7 +551,7 @@ export default function Filteri({
               {/* Drawer header */}
               <div className="flex items-center justify-between px-6 py-5 border-b border-[#e8e0d8] shrink-0">
                 <p className="text-[11px] tracking-[0.35em] uppercase text-[#1a1a1a]" style={{ fontFamily: 'var(--font-sans)' }}>
-                  Filteri
+                  {tr.filteri}
                 </p>
                 <button type="button" onClick={() => setDrawerOpen(false)} className="p-1 -mr-1 text-[#8a8a8a] hover:text-[#1a1a1a] transition-colors cursor-pointer">
                   <X size={20} strokeWidth={1.5} />
@@ -575,13 +563,13 @@ export default function Filteri({
 
                 {/* Veličina */}
                 <div className="py-5 border-b border-[#e8e0d8]">
-                  <p className="text-[9px] tracking-[0.35em] uppercase text-[#c9a96e] mb-4" style={{ fontFamily: 'var(--font-sans)' }}>Veličina</p>
+                  <p className="text-[9px] tracking-[0.35em] uppercase text-[#c9a96e] mb-4" style={{ fontFamily: 'var(--font-sans)' }}>{tr.velicina}</p>
                   <SizePills />
                 </div>
 
                 {/* Cena */}
                 <div className="py-5 border-b border-[#e8e0d8]">
-                  <p className="text-[9px] tracking-[0.35em] uppercase text-[#c9a96e] mb-4" style={{ fontFamily: 'var(--font-sans)' }}>Cena</p>
+                  <p className="text-[9px] tracking-[0.35em] uppercase text-[#c9a96e] mb-4" style={{ fontFamily: 'var(--font-sans)' }}>{tr.cena}</p>
                   <DualSlider min={priceBounds.min} max={priceBounds.max} value={priceRange} onChange={onPriceChange} />
                   <div className="flex items-center gap-2 mt-4">
                     <div className="flex-1 border border-[#e8e0d8] px-3 py-2.5 text-center">
@@ -596,7 +584,7 @@ export default function Filteri({
 
                 {/* Sortiranje — collapsible */}
                 <DrawerAccordion
-                  label="Sortiranje"
+                  label={tr.sortiranje}
                   value={SORTIRANJA.find(s => (s.value || '') === (activeParams.sort || ''))?.label}
                   active={!!activeParams.sort}
                 >
@@ -620,8 +608,8 @@ export default function Filteri({
 
                 {/* Boja — collapsible */}
                 <DrawerAccordion
-                  label="Boja"
-                  value={selectedBoje.length > 0 ? `${selectedBoje.length} odabrano` : undefined}
+                  label={tr.boja}
+                  value={selectedBoje.length > 0 ? `${selectedBoje.length} ${tr.odabrano}` : undefined}
                   active={selectedBoje.length > 0}
                 >
                   <div className="pb-1">
@@ -632,7 +620,7 @@ export default function Filteri({
                 {/* Na popustu */}
                 <div className="py-5 border-b border-[#e8e0d8]">
                   <div className="flex items-center justify-between">
-                    <p className="text-[10px] tracking-[0.2em] uppercase text-[#1a1a1a]" style={{ fontFamily: 'var(--font-sans)' }}>Na popustu</p>
+                    <p className="text-[10px] tracking-[0.2em] uppercase text-[#1a1a1a]" style={{ fontFamily: 'var(--font-sans)' }}>{tr.naPopustu}</p>
                     <button type="button"
                       onClick={() => onNaPopustuChange(!naPopustu)}
                       className={cn('relative w-12 h-6 rounded-full transition-colors duration-200 shrink-0 cursor-pointer',
@@ -660,7 +648,7 @@ export default function Filteri({
                     className="flex-1 py-3.5 text-[10px] tracking-[0.2em] uppercase border border-[#e8e0d8] text-[#8a8a8a] hover:border-[#1a1a1a] hover:text-[#1a1a1a] transition-colors cursor-pointer"
                     style={{ fontFamily: 'var(--font-sans)' }}
                   >
-                    Poništi
+                    {tr.ponisti}
                   </button>
                 )}
                 <button type="button"
@@ -668,7 +656,7 @@ export default function Filteri({
                   className="flex-1 py-3.5 text-[10px] tracking-[0.2em] uppercase bg-[#1a1a1a] text-[#faf7f4] hover:bg-[#333] transition-colors cursor-pointer"
                   style={{ fontFamily: 'var(--font-sans)' }}
                 >
-                  Prikaži {totalCount} {totalCount === 1 ? 'haljinu' : 'haljine'}
+                  {tr.prikaziBroj} {totalCount} {totalCount === 1 ? tr.haljinaAku : tr.haljinaPlural}
                 </button>
               </div>
             </motion.div>

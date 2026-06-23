@@ -11,6 +11,8 @@ import { useKorpa } from '@/store/korpa'
 import { rezervacijaSchema, type RezervacijaInput } from '@/lib/validations/rezervacija'
 import { formatCijena } from '@/components/haljine/HaljinaCard'
 import { cn } from '@/lib/utils'
+import { useJezik } from '@/store/jezik'
+import { t } from '@/messages'
 
 const KURS = 117
 
@@ -95,6 +97,8 @@ export default function RezervacijaClient() {
   const [serverError, setServerError] = useState<string | null>(null)
 
   const { artikli, ocistiKorpu } = useKorpa()
+  const { jezik } = useJezik()
+  const tr = t[jezik].rezervacija
   const ukupno = artikli.reduce((sum, a) => sum + a.cijena_rsd, 0)
 
   const {
@@ -117,12 +121,12 @@ export default function RezervacijaClient() {
       })
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
-        throw new Error(body.error || 'Greška pri slanju rezervacije.')
+        throw new Error(body.error || tr.greska)
       }
       setSubmitted(true)
       ocistiKorpu()
     } catch (e) {
-      setServerError(e instanceof Error ? e.message : 'Greška. Pokušajte ponovo.')
+      setServerError(e instanceof Error ? e.message : tr.greska)
     }
   }
 
@@ -162,7 +166,7 @@ export default function RezervacijaClient() {
           className="text-[9px] tracking-[0.5em] uppercase text-[#c9a96e] mb-4"
           style={{ fontFamily: 'var(--font-sans)' }}
         >
-          Zahtev primljen
+          {tr.zahtevPrimljen}
         </motion.p>
 
         <motion.h2
@@ -172,7 +176,7 @@ export default function RezervacijaClient() {
           className="text-[clamp(24px,3.5vw,40px)] font-light italic text-[#1a1a1a] mb-4"
           style={{ fontFamily: 'var(--font-serif)' }}
         >
-          Hvala na poverenju
+          {tr.hvala}
         </motion.h2>
 
         <motion.p
@@ -182,8 +186,7 @@ export default function RezervacijaClient() {
           className="text-[12px] text-[#8a8a8a] max-w-sm leading-relaxed mb-6"
           style={{ fontFamily: 'var(--font-sans)' }}
         >
-          Vaš zahtev za rezervaciju je primljen. Naš tim će vas kontaktirati
-          radi potvrde termina.
+          {tr.porukaPrimana}
         </motion.p>
 
         <motion.div
@@ -197,7 +200,7 @@ export default function RezervacijaClient() {
               className="text-[11px] tracking-[0.3em] uppercase text-[#c9a96e] mb-1"
               style={{ fontFamily: 'var(--font-sans)' }}
             >
-              U roku od
+              {tr.uRokuOd}
             </p>
             <p
               className="text-[clamp(22px,3vw,32px)] font-light text-[#1a1a1a]"
@@ -211,7 +214,7 @@ export default function RezervacijaClient() {
             className="text-[11px] text-[#8a8a8a] leading-relaxed"
             style={{ fontFamily: 'var(--font-sans)' }}
           >
-            Kontaktiraćemo vas putem<br />telefona ili emaila.
+            {tr.kontaktKanal}
           </p>
         </motion.div>
 
@@ -225,7 +228,7 @@ export default function RezervacijaClient() {
             className="inline-flex items-center gap-3 border border-[#1a1a1a] text-[#1a1a1a] px-10 py-4 text-[9px] tracking-[0.35em] uppercase hover:bg-[#1a1a1a] hover:text-[#faf7f4] transition-all duration-300"
             style={{ fontFamily: 'var(--font-sans)' }}
           >
-            Nastavi pregledanje
+            {tr.nastaviPregledanje}
             <ArrowRight size={11} strokeWidth={1.5} />
           </Link>
         </motion.div>
@@ -249,22 +252,22 @@ export default function RezervacijaClient() {
                 className="text-[10px] tracking-[0.5em] uppercase text-[#c9a96e] mb-6 pb-3 border-b border-[#e8e0d8]"
                 style={{ fontFamily: 'var(--font-sans)' }}
               >
-                Kontakt informacije
+                {tr.kontaktInfo}
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-8">
                 <FieldInput
-                  label="Ime"
+                  label={tr.ime}
                   required
-                  placeholder="Vaše ime"
+                  placeholder={tr.imePlace}
                   autoComplete="given-name"
                   error={errors.ime?.message}
                   {...register('ime')}
                 />
                 <FieldInput
-                  label="Prezime"
+                  label={tr.prezime}
                   required
-                  placeholder="Vaše prezime"
+                  placeholder={tr.prezimePlace}
                   autoComplete="family-name"
                   error={errors.prezime?.message}
                   {...register('prezime')}
@@ -273,7 +276,7 @@ export default function RezervacijaClient() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                 <FieldInput
-                  label="Telefon"
+                  label={tr.telefon}
                   required
                   type="tel"
                   placeholder="+381 60 000 0000"
@@ -299,12 +302,12 @@ export default function RezervacijaClient() {
                 className="text-[10px] tracking-[0.5em] uppercase text-[#c9a96e] mb-6 pb-3 border-b border-[#e8e0d8]"
                 style={{ fontFamily: 'var(--font-sans)' }}
               >
-                Termin i napomena
+                {tr.terminNapomena}
               </p>
 
               <div className="mb-8">
                 <FieldInput
-                  label="Željeni datum termina"
+                  label={tr.datumTermina}
                   type="date"
                   required
                   min={getTomorrow()}
@@ -315,13 +318,13 @@ export default function RezervacijaClient() {
                   className="mt-2 text-[11px] text-[#8a8a8a]"
                   style={{ fontFamily: 'var(--font-sans)' }}
                 >
-                  Datum je okvirni — naš tim će potvrditi dostupnost termina.
+                  {tr.datumNapomena}
                 </p>
               </div>
 
               <FieldTextarea
-                label="Napomena"
-                placeholder="Posebne napomene, pitanja ili zahtevi…"
+                label={tr.napomena}
+                placeholder={tr.napomenaPlace}
                 error={errors.napomena?.message}
                 {...register('napomena')}
               />
@@ -333,11 +336,11 @@ export default function RezervacijaClient() {
                 className="border border-[#e8e0d8] p-4 mb-8 text-[11px] text-[#8a8a8a]"
                 style={{ fontFamily: 'var(--font-sans)' }}
               >
-                Vaša korpa je prazna.{' '}
+                {tr.korpaUpozorenje}{' '}
                 <Link href="/katalog" className="text-[#c9a96e] hover:underline">
-                  Dodajte haljine
+                  {tr.korpaUpozorenjeLink}
                 </Link>{' '}
-                pre slanja rezervacije.
+                {tr.korpaUpozorenjeSufix}
               </div>
             )}
 
@@ -368,11 +371,11 @@ export default function RezervacijaClient() {
               {isSubmitting ? (
                 <>
                   <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />
-                  Slanje…
+                  {tr.slanje}
                 </>
               ) : (
                 <>
-                  Pošaljite zahtev za rezervaciju
+                  {tr.posalji}
                   <ArrowRight size={11} strokeWidth={1.5} />
                 </>
               )}
@@ -382,16 +385,16 @@ export default function RezervacijaClient() {
               className="mt-3 text-[11px] text-center text-[#8a8a8a]"
               style={{ fontFamily: 'var(--font-sans)' }}
             >
-              Kontaktiraćemo vas u roku od 24 sata putem telefona ili emaila.
+              {tr.kontaktNapomena}
             </p>
 
             <p
               className="mt-3 text-[9px] text-center text-[#8a8a8a]/70"
               style={{ fontFamily: 'var(--font-sans)' }}
             >
-              Rezervacijom prihvatate naše{' '}
+              {tr.usloviTekst}{' '}
               <Link href="/politika-privatnosti" className="underline hover:text-[#c9a96e] transition-colors">
-                uslove poslovanja
+                {tr.usloviLink}
               </Link>.
             </p>
           </form>
@@ -408,7 +411,7 @@ export default function RezervacijaClient() {
             className="text-[9px] tracking-[0.4em] uppercase text-[#8a8a8a] mb-6"
             style={{ fontFamily: 'var(--font-sans)' }}
           >
-            Vaša selekcija
+            {tr.vasaSelekcija}
           </p>
 
           {artikli.length === 0 ? (
@@ -416,7 +419,7 @@ export default function RezervacijaClient() {
               className="text-[12px] text-[#8a8a8a] italic"
               style={{ fontFamily: 'var(--font-serif)' }}
             >
-              Korpa je prazna
+              {tr.korpaJePrazna}
             </p>
           ) : (
             <>
@@ -460,7 +463,7 @@ export default function RezervacijaClient() {
                         className="text-[10px] text-[#8a8a8a]"
                         style={{ fontFamily: 'var(--font-sans)' }}
                       >
-                        {a.boja_naziv} · {a.velicina === 'po_mjeri' ? 'Po meri' : a.velicina}
+                        {a.boja_naziv} · {a.velicina === 'po_mjeri' ? tr.poMjeri : a.velicina}
                       </p>
                       <p
                         className="text-[11px] font-medium text-[#1a1a1a] mt-1"
@@ -479,7 +482,7 @@ export default function RezervacijaClient() {
                     className="text-[9px] tracking-[0.3em] uppercase text-[#8a8a8a]"
                     style={{ fontFamily: 'var(--font-sans)' }}
                   >
-                    Ukupno
+                    {tr.ukupno}
                   </span>
                   <div className="text-right">
                     <p
@@ -504,14 +507,13 @@ export default function RezervacijaClient() {
                   className="text-[9px] tracking-[0.3em] uppercase text-[#c9a96e] mb-2"
                   style={{ fontFamily: 'var(--font-sans)' }}
                 >
-                  Napomena salona
+                  {tr.napomenaSalona}
                 </p>
                 <p
                   className="text-[11px] text-[#8a8a8a] leading-relaxed"
                   style={{ fontFamily: 'var(--font-sans)' }}
                 >
-                  Plaćanje se vrši u salonu prilikom preuzimanja. Rezervacija
-                  je besplatna i ne obavezuje na kupovinu.
+                  {tr.salonskaInfo}
                 </p>
               </div>
             </>

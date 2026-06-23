@@ -5,6 +5,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowRight, Phone, Mail, MapPin, Clock } from 'lucide-react'
+import { useJezik } from '@/store/jezik'
+import { t } from '@/messages'
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
@@ -48,12 +50,10 @@ function FotoPlaceholder({ initial = 'T', label }: { initial?: string; label?: s
         </defs>
         <rect width="100%" height="100%" fill={`url(#${id})`} opacity="0.07" />
       </svg>
-      {/* Corner brackets */}
       <span className="absolute top-6 left-6 w-10 h-10 border-t border-l border-[#c9a96e]/35" />
       <span className="absolute top-6 right-6 w-10 h-10 border-t border-r border-[#c9a96e]/35" />
       <span className="absolute bottom-6 left-6 w-10 h-10 border-b border-l border-[#c9a96e]/35" />
       <span className="absolute bottom-6 right-6 w-10 h-10 border-b border-r border-[#c9a96e]/35" />
-      {/* Monogram */}
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
         <span
           className="text-[160px] font-light italic leading-none text-[#c9a96e]/10 select-none"
@@ -71,31 +71,6 @@ function FotoPlaceholder({ initial = 'T', label }: { initial?: string; label?: s
   )
 }
 
-// ─── Data ─────────────────────────────────────────────────────────────────────
-
-const VREDNOSTI = [
-  {
-    broj: '01',
-    naziv: 'Šivenje po meri',
-    opis: 'Kako su nam bitni krojevi i znamo da se svaka žena ne uklapa u standardne krojeve, nudimo vam izradu po vašim ličnim merama.',
-  },
-  {
-    broj: '02',
-    naziv: 'Izbor materijala i boja',
-    opis: 'U našoj ponudi možete pronaći veliki izbor različitih materijala i izradu haljina u boji po želji.',
-  },
-  {
-    broj: '03',
-    naziv: 'Individualan pristup',
-    opis: 'Svaka klijentkinja je jedinstvena. Posvećujemo vam puno vreme i pažnju kako biste pronašli haljinu koja govori upravo vašim jezikom.',
-  },
-  {
-    broj: '04',
-    naziv: 'Besprekorna izrada',
-    opis: 'Za vas biramo najkvalitetnije materijale i obraćamo pažnju na svaki detalj.',
-  },
-]
-
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
   visible: { opacity: 1, y: 0 },
@@ -104,6 +79,9 @@ const fadeUp = {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function ONamaContent() {
+  const { jezik } = useJezik()
+  const tr = t[jezik].oNama
+
   return (
     <main className="min-h-screen bg-[#faf7f4] pt-20 relative">
 
@@ -137,24 +115,24 @@ export default function ONamaContent() {
               className="text-[9px] tracking-[0.55em] uppercase text-[#c9a96e] mb-7"
               style={{ fontFamily: 'var(--font-sans)' }}
             >
-              O nama
+              {tr.hero.eyebrow}
             </p>
             <h1
               className="text-[clamp(40px,5.5vw,72px)] font-light text-[#1a1a1a] leading-[1.1] mb-8"
               style={{ fontFamily: 'var(--font-serif)' }}
             >
-              Gde elegancija<br />
-              <span className="italic">postaje osećaj</span>
+              {tr.hero.naslov1}<br />
+              <span className="italic">{tr.hero.naslov2}</span>
             </h1>
             <div className="w-12 h-[1.5px] bg-[#c9a96e] mb-8" />
             <p className="text-[13px] text-[#8a8a8a] leading-relaxed mb-4 max-w-sm" style={{ fontFamily: 'var(--font-sans)' }}>
-              TESORO je domaći brend osnovan 2020. godine u Beogradu, nastao sa željom da se svaka žena oseća glamurozno, ženstveno i samouvereno. Naš prepoznatljiv stil ogleda se u bezvremenskoj eleganciji, preciznim krojevima i pažljivo odabranim materijalima koji pružaju osećaj udobnosti i ističu lepotu svake žene.
+              {tr.hero.p1}
             </p>
             <p className="text-[13px] text-[#8a8a8a] leading-relaxed mb-4 max-w-sm" style={{ fontFamily: 'var(--font-sans)' }}>
-              U Tesoru možete pronaći haljine za različite prilike – od večernjih izlazaka i proslava, do matura, rođendana i venčanja. Pored gotovih modela, nudimo i izradu po meri, određene korekcije, kao i veliki izbor materijala i boja, kako bi svaka haljina bila prilagođena vašim željama.
+              {tr.hero.p2}
             </p>
             <p className="text-[13px] text-[#8a8a8a] leading-relaxed max-w-sm" style={{ fontFamily: 'var(--font-sans)' }}>
-              Verujemo da prava haljina nije samo lepa, već i ona u kojoj se osećate posebno. Zato biramo modele koji pristaju različitim građama, odolevaju prolaznim trendovima i ostaju deo najlepših uspomena. Jer u Tesoru, elegancija nije samo stil – ona je osećaj koji traje.
+              {tr.hero.p3}
             </p>
           </motion.div>
 
@@ -173,14 +151,11 @@ export default function ONamaContent() {
               sizes="(max-width: 1024px) 100vw, 58vw"
               priority
             />
-
           </motion.div>
         </div>
       </section>
 
-
-
-      {/* ── Vrednosti — horizontal rows with huge watermark numbers ──────── */}
+      {/* ── Vrednosti ─────────────────────────────────────────────────────── */}
       <section className="py-16 lg:py-24 bg-white border-b border-[#e8e0d8]">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <motion.div
@@ -195,18 +170,18 @@ export default function ONamaContent() {
               className="text-[9px] tracking-[0.5em] uppercase text-[#c9a96e] mb-4"
               style={{ fontFamily: 'var(--font-sans)' }}
             >
-              Naše vrednosti
+              {tr.vrednosti.eyebrow}
             </p>
             <h2
               className="text-[clamp(28px,4vw,52px)] font-light text-[#1a1a1a]"
               style={{ fontFamily: 'var(--font-serif)' }}
             >
-              Zašto odabrati <span className="italic">TESORO</span>
+              {tr.vrednosti.naslov} <span className="italic">TESORO</span>
             </h2>
           </motion.div>
 
           <div className="divide-y divide-[#e8e0d8] border-t border-[#e8e0d8]">
-            {VREDNOSTI.map((v, i) => (
+            {tr.vrednosti.stavke.map((v, i) => (
               <motion.div
                 key={v.naziv}
                 variants={fadeUp}
@@ -216,10 +191,7 @@ export default function ONamaContent() {
                 transition={{ duration: 0.5, delay: i * 0.07 }}
                 className="relative py-9 lg:py-11 flex flex-col sm:flex-row items-start sm:items-center gap-5 lg:gap-14 group overflow-hidden"
               >
-                {/* Vertical divider — desktop only */}
                 <div className="hidden sm:block w-px h-10 bg-[#e8e0d8] shrink-0" />
-
-                {/* Content */}
                 <div className="relative z-10 flex-1 max-w-lg">
                   <h3
                     className="text-[18px] lg:text-[21px] font-light text-[#1a1a1a] mb-2.5 leading-snug"
@@ -240,8 +212,6 @@ export default function ONamaContent() {
         </div>
       </section>
 
-
-
       {/* ── Kontakt + Mapa ────────────────────────────────────────────────── */}
       <section className="py-20 lg:py-28 px-6 bg-[#faf7f4] border-b border-[#e8e0d8]">
         <div className="max-w-7xl mx-auto">
@@ -257,14 +227,14 @@ export default function ONamaContent() {
               className="text-[9px] tracking-[0.5em] uppercase text-[#c9a96e] mb-4"
               style={{ fontFamily: 'var(--font-sans)' }}
             >
-              Kontakt
+              {tr.kontakt.eyebrow}
             </p>
             <h2
               className="text-[clamp(28px,4vw,52px)] font-light text-[#1a1a1a]"
               style={{ fontFamily: 'var(--font-serif)' }}
             >
-              Pronađite nas<br />
-              <span className="italic">u Beogradu</span>
+              {tr.kontakt.naslov1}<br />
+              <span className="italic">{tr.kontakt.naslov2}</span>
             </h2>
           </motion.div>
 
@@ -281,12 +251,18 @@ export default function ONamaContent() {
               {[
                 {
                   icon: MapPin,
-                  label: 'Adresa',
-                  content: <p className="text-[13px] text-[#1a1a1a] leading-relaxed" style={{ fontFamily: 'var(--font-sans)' }}>Jurija Gagarina 151a<br />11070 Beograd, Srbija</p>,
+                  label: tr.kontakt.adresa,
+                  content: (
+                    <p className="text-[13px] text-[#1a1a1a] leading-relaxed" style={{ fontFamily: 'var(--font-sans)' }}>
+                      {tr.kontakt.adresaTekst.split('\n').map((line, i) => (
+                        <span key={i}>{line}{i === 0 && <br />}</span>
+                      ))}
+                    </p>
+                  ),
                 },
                 {
                   icon: Phone,
-                  label: 'Telefon',
+                  label: tr.kontakt.telefon,
                   content: <a href="tel:+381654033795" className="text-[13px] text-[#1a1a1a] hover:text-[#c9a96e] transition-colors duration-300" style={{ fontFamily: 'var(--font-sans)' }}>065 403 3795</a>,
                 },
                 {
@@ -315,17 +291,10 @@ export default function ONamaContent() {
                 </div>
                 <div>
                   <p className="text-[9px] tracking-[0.35em] uppercase text-[#c9a96e] mb-2.5" style={{ fontFamily: 'var(--font-sans)' }}>
-                    Radno vreme
+                    {tr.kontakt.radnoVreme}
                   </p>
                   <div className="flex flex-col gap-1.5" style={{ fontFamily: 'var(--font-sans)' }}>
-                    {[
-                      { dan: 'Ponedeljak', vreme: '12:00 – 19:00' },
-                      { dan: 'Utorak', vreme: '12:00 – 19:00' },
-                      { dan: 'Sreda', vreme: '12:00 – 19:00' },
-                      { dan: 'Četvrtak', vreme: '12:00 – 19:00' },
-                      { dan: 'Petak', vreme: '12:00 – 19:00' },
-                      { dan: 'Subota', vreme: '10:00 – 16:00' },
-                    ].map(({ dan, vreme }) => (
+                    {tr.kontakt.dani.map(({ dan, vreme }) => (
                       <div key={dan} className="flex justify-between gap-8">
                         <span className="text-[12px] text-[#1a1a1a]">{dan}</span>
                         <span className="text-[12px] text-[#8a8a8a]">{vreme}</span>
@@ -338,7 +307,7 @@ export default function ONamaContent() {
               {/* Social */}
               <div>
                 <p className="text-[9px] tracking-[0.35em] uppercase text-[#c9a96e] mb-4" style={{ fontFamily: 'var(--font-sans)' }}>
-                  Pratite nas
+                  {tr.kontakt.pratiNas}
                 </p>
                 <div className="flex items-center gap-3">
                   {[
@@ -407,19 +376,19 @@ export default function ONamaContent() {
             className="text-[9px] tracking-[0.5em] uppercase text-[#c9a96e] mb-6"
             style={{ fontFamily: 'var(--font-sans)' }}
           >
-            Posetite nas
+            {tr.cta.eyebrow}
           </p>
           <h2
             className="text-[clamp(28px,4vw,50px)] font-light text-[#1a1a1a] mb-6 leading-tight"
             style={{ fontFamily: 'var(--font-serif)' }}
           >
-            Doživite <span className="italic">TESORO iskustvo</span>
+            {tr.cta.naslov1} <span className="italic">{tr.cta.naslov2}</span>
           </h2>
           <p
             className="text-[13px] text-[#8a8a8a] leading-relaxed mb-10"
             style={{ fontFamily: 'var(--font-sans)' }}
           >
-            Rezervišite svoj termin i uz individualne konsultacije pronađite haljinu koja će obeležiti vaše posebne trenutke.
+            {tr.cta.opis}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
@@ -427,7 +396,7 @@ export default function ONamaContent() {
               className="group inline-flex items-center gap-3 bg-[#1a1a1a] text-[#faf7f4] px-10 py-4 text-[10px] tracking-[0.35em] uppercase hover:bg-[#c9a96e] hover:text-[#1a1a1a] transition-all duration-500"
               style={{ fontFamily: 'var(--font-sans)' }}
             >
-              Rezerviši termin
+              {tr.cta.btnRezervacija}
               <ArrowRight size={11} className="group-hover:translate-x-0.5 transition-transform duration-300" />
             </Link>
             <Link
@@ -435,7 +404,7 @@ export default function ONamaContent() {
               className="inline-flex items-center gap-2 text-[10px] tracking-[0.3em] uppercase text-[#8a8a8a] border-b border-[#e8e0d8] hover:text-[#1a1a1a] hover:border-[#1a1a1a] pb-1 transition-all duration-300"
               style={{ fontFamily: 'var(--font-sans)' }}
             >
-              Pogledaj kolekciju
+              {tr.cta.btnKolekcija}
             </Link>
           </div>
         </motion.div>

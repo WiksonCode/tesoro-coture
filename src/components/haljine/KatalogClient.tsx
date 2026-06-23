@@ -7,6 +7,8 @@ import HaljinaCard from '@/components/haljine/HaljinaCard'
 import Filteri from '@/components/haljine/Filteri'
 import { cn } from '@/lib/utils'
 import type { Haljina } from '@/types'
+import { useJezik } from '@/store/jezik'
+import { t } from '@/messages'
 
 interface ActiveParams {
   kategorija?: string
@@ -35,6 +37,8 @@ function parseList(val?: string): string[] {
 export default function KatalogClient({ haljine, activeParams }: KatalogClientProps) {
   const router = useRouter()
   const [cols, setCols] = useState(3)
+  const { jezik } = useJezik()
+  const tr = t[jezik].katalog
 
   const [selectedBoje, setSelectedBoje] = useState<string[]>(() => parseList(activeParams.boje))
   const [selectedVelicine, setSelectedVelicine] = useState<string[]>(() => parseList(activeParams.velicine))
@@ -168,10 +172,10 @@ export default function KatalogClient({ haljine, activeParams }: KatalogClientPr
                 ∅
               </p>
               <p className="text-2xl font-light italic text-[#1a1a1a] mb-3" style={{ fontFamily: 'var(--font-serif)' }}>
-                Nema rezultata
+                {tr.nemaRezultata}
               </p>
               <p className="text-[11px] tracking-wide text-[#8a8a8a] mb-8 max-w-xs leading-relaxed" style={{ fontFamily: 'var(--font-sans)' }}>
-                Nijedna haljina ne odgovara odabranim filterima.
+                {tr.nemaRezultataOpis}
               </p>
               {hasActiveFilters && (
                 <button
@@ -179,7 +183,7 @@ export default function KatalogClient({ haljine, activeParams }: KatalogClientPr
                   className="px-8 py-3.5 text-[10px] tracking-[0.3em] uppercase border border-[#1a1a1a] text-[#1a1a1a] hover:bg-[#1a1a1a] hover:text-[#faf7f4] transition-all duration-300 cursor-pointer"
                   style={{ fontFamily: 'var(--font-sans)' }}
                 >
-                  Poništi sve filtere
+                  {tr.ponistiSveFiltere}
                 </button>
               )}
             </motion.div>

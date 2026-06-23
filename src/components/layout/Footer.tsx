@@ -2,16 +2,14 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-
-const footerLinks = [
-  { href: '/katalog', label: 'Shop' },
-  { href: '/o-nama', label: 'O nama' },
-  { href: '/rezervacija', label: 'Rezervacija' },
-]
+import { useJezik } from '@/store/jezik'
+import { t } from '@/messages'
 
 export default function Footer() {
   const pathname = usePathname()
   const year = new Date().getFullYear()
+  const { jezik } = useJezik()
+  const tr = t[jezik].footer
 
   if (pathname.startsWith('/admin') || pathname === '/login' || pathname === '/registracija') {
     return null
@@ -89,10 +87,10 @@ export default function Footer() {
               className="text-[8px] tracking-[0.5em] uppercase text-[#c9a96e] mb-4"
               style={{ fontFamily: 'var(--font-sans)' }}
             >
-              Navigacija
+              {tr.navigacija}
             </h4>
             <ul className="flex flex-col gap-2.5">
-              {footerLinks.map((link) => (
+              {tr.links.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
@@ -113,15 +111,16 @@ export default function Footer() {
               className="text-[8px] tracking-[0.5em] uppercase text-[#c9a96e] mb-4"
               style={{ fontFamily: 'var(--font-sans)' }}
             >
-              Kontakt
+              {tr.kontakt}
             </h4>
             <ul className="flex flex-col gap-3">
               <li
                 className="text-[12px] tracking-wide text-[#faf7f4]/40 leading-relaxed"
                 style={{ fontFamily: 'var(--font-sans)' }}
               >
-                Jurija Gagarina 151a<br />
-                11070 Beograd, Srbija
+                {tr.adresa.split('\n').map((line, i) => (
+                  <span key={i}>{line}{i === 0 && <br />}</span>
+                ))}
               </li>
               <li>
                 <a
@@ -144,19 +143,16 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Radno vreme */}
+          {/* Working hours */}
           <div className="col-span-2 sm:col-span-1">
             <h4
               className="text-[8px] tracking-[0.5em] uppercase text-[#c9a96e] mb-4"
               style={{ fontFamily: 'var(--font-sans)' }}
             >
-              Radno vreme
+              {tr.radnoVreme}
             </h4>
             <ul className="flex flex-row justify-between sm:flex-col sm:gap-2">
-              {[
-                { label: 'Pon – Pet', vreme: '12:00 – 19:00' },
-                { label: 'Subota', vreme: '10:00 – 16:00' },
-              ].map(({ label, vreme }) => (
+              {tr.sati.map(({ label, vreme }) => (
                 <li key={label} className="flex flex-col sm:flex-row sm:items-center sm:justify-between sm:gap-4" style={{ fontFamily: 'var(--font-sans)' }}>
                   <span className="text-[12px] text-[#faf7f4]/40">{label}</span>
                   <span className="text-[12px] text-[#faf7f4]/25">{vreme}</span>
@@ -172,14 +168,14 @@ export default function Footer() {
             className="text-[9px] tracking-[0.25em] uppercase text-[#faf7f4]/50"
             style={{ fontFamily: 'var(--font-sans)' }}
           >
-            © {year} TESORO Couture · Sva prava zadržana
+            © {year} TESORO Couture · {tr.copyright}
           </p>
           <Link
             href="/politika-privatnosti"
             className="text-[9px] tracking-[0.25em] uppercase text-[#faf7f4]/30 hover:text-[#c9a96e] transition-colors duration-300"
             style={{ fontFamily: 'var(--font-sans)' }}
           >
-            Politika privatnosti
+            {tr.politika}
           </Link>
         </div>
       </div>

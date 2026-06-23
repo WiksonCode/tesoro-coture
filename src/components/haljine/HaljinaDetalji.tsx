@@ -11,6 +11,7 @@ import VodicZaVelicineModal from '@/components/haljine/VodicZaVelicineModal'
 import { cn } from '@/lib/utils'
 import { useKorpa } from '@/store/korpa'
 import { useJezik } from '@/store/jezik'
+import { t } from '@/messages'
 import type { Haljina } from '@/types'
 
 const KURS = 117
@@ -31,7 +32,9 @@ const WHATSAPP_BROJ = process.env.NEXT_PUBLIC_WHATSAPP_BROJ ?? ''
 
 export default function HaljinaDetalji({ haljina }: { haljina: Haljina }) {
   const { jezik } = useJezik()
+  const tr = t[jezik].haljina
   const naziv = (jezik === 'en' && haljina.naziv_en) ? haljina.naziv_en : haljina.naziv_sr
+  const opis = (jezik === 'en' && haljina.opis_en) ? haljina.opis_en : haljina.opis_sr
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -115,9 +118,9 @@ export default function HaljinaDetalji({ haljina }: { haljina: Haljina }) {
         (!odabranaVelicina || i.velicina === odabranaVelicina)
     )
     const n = filtered.length
-    if (n === 0 && (odabranaBoja || odabranaVelicina)) return { tip: 'nedostupno' as const, tekst: 'Odabrana kombinacija nije dostupna' }
-    if (n === 1) return { tip: 'zadnji' as const, tekst: 'Poslednji dostupan primerak' }
-    return { tip: 'dostupno' as const, tekst: 'Dostupno' }
+    if (n === 0 && (odabranaBoja || odabranaVelicina)) return { tip: 'nedostupno' as const, tekst: tr.nedostupnaKomb }
+    if (n === 1) return { tip: 'zadnji' as const, tekst: tr.zadnjiPrimerak }
+    return { tip: 'dostupno' as const, tekst: tr.dostupno }
   }, [dostupniInventar, odabranaBoja, odabranaVelicina, isRasprodato])
 
   const whatsappUrl = useMemo(() => {
@@ -179,7 +182,7 @@ export default function HaljinaDetalji({ haljina }: { haljina: Haljina }) {
             style={{ fontFamily: 'var(--font-sans)' }}
           >
             <ArrowLeft size={11} />
-            Katalog
+            {tr.katalog}
           </Link>
         </div>
 
@@ -202,7 +205,7 @@ export default function HaljinaDetalji({ haljina }: { haljina: Haljina }) {
                   style={{ fontFamily: 'var(--font-sans)' }}
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-[#8a8a8a]/40 shrink-0" />
-                  Rasprodato
+                  {tr.rasprodato}
                 </span>
               )}
             </div>
@@ -263,9 +266,9 @@ export default function HaljinaDetalji({ haljina }: { haljina: Haljina }) {
               )}
             </div>
 
-            {haljina.opis_sr && (
+            {opis && (
               <p className="text-sm text-[#8a8a8a] leading-relaxed mb-8" style={{ fontFamily: 'var(--font-sans)' }}>
-                {haljina.opis_sr}
+                {opis}
               </p>
             )}
 
@@ -295,7 +298,7 @@ export default function HaljinaDetalji({ haljina }: { haljina: Haljina }) {
                   className="flex items-center justify-center gap-3 py-4 px-8 text-[10px] tracking-[0.35em] uppercase bg-[#f0ebe5] text-[#8a8a8a] border border-[#e8e0d8] select-none"
                   style={{ fontFamily: 'var(--font-sans)' }}
                 >
-                  Trenutno nije dostupno
+                  {tr.trenutnoNedostupno}
                 </div>
               ) : (
                 <button
@@ -312,7 +315,7 @@ export default function HaljinaDetalji({ haljina }: { haljina: Haljina }) {
                   style={{ fontFamily: 'var(--font-sans)' }}
                 >
                   {dodano ? <Check size={14} strokeWidth={2} /> : <ShoppingBag size={14} strokeWidth={1.5} />}
-                  {dodano ? 'Dodano u korpu!' : 'Dodaj u korpu'}
+                  {dodano ? tr.dodanoUKorpu : tr.dodajUKorpu}
                 </button>
               )}
 
@@ -322,7 +325,7 @@ export default function HaljinaDetalji({ haljina }: { haljina: Haljina }) {
                 style={{ fontFamily: 'var(--font-sans)' }}
               >
                 <Calendar size={14} strokeWidth={1.5} />
-                {isRasprodato ? 'Rezerviši za narednu dostavu' : 'Rezerviši odmah'}
+                {isRasprodato ? tr.rezervisiNarednu : tr.rezervisiOdmah}
               </Link>
 
               {whatsappUrl && (
@@ -334,7 +337,7 @@ export default function HaljinaDetalji({ haljina }: { haljina: Haljina }) {
                   style={{ fontFamily: 'var(--font-sans)' }}
                 >
                   <MessageCircle size={13} strokeWidth={1.5} />
-                  Pitajte nas
+                  {tr.pitajteNas}
                 </a>
               )}
             </div>
@@ -349,7 +352,7 @@ export default function HaljinaDetalji({ haljina }: { haljina: Haljina }) {
           </p>
           <div className="flex items-center gap-2 mt-0.5">
             {isRasprodato ? (
-              <p className="text-[15px] font-light text-[#8a8a8a]" style={{ fontFamily: 'var(--font-sans)' }}>Rasprodato</p>
+              <p className="text-[15px] font-light text-[#8a8a8a]" style={{ fontFamily: 'var(--font-sans)' }}>{tr.rasprodato}</p>
             ) : cijenaAkcija && originalCijena > 0 ? (
               <>
                 <p className="text-[15px] font-light text-red-600" style={{ fontFamily: 'var(--font-sans)' }}>{formatRSD(cijenaAkcija)}</p>
@@ -364,7 +367,7 @@ export default function HaljinaDetalji({ haljina }: { haljina: Haljina }) {
                 dostupnostInfo.tip === 'zadnji' ? 'text-amber-600' : 'text-[#8a8a8a]'
               )} style={{ fontFamily: 'var(--font-sans)' }}>
                 <span className={cn('w-1.5 h-1.5 rounded-full', dostupnostInfo.tip === 'zadnji' ? 'bg-amber-500' : 'bg-[#d0ccc8]')} />
-                {dostupnostInfo.tip === 'zadnji' ? 'Poslednji' : 'Nedostupno'}
+                {dostupnostInfo.tip === 'zadnji' ? tr.zadnji : tr.nedostupno}
               </span>
             )}
           </div>
@@ -386,7 +389,7 @@ export default function HaljinaDetalji({ haljina }: { haljina: Haljina }) {
             className="shrink-0 px-5 py-3 text-[9px] tracking-[0.2em] uppercase border border-[#1a1a1a] text-[#1a1a1a] hover:bg-[#1a1a1a] hover:text-[#faf7f4] transition-all duration-300"
             style={{ fontFamily: 'var(--font-sans)' }}
           >
-            Rezerviši
+            {tr.rezervisi}
           </Link>
         ) : (
           <>
@@ -410,7 +413,7 @@ export default function HaljinaDetalji({ haljina }: { haljina: Haljina }) {
               )}
               style={{ fontFamily: 'var(--font-sans)' }}
             >
-              {dodano ? 'Dodano!' : 'U korpu'}
+              {dodano ? '✓' : tr.uKorpu}
             </button>
           </>
         )}
