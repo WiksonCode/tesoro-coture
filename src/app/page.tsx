@@ -20,7 +20,7 @@ export default async function HomePage() {
     .eq('arhivirana', false)
     .eq('featured', true)
     .order('redoslijed', { ascending: false })
-    .limit(3)
+    .limit(12)
 
   let haljine = (featuredData as unknown as Haljina[]) || []
 
@@ -30,7 +30,7 @@ export default async function HomePage() {
       .select('id, slug, naziv_sr, naziv_en, slike, video_url, featured, created_at, redoslijed, kategorija_id, kategorija:kategorije(id, slug, naziv_sr, naziv_en, redosled), inventar(id, sifra, boja_naziv, boja_hex, velicina, cijena_rsd, cijena_eur, slike, dostupna, arhivirana)')
       .eq('arhivirana', false)
       .order('redoslijed', { ascending: false })
-      .limit(3)
+      .limit(12)
     haljine = (fallback as unknown as Haljina[]) || []
   }
 
@@ -38,8 +38,8 @@ export default async function HomePage() {
     <main className="w-full overflow-x-hidden">
       <HeroSection />
       <MarqueeStrip />
-      <CategorySection />
       <AboutSection haljine={haljine} />
+      <CategorySection />
       <CTASection />
     </main>
   )

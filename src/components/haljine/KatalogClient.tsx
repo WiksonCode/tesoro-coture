@@ -14,6 +14,7 @@ interface ActiveParams {
   q?: string
   boje?: string
   velicine?: string
+  naPopustu?: string
 }
 
 interface KatalogClientProps {
@@ -95,9 +96,13 @@ export default function KatalogClient({ haljine, activeParams }: KatalogClientPr
         if (minCijena < priceRange[0] || minCijena > priceRange[1]) return false
       }
 
+      if (activeParams.naPopustu === 'true') {
+        if (!dostupniInv.some((i) => i.na_akciji)) return false
+      }
+
       return true
     })
-  }, [haljine, selectedBoje, selectedVelicine, priceRange, priceBounds])
+  }, [haljine, selectedBoje, selectedVelicine, priceRange, priceBounds, activeParams.naPopustu])
 
   const handleReset = useCallback(() => {
     setSelectedBoje([])

@@ -10,19 +10,15 @@ type Boja = { naziv: string; hex: string }
 
 const KATEGORIJE = [
   { value: '', label: 'Sve' },
-  { value: 'vjencana', label: 'Venčane' },
-  { value: 'koktel', label: 'Koktel' },
-  { value: 'svecana', label: 'Svečane' },
-  { value: 'casual', label: 'Casual' },
-  { value: 'maturska', label: 'Maturske' },
+  { value: 'kratke', label: 'Kratke haljine' },
+  { value: 'midi', label: 'Midi haljine' },
+  { value: 'duge', label: 'Duge haljine' },
 ]
 
 const KATEGORIJE_NAZIVI: Record<string, string> = {
-  vjencana: 'Venčane',
-  koktel: 'Koktel',
-  svecana: 'Svečane',
-  casual: 'Casual',
-  maturska: 'Maturske',
+  kratke: 'Kratke haljine',
+  midi: 'Midi haljine',
+  duge: 'Duge haljine',
 }
 
 const SORTIRANJA = [

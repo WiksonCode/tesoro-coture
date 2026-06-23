@@ -166,7 +166,7 @@ export default function ONamaContent() {
             className="relative min-h-[420px] lg:min-h-0"
           >
             <Image
-              src="/haljina1.jpg"
+              src="/o-nama.jpeg"
               alt="TESORO Couture salon"
               fill
               className="object-cover object-top"
@@ -198,65 +198,6 @@ export default function ONamaContent() {
         </div>
       </section>
 
-      {/* ── Filozofija ────────────────────────────────────────────────────── */}
-      <section className="py-20 lg:py-28 px-6 bg-[#141414] overflow-hidden relative">
-        {/* Giant T */}
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none select-none overflow-hidden" aria-hidden>
-          <span
-            className="block leading-none"
-            style={{
-              fontFamily: 'var(--font-serif)',
-              fontSize: 'clamp(220px, 42vw, 560px)',
-              color: 'rgba(201,169,110,0.035)',
-              marginRight: '-0.12em',
-            }}
-          >
-            T
-          </span>
-        </div>
-        {/* Decorative opening quote */}
-        <div
-          className="absolute top-4 left-6 lg:left-12 leading-none select-none pointer-events-none text-[#c9a96e]/10"
-          style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(100px, 18vw, 180px)' }}
-          aria-hidden
-        >
-          "
-        </div>
-
-        <div className="max-w-4xl mx-auto relative">
-          <span
-            className="text-[9px] tracking-[0.5em] uppercase text-[#c9a96e]/45 mb-8 block"
-            style={{ fontFamily: 'var(--font-sans)' }}
-          >
-            Naša filozofija
-          </span>
-
-          <motion.blockquote
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.01 }}
-            transition={{ duration: 0.9 }}
-          >
-            <p
-              className="text-[clamp(22px,3.8vw,46px)] font-light italic text-[#faf7f4]/88 leading-[1.3]"
-              style={{ fontFamily: 'var(--font-serif)' }}
-            >
-              "Svaka haljina koju stvorimo nosi u sebi priču o ženi koja će je nositi — njenu snagu, njenu lepotu, njen jedinstven trenutak."
-            </p>
-          </motion.blockquote>
-
-          <div className="mt-10 flex items-center gap-4">
-            <div className="w-8 h-px bg-[#c9a96e]/35" />
-            <p
-              className="text-[9px] tracking-[0.4em] uppercase text-[#c9a96e]/40"
-              style={{ fontFamily: 'var(--font-sans)' }}
-            >
-              Osnivačica, TESORO Couture
-            </p>
-          </div>
-        </div>
-      </section>
 
 
       {/* ── Vrednosti — horizontal rows with huge watermark numbers ──────── */}
@@ -295,27 +236,6 @@ export default function ONamaContent() {
                 transition={{ duration: 0.5, delay: i * 0.07 }}
                 className="relative py-9 lg:py-11 flex flex-col sm:flex-row items-start sm:items-center gap-5 lg:gap-14 group overflow-hidden"
               >
-                {/* Huge watermark number */}
-                <span
-                  className="absolute right-0 top-1/2 -translate-y-1/2 font-light leading-none select-none pointer-events-none transition-colors duration-700"
-                  style={{
-                    fontFamily: 'var(--font-serif)',
-                    fontSize: 'clamp(90px, 16vw, 200px)',
-                    color: 'rgba(232,224,216,0.5)',
-                  }}
-                  aria-hidden
-                >
-                  {v.broj}
-                </span>
-
-                {/* Index */}
-                <span
-                  className="text-[11px] tracking-[0.45em] text-[#c9a96e] shrink-0 w-10 font-light"
-                  style={{ fontFamily: 'var(--font-sans)' }}
-                >
-                  {v.broj}
-                </span>
-
                 {/* Vertical divider — desktop only */}
                 <div className="hidden sm:block w-px h-10 bg-[#e8e0d8] shrink-0" />
 
@@ -340,83 +260,6 @@ export default function ONamaContent() {
         </div>
       </section>
 
-      {/* ── Naša priča — gold vertical line + pull quote ──────────────────── */}
-      <section className="py-20 lg:py-28 px-6 bg-[#faf7f4] border-b border-[#e8e0d8]">
-        <div className="max-w-3xl mx-auto">
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.01 }}
-            transition={{ duration: 0.7 }}
-          >
-            <p
-              className="text-[9px] tracking-[0.5em] uppercase text-[#c9a96e] mb-6"
-              style={{ fontFamily: 'var(--font-sans)' }}
-            >
-              Naša priča
-            </p>
-            <h2
-              className="text-[clamp(28px,4vw,46px)] font-light text-[#1a1a1a] leading-tight mb-12"
-              style={{ fontFamily: 'var(--font-serif)' }}
-            >
-              Sve je počelo jednom<br />
-              <span className="italic">savršenom haljinom</span>
-            </h2>
-          </motion.div>
-
-          <div className="flex gap-8 lg:gap-12">
-            {/* Vertical gold line */}
-            <div
-              className="hidden lg:block w-px shrink-0"
-              style={{
-                background: 'linear-gradient(to bottom, #c9a96e 0%, rgba(201,169,110,0.4) 60%, transparent 100%)',
-                minHeight: '100%',
-                alignSelf: 'stretch',
-              }}
-            />
-
-            <motion.div
-              variants={fadeUp}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.01 }}
-              transition={{ duration: 0.7, delay: 0.1 }}
-              className="flex-1 flex flex-col gap-6"
-            >
-              <p
-                className="text-[13px] text-[#8a8a8a] leading-relaxed"
-                style={{ fontFamily: 'var(--font-sans)' }}
-              >
-                TESORO Couture je osnovan 2018. godine sa jednom jedinom misijom: napraviti mesto gde svaka žena može pronaći haljinu koja govori njenom jeziku. Ne haljinu koja je modna u ovom trenutku — već haljinu koja je večna.
-              </p>
-
-              {/* Pull quote */}
-              <blockquote className="relative pl-6 py-4 my-2 border-l-[2px] border-[#c9a96e]">
-                <p
-                  className="text-[18px] lg:text-[22px] font-light italic text-[#1a1a1a] leading-[1.45]"
-                  style={{ fontFamily: 'var(--font-serif)' }}
-                >
-                  Naš salon se nalazi u srcu Beograda. Interijeri su dizajnirani da odišu toplinom i elegancijom — jer verujemo da iskustvo počinje već na ulaznim vratima.
-                </p>
-              </blockquote>
-
-              <p
-                className="text-[13px] text-[#8a8a8a] leading-relaxed"
-                style={{ fontFamily: 'var(--font-sans)' }}
-              >
-                Radimo sa dizajnerima iz Srbije, Italije i Francuske. Svaki komad prolazi rigoroznu selekciju: kvalitet materijala, kroj, i ono neuhvatljivo — osećaj koji dobijate kada je obučete.
-              </p>
-              <p
-                className="text-[13px] text-[#8a8a8a] leading-relaxed"
-                style={{ fontFamily: 'var(--font-sans)' }}
-              >
-                Tokom godina, pomogli smo stotinama žena da pronađu haljinu za najvažnije trenutke svog života. To je privilegija koju ne uzimamo zdravo za gotovo.
-              </p>
-            </motion.div>
-          </div>
-        </div>
-      </section>
 
 
       {/* ── Kontakt + Mapa ────────────────────────────────────────────────── */}
@@ -502,7 +345,6 @@ export default function ONamaContent() {
                       { dan: 'Četvrtak', vreme: '12:00 – 19:00' },
                       { dan: 'Petak', vreme: '12:00 – 19:00' },
                       { dan: 'Subota', vreme: '10:00 – 16:00' },
-                      { dan: 'Nedelja', vreme: 'Zatvoreno' },
                     ].map(({ dan, vreme }) => (
                       <div key={dan} className="flex justify-between gap-8">
                         <span className="text-[12px] text-[#1a1a1a]">{dan}</span>

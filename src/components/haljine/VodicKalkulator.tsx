@@ -7,12 +7,10 @@ import Link from 'next/link'
 type MjeraKey = 'grudi' | 'struk' | 'bokovi'
 
 const TABELA = [
-  { velicina: 'XS',  grudi: [78, 82]  as [number,number], struk: [60, 64]  as [number,number], bokovi: [84, 88]   as [number,number], visina: '160–167' },
-  { velicina: 'S',   grudi: [82, 86]  as [number,number], struk: [64, 68]  as [number,number], bokovi: [88, 92]   as [number,number], visina: '162–168' },
-  { velicina: 'M',   grudi: [86, 90]  as [number,number], struk: [68, 72]  as [number,number], bokovi: [92, 96]   as [number,number], visina: '164–170' },
-  { velicina: 'L',   grudi: [90, 96]  as [number,number], struk: [72, 78]  as [number,number], bokovi: [96, 102]  as [number,number], visina: '165–172' },
-  { velicina: 'XL',  grudi: [96, 102] as [number,number], struk: [78, 84]  as [number,number], bokovi: [102, 108] as [number,number], visina: '166–174' },
-  { velicina: 'XXL', grudi: [102, 110]as [number,number], struk: [84, 92]  as [number,number], bokovi: [108, 116] as [number,number], visina: '167–175' },
+  { velicina: 'XS', grudi: [78, 82] as [number,number], struk: [60, 64] as [number,number], bokovi: [84, 88]  as [number,number] },
+  { velicina: 'S',  grudi: [82, 86] as [number,number], struk: [64, 68] as [number,number], bokovi: [88, 92]  as [number,number] },
+  { velicina: 'M',  grudi: [86, 90] as [number,number], struk: [68, 72] as [number,number], bokovi: [92, 96]  as [number,number] },
+  { velicina: 'L',  grudi: [90, 96] as [number,number], struk: [72, 78] as [number,number], bokovi: [96, 102] as [number,number] },
 ]
 
 const MJERA_TIPS: Record<MjeraKey, string> = {
@@ -25,7 +23,7 @@ function getSizeFor(key: MjeraKey, val: number): string {
   for (const row of TABELA) {
     if (val >= row[key][0] && val <= row[key][1]) return row.velicina
   }
-  return val < TABELA[0][key][0] ? 'XS' : 'XXL'
+  return val < TABELA[0][key][0] ? 'XS' : 'L'
 }
 
 function nadjiPreporuku(
@@ -76,10 +74,10 @@ function FiguraSVG({
 
   return (
     <svg
-      viewBox="0 0 320 430"
+      viewBox="0 -16 320 446"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className="w-full max-w-[300px] mx-auto"
+      className="w-full max-w-[300px] mx-auto scale-[0.9] origin-top"
       aria-hidden="true"
     >
       <defs>

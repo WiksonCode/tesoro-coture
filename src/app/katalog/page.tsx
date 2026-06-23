@@ -22,27 +22,21 @@ interface SearchParams {
 }
 
 const KATEGORIJE_NAZIVI: Record<string, string> = {
-  vjencana: 'Venčane haljine',
-  koktel: 'Koktel haljine',
-  svecana: 'Svečane haljine',
-  casual: 'Casual haljine',
-  maturska: 'Maturske haljine',
+  kratke: 'Kratke haljine',
+  midi: 'Midi haljine',
+  duge: 'Duge haljine',
 }
 
 const KATEGORIJE_OPISI: Record<string, string> = {
-  vjencana: 'Elegantne venčane haljine za vaš najvažniji dan',
-  koktel: 'Sofisticirane koktel haljine za svečane prilike',
-  svecana: 'Luksuzne svečane haljine za posebne trenutke',
-  casual: 'Elegantne casual haljine za svakodnevni šarm',
-  maturska: 'Glamurozne maturske haljine za nezaboravnu noć',
+  kratke: 'Elegantne kratke haljine za svaku priliku',
+  midi: 'Sofisticirane midi haljine savršene dužine',
+  duge: 'Luksuzne duge haljine za posebne trenutke',
 }
 
 const KATEGORIJE_SLIKE: Record<string, string> = {
-  vjencana: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=1920&q=85&fit=crop&auto=format',
-  koktel:   'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1920&q=85&fit=crop&auto=format',
-  svecana:  'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=1920&q=85&fit=crop&auto=format',
-  casual:   'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1920&q=85&fit=crop&auto=format',
-  maturska: 'https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=1920&q=85&fit=crop&auto=format',
+  kratke: '/kratka.jpeg',
+  midi:   '/midi.jpeg',
+  duge:   '/duga.jpeg',
 }
 const DEFAULT_BANNER = '/hero-bg.png'
 

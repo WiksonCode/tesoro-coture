@@ -19,9 +19,8 @@ export default function HeroSection() {
         className="object-cover object-center"
       />
 
-      <div className="absolute inset-0 bg-black/55 lg:hidden" />
-      <div className="absolute inset-0 hidden lg:block bg-gradient-to-t from-black/80 via-black/25 to-black/10" />
-      <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-black/50 to-transparent" />
+      <div className="absolute top-0 left-0 right-0 h-28 bg-gradient-to-b from-black/45 to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 h-96 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
 
       <div className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-10 py-28">
         <div className="flex flex-col items-center text-center">
@@ -34,13 +33,13 @@ export default function HeroSection() {
           >
             <span
               className="block text-[clamp(48px,10vw,100px)] tracking-[-0.01em] font-light text-white uppercase"
-              style={{ fontFamily: 'var(--font-serif)' }}
+              style={{ fontFamily: 'var(--font-serif)', textShadow: '0 2px 24px rgba(0,0,0,0.85), 0 8px 48px rgba(0,0,0,0.6)' }}
             >
               Elegancija
             </span>
             <span
               className="block text-[clamp(34px,7.5vw,72px)] italic font-light text-white"
-              style={{ fontFamily: 'var(--font-serif)' }}
+              style={{ fontFamily: 'var(--font-serif)', textShadow: '0 2px 24px rgba(0,0,0,0.85), 0 8px 48px rgba(0,0,0,0.6)' }}
             >
               koja traje
             </span>
@@ -61,7 +60,7 @@ export default function HeroSection() {
           >
             <Link
               href="/katalog"
-              className="group inline-flex items-center gap-3 border border-white/60 px-8 sm:px-10 py-3.5 sm:py-4 text-[10px] tracking-[0.35em] uppercase text-white hover:bg-white hover:text-[#1a1a1a] transition-all duration-500"
+              className="group inline-flex items-center gap-3 border border-white/60 px-8 sm:px-10 py-3.5 sm:py-4 text-[10px] tracking-[0.35em] uppercase text-white hover:bg-[#c9a96e] hover:border-[#c9a96e] hover:text-[#1a1a1a] transition-all duration-500"
               style={{ fontFamily: 'var(--font-sans)' }}
             >
               Pogledaj kolekciju

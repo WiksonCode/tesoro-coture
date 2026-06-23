@@ -12,12 +12,10 @@ interface Props {
 type MjeraKey = 'grudi' | 'struk' | 'bokovi'
 
 const TABELA = [
-  { velicina: 'XS',  grudi: [78, 82]  as [number,number], struk: [60, 64]  as [number,number], bokovi: [84, 88]   as [number,number], visina: '160–167' },
-  { velicina: 'S',   grudi: [82, 86]  as [number,number], struk: [64, 68]  as [number,number], bokovi: [88, 92]   as [number,number], visina: '162–168' },
-  { velicina: 'M',   grudi: [86, 90]  as [number,number], struk: [68, 72]  as [number,number], bokovi: [92, 96]   as [number,number], visina: '164–170' },
-  { velicina: 'L',   grudi: [90, 96]  as [number,number], struk: [72, 78]  as [number,number], bokovi: [96, 102]  as [number,number], visina: '165–172' },
-  { velicina: 'XL',  grudi: [96, 102] as [number,number], struk: [78, 84]  as [number,number], bokovi: [102, 108] as [number,number], visina: '166–174' },
-  { velicina: 'XXL', grudi: [102, 110]as [number,number], struk: [84, 92]  as [number,number], bokovi: [108, 116] as [number,number], visina: '167–175' },
+  { velicina: 'XS', grudi: [78, 82] as [number,number], struk: [60, 64] as [number,number], bokovi: [84, 88]  as [number,number] },
+  { velicina: 'S',  grudi: [82, 86] as [number,number], struk: [64, 68] as [number,number], bokovi: [88, 92]  as [number,number] },
+  { velicina: 'M',  grudi: [86, 90] as [number,number], struk: [68, 72] as [number,number], bokovi: [92, 96]  as [number,number] },
+  { velicina: 'L',  grudi: [90, 96] as [number,number], struk: [72, 78] as [number,number], bokovi: [96, 102] as [number,number] },
 ]
 
 const TIPS: Record<MjeraKey, string> = {
@@ -30,7 +28,7 @@ function getSizeFor(key: MjeraKey, val: number): string {
   for (const row of TABELA) {
     if (val >= row[key][0] && val <= row[key][1]) return row.velicina
   }
-  return val < TABELA[0][key][0] ? 'XS' : 'XXL'
+  return val < TABELA[0][key][0] ? 'XS' : 'L'
 }
 
 function nadjiPreporuku(g: string, s: string, b: string): { velicina: string; konflikt: boolean } | null {
@@ -275,9 +273,9 @@ export default function VodicZaVelicineModal({ open, onClose }: Props) {
                   <table className="w-full" style={{ fontFamily: 'var(--font-sans)' }}>
                     <thead>
                       <tr className="border-b border-[#e8e0d8]">
-                        {['Vel.', 'Grudi', 'Struk', 'Bokovi', 'Visina'].map(col => (
+                        {['Vel.', 'Grudi', 'Struk', 'Bokovi'].map(col => (
                           <th key={col} className="text-left pb-2.5 text-[7.5px] tracking-[0.2em] uppercase font-normal"
-                            style={{ color: col === 'Vel.' || col === 'Visina' ? '#8a8a8a' : '#c9a96e', opacity: col === 'Visina' ? 0.65 : 1 }}>
+                            style={{ color: col === 'Vel.' ? '#8a8a8a' : '#c9a96e' }}>
                             {col}
                           </th>
                         ))}
@@ -312,10 +310,9 @@ export default function VodicZaVelicineModal({ open, onClose }: Props) {
                               `${row.grudi[0]}–${row.grudi[1]}`,
                               `${row.struk[0]}–${row.struk[1]}`,
                               `${row.bokovi[0]}–${row.bokovi[1]}`,
-                              row.visina,
                             ].map((val, j) => (
                               <td key={j} className="py-2.5 pr-1 text-[10px] tabular-nums"
-                                style={{ color: isRec ? '#3a3a3a' : j === 3 ? 'rgba(138,138,138,0.65)' : '#5a5a5a' }}>
+                                style={{ color: isRec ? '#3a3a3a' : '#5a5a5a' }}>
                                 {val}
                               </td>
                             ))}

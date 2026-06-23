@@ -47,23 +47,21 @@ export default function CTASection() {
           className="text-[clamp(36px,5vw,64px)] font-light text-[#1a1a1a] leading-[1.1] mb-4"
           style={{ fontFamily: 'var(--font-serif)' }}
         >
-          Pronađite haljinu koja<br />
-          <span className="italic">priča vašu priču</span>
+          Pronađite haljinu stvorenu<br />
+          <span className="italic">za vaš poseban trenutak</span>
         </h2>
 
         <p
           className="text-sm text-[#8a8a8a] mb-12 leading-relaxed tracking-wide max-w-lg mx-auto"
           style={{ fontFamily: 'var(--font-sans)' }}
         >
-          Zakažite besplatnu konsultaciju u našem beogradskom salonu.
-          Naš tim vas vodi kroz celu kolekciju — venčane, koktel i svečane haljine —
-          dok ne pronađete onu pravu.
+          Zakažite besplatnu konsultaciju u našem salonu i zajedno ćemo pronaći model koji će obeležiti vaš poseban trenutak.
         </p>
 
         <div className="flex flex-col items-center gap-5">
           <Link
             href="/rezervacija"
-            className="group inline-flex items-center gap-3 border border-[#1a1a1a] px-10 py-4 text-[10px] tracking-[0.35em] uppercase text-[#1a1a1a] hover:bg-[#1a1a1a] hover:text-[#faf7f4] transition-all duration-500"
+            className="group inline-flex items-center gap-4 bg-[#1a1a1a] px-12 py-5 text-[11px] tracking-[0.35em] uppercase text-white hover:shadow-[0_0_0_1px_#c9a96e] transition-all duration-400"
             style={{ fontFamily: 'var(--font-sans)' }}
           >
             Zakaži termin

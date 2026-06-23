@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 const footerLinks = [
-  { href: '/katalog', label: 'Kolekcija' },
+  { href: '/katalog', label: 'Shop' },
   { href: '/o-nama', label: 'O nama' },
   { href: '/rezervacija', label: 'Rezervacija' },
   { href: '/vodic-za-velicine', label: 'Vodič za veličine' },
@@ -40,7 +40,7 @@ export default function Footer() {
         {/* Social */}
         <div className="flex items-center justify-center gap-3 mb-10">
           <a
-            href="https://www.instagram.com/tesoro_couture/"
+            href="https://www.instagram.com/tesoro_couture?igsh=cWxic29pdmU1dTVi&utm_source=qr"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Instagram"
@@ -53,7 +53,7 @@ export default function Footer() {
             </svg>
           </a>
           <a
-            href="https://www.facebook.com/Tesoro.couture/"
+            href="https://www.facebook.com/share/18fjyBJJMM/?mibextid=wwXIfr"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Facebook"
@@ -64,7 +64,7 @@ export default function Footer() {
             </svg>
           </a>
           <a
-            href="https://www.tiktok.com/@tesoro_couture"
+            href="https://www.tiktok.com/@tesorocouture?_r=1&_t=ZS-97LESUAHmrd"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="TikTok"
@@ -155,9 +155,8 @@ export default function Footer() {
             </h4>
             <ul className="flex flex-row justify-between sm:flex-col sm:gap-2">
               {[
-                { label: 'Pon – Pet', vreme: '10:00 – 20:00' },
-                { label: 'Subota', vreme: '10:00 – 18:00' },
-                { label: 'Nedeljom', vreme: 'po dogovoru' },
+                { label: 'Pon – Pet', vreme: '12:00 – 19:00' },
+                { label: 'Subota', vreme: '10:00 – 16:00' },
               ].map(({ label, vreme }) => (
                 <li key={label} className="flex flex-col sm:flex-row sm:items-center sm:justify-between sm:gap-4" style={{ fontFamily: 'var(--font-sans)' }}>
                   <span className="text-[12px] text-[#faf7f4]/40">{label}</span>
