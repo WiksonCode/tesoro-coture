@@ -1,4 +1,4 @@
-export type Velicina = 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL' | 'po_mjeri'
+export type Velicina = 'XS' | 'S' | 'M' | 'L' | 'po_mjeri'
 export type StatusRezervacije = 'na_cekanju' | 'potvrdjena' | 'otkazana' | 'realizovana'
 export type UlogaKorisnika = 'korisnik' | 'admin'
 

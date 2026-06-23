@@ -3,7 +3,7 @@
 import { cn } from '@/lib/utils'
 import { Ruler } from 'lucide-react'
 
-const SVE_VELICINE = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'po_mjeri'] as const
+const SVE_VELICINE = ['XS', 'S', 'M', 'L', 'po_mjeri'] as const
 
 interface VelicineSelectorProps {
   velicine: string[]

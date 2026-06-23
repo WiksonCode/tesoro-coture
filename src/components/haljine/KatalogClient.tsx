@@ -59,7 +59,7 @@ export default function KatalogClient({ haljine, activeParams }: KatalogClientPr
     haljine.forEach((h) =>
       h.inventar?.filter((i) => i.dostupna && !i.arhivirana).forEach((i) => set.add(i.velicina))
     )
-    return ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'po_mjeri'].filter((v) => set.has(v))
+    return ['XS', 'S', 'M', 'L', 'po_mjeri'].filter((v) => set.has(v))
   }, [haljine])
 
   const priceBounds = useMemo(() => {

@@ -27,7 +27,7 @@ function getBojeIzInventara(inventar: InventarStavka[]) {
 
 function getVelicineIzInventara(inventar: InventarStavka[]) {
   const set = new Set(inventar.map((i) => i.velicina))
-  return (['XS', 'S', 'M', 'L', 'XL', 'XXL', 'po_mjeri'] as const).filter((v) => set.has(v))
+  return (['XS', 'S', 'M', 'L', 'po_mjeri'] as const).filter((v) => set.has(v))
 }
 
 export default function HaljinaCard({ haljina, className }: { haljina: Haljina; className?: string }) {

@@ -28,7 +28,7 @@ const SORTIRANJA = [
   { value: 'po_dostupnosti', label: 'Dostupnost' },
 ]
 
-const STANDARD_VELICINE = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'po_mjeri']
+const STANDARD_VELICINE = ['XS', 'S', 'M', 'L', 'po_mjeri']
 
 const PRESET_BOJE: Boja[] = [
   { naziv: 'Bela', hex: '#FAFAFA' },

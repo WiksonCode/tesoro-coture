@@ -19,7 +19,7 @@ interface Props {
   haljine: Haljina[]
 }
 
-const VELICINE = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'po_mjeri']
+const VELICINE = ['XS', 'S', 'M', 'L', 'po_mjeri']
 const UNDO_DELAY = 5000
 
 interface PendingDelete {

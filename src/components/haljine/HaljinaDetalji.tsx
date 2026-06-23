@@ -86,7 +86,7 @@ export default function HaljinaDetalji({ haljina }: { haljina: Haljina }) {
       ? dostupniInventar.filter((i) => i.boja_naziv === odabranaBoja)
       : dostupniInventar
     const set = new Set(filtered.map((i) => i.velicina))
-    return (['XS', 'S', 'M', 'L', 'XL', 'XXL', 'po_mjeri'] as const).filter((v) => set.has(v))
+    return (['XS', 'S', 'M', 'L', 'po_mjeri'] as const).filter((v) => set.has(v))
   }, [dostupniInventar, odabranaBoja])
 
   const odabraniInventar = useMemo(
