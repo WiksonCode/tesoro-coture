@@ -27,7 +27,7 @@ function formatDatum(datum: string): string {
 export function PotvrdarezervacijeEmail({ ime, prezime, artikli, datumTermina, napomena }: Props) {
   const ukupno = artikli.reduce((sum, a) => sum + a.cijena_rsd, 0)
 
-  const artikliRows = artikli.map((a, i) => `
+  const artikliRows = artikli.map((a) => `
     <tr>
       <td style="padding:16px 0;border-bottom:1px solid #e8e0d8;vertical-align:top;">
         <span style="display:block;font-size:13px;color:#1a1a1a;font-weight:500;margin-bottom:3px;font-family:Georgia,serif;font-style:italic;">${a.naziv}</span>

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
-import { Shield, User, ChevronRight } from 'lucide-react'
+import { Shield, User } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 type ProfilRow = { id: string; ime: string; prezime: string; telefon: string | null; uloga: string; created_at: string }

@@ -3,6 +3,7 @@ import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ScrollToTop from "@/components/ui/ScrollToTop";
+import { SITE_URL, organizationSchema, localBusinessSchema } from "@/lib/seo";
 import "./globals.css";
 
 const cormorantGaramond = Cormorant_Garamond({
@@ -19,14 +20,16 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://tesorocouture.rs"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "TESORO Couture — Salon haljina Beograd",
     template: "%s | TESORO Couture",
   },
   description:
     "Elegantne ženske haljine za svaku priliku. Vjenčane, koktel, svečane i maturske haljine. Rezervišite termin u našem salonu u Beogradu.",
-  keywords: ["haljine", "salon haljina", "Beograd", "vjenčane haljine", "maturske haljine"],
+  alternates: {
+    canonical: "/",
+  },
   icons: {
     icon: [
       { url: "/icon.png", sizes: "192x192", type: "image/png" },
@@ -38,7 +41,15 @@ export const metadata: Metadata = {
     type: "website",
     locale: "sr_RS",
     siteName: "TESORO Couture",
-    url: "https://tesorocouture.rs",
+    url: SITE_URL,
+    images: [{ url: "/tesoro2-logo.png", width: 802, height: 311, alt: "TESORO Couture" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "TESORO Couture — Salon haljina Beograd",
+    description:
+      "Elegantne ženske haljine za svaku priliku. Vjenčane, koktel, svečane i maturske haljine.",
+    images: ["/tesoro2-logo.png"],
   },
   robots: {
     index: true,
@@ -58,6 +69,14 @@ export default function RootLayout({
       className={`${cormorantGaramond.variable} ${dmSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[#faf7f4]">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema()) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema()) }}
+        />
         <ScrollToTop />
         <Navbar />
         <div className="flex-1">{children}</div>

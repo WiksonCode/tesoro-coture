@@ -124,7 +124,7 @@ export default function HaljinaGalerija({ slike, naziv, videoUrl }: HaljinaGaler
     if (!current) return null
     if (current.type === 'video') {
       return (
-        // eslint-disable-next-line jsx-a11y/media-has-caption
+         
         <video
           key={current.src}
           src={current.src}

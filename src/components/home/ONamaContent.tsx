@@ -1,6 +1,5 @@
 'use client'
 
-import { useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
@@ -33,41 +32,6 @@ function IconTikTok({ className }: { className?: string }) {
     <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
       <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z" />
     </svg>
-  )
-}
-
-// ─── Foto Placeholder ─────────────────────────────────────────────────────────
-
-function FotoPlaceholder({ initial = 'T', label }: { initial?: string; label?: string }) {
-  const id = `diag-${initial}`
-  return (
-    <div className="absolute inset-0 bg-[#141414] overflow-hidden">
-      <svg className="absolute inset-0 w-full h-full" aria-hidden>
-        <defs>
-          <pattern id={id} patternUnits="userSpaceOnUse" width="28" height="28" patternTransform="rotate(45)">
-            <line x1="0" y1="0" x2="0" y2="28" stroke="#c9a96e" strokeWidth="0.6" />
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill={`url(#${id})`} opacity="0.07" />
-      </svg>
-      <span className="absolute top-6 left-6 w-10 h-10 border-t border-l border-[#c9a96e]/35" />
-      <span className="absolute top-6 right-6 w-10 h-10 border-t border-r border-[#c9a96e]/35" />
-      <span className="absolute bottom-6 left-6 w-10 h-10 border-b border-l border-[#c9a96e]/35" />
-      <span className="absolute bottom-6 right-6 w-10 h-10 border-b border-r border-[#c9a96e]/35" />
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
-        <span
-          className="text-[160px] font-light italic leading-none text-[#c9a96e]/10 select-none"
-          style={{ fontFamily: 'var(--font-serif)' }}
-        >
-          {initial}
-        </span>
-        {label && (
-          <p className="text-[7px] tracking-[0.75em] uppercase text-[#c9a96e]/20" style={{ fontFamily: 'var(--font-sans)' }}>
-            {label}
-          </p>
-        )}
-      </div>
-    </div>
   )
 }
 

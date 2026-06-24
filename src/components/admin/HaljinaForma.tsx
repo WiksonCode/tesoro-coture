@@ -349,7 +349,7 @@ export default function HaljinaForma({ haljina, kategorije }: Props) {
           <label className={labelCls} style={{ fontFamily: 'var(--font-sans)' }}>Video (opciono)</label>
           {videoUrl ? (
             <div className="relative bg-black">
-              {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+              { }
               <video
                 src={videoUrl}
                 controls

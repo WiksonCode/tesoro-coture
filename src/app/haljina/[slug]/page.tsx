@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import HaljinaDetalji from '@/components/haljine/HaljinaDetalji'
 import SrodneHaljine from '@/components/haljine/SrodneHaljine'
+import { productSchema, breadcrumbSchema } from '@/lib/seo'
 import type { Haljina } from '@/types'
 
 export const dynamic = 'force-dynamic'
@@ -27,7 +28,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: data.naziv_sr,
     description: data.opis_sr?.slice(0, 160),
+    alternates: {
+      canonical: `/haljina/${slug}`,
+    },
     openGraph: {
+      type: 'website',
+      title: data.naziv_sr,
+      description: data.opis_sr?.slice(0, 160),
+      url: `/haljina/${slug}`,
       images: data.slike?.[0] ? [{ url: data.slike[0] }] : [],
     },
   }
@@ -70,8 +78,22 @@ export default async function HaljinaPage({ params }: Props) {
     srodneHaljine = (ostalePodaci as unknown as Haljina[]) || []
   }
 
+  const breadcrumb = breadcrumbSchema([
+    { ime: 'Početna', path: '/' },
+    { ime: 'Katalog', path: '/katalog' },
+    { ime: haljina.naziv_sr, path: `/haljina/${haljina.slug}` },
+  ])
+
   return (
     <main className="min-h-screen bg-[#faf7f4] pt-16 lg:pt-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema(haljina)) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      />
       <HaljinaDetalji haljina={haljina} />
       <SrodneHaljine
         haljine={srodneHaljine}

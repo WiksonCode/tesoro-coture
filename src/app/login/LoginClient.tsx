@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff, ArrowRight } from 'lucide-react'
@@ -12,7 +12,6 @@ import { loginSchema, type LoginInput } from '@/lib/validations/auth'
 import { cn } from '@/lib/utils'
 
 export default function LoginClient() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl') || '/profil'
 

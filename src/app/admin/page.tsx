@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { CalendarCheck, Shirt, Users, TrendingUp, ArrowRight, Clock, Plus, CalendarDays } from 'lucide-react'
+import { CalendarCheck, Shirt, Users, TrendingUp, ArrowRight, Clock, CalendarDays } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export const metadata: Metadata = { title: 'Dashboard' }
@@ -323,7 +323,6 @@ export default async function AdminDashboardPage() {
                   const inv = r.inventar as unknown as { haljina: { naziv_sr: string } | null } | null
                   const datum = r.datum_termina ? new Date(r.datum_termina + 'T00:00:00') : null
                   const danLabel = datum?.toLocaleDateString('sr-Latn-RS', { weekday: 'short', day: 'numeric', month: 'short' }) ?? '—'
-                  const cfg = STATUS_CONFIG[r.status]
                   return (
                     <Link
                       key={r.id}

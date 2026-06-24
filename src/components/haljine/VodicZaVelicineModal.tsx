@@ -1,8 +1,10 @@
 'use client'
 
 import { useState, useMemo, useEffect } from 'react'
+import Image from 'next/image'
 import { X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import figuraLutka from '../../../public/figura-lutka.png'
 
 interface Props {
   open: boolean
@@ -17,12 +19,6 @@ const TABELA = [
   { velicina: 'M',  grudi: [86, 90] as [number,number], struk: [68, 72] as [number,number], bokovi: [92, 96]  as [number,number] },
   { velicina: 'L',  grudi: [90, 96] as [number,number], struk: [72, 78] as [number,number], bokovi: [96, 102] as [number,number] },
 ]
-
-const TIPS: Record<MjeraKey, string> = {
-  grudi:  'Najširi deo, metar horizontalno.',
-  struk:  '2–3 cm iznad pupka, ne uvlačiti stomak.',
-  bokovi: 'Najširi deo bokova i zadnjice.',
-}
 
 function getSizeFor(key: MjeraKey, val: number): string {
   for (const row of TABELA) {
@@ -49,12 +45,12 @@ function nadjiPreporuku(g: string, s: string, b: string): { velicina: string; ko
 
 function FiguraSlika() {
   return (
-    <img
-      src="/figura-lutka.png"
+    <Image
+      src={figuraLutka}
       alt=""
       aria-hidden
       className="w-full scale-125 origin-top"
-      style={{ width: 'calc(100% + 64px)', marginLeft: '-32px', marginRight: '-32px' }}
+      style={{ width: 'calc(100% + 64px)', height: 'auto', marginLeft: '-32px', marginRight: '-32px' }}
     />
   )
 }
@@ -138,12 +134,12 @@ export default function VodicZaVelicineModal({ open, onClose }: Props) {
                   >
                     Vodič za veličine
                   </h2>
-                  <img
-                    src="/figura-lutka.png"
+                  <Image
+                    src={figuraLutka}
                     alt=""
                     aria-hidden
                     className="w-full"
-                    style={{ width: 'calc(100% + 64px)', marginLeft: '-32px', marginRight: '-32px' }}
+                    style={{ width: 'calc(100% + 64px)', height: 'auto', marginLeft: '-32px', marginRight: '-32px' }}
                   />
                 </div>
 

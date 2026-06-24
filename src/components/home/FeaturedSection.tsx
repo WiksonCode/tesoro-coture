@@ -21,7 +21,7 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 }
 
-export default function FeaturedSection({ haljine, isFallback }: FeaturedSectionProps) {
+export default function FeaturedSection({ haljine }: FeaturedSectionProps) {
   if (!haljine.length) return null
 
   return (

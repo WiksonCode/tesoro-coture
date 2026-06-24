@@ -227,7 +227,7 @@ export default function RezervacijeTableClient({ rezervacije }: { rezervacije: R
 
       {q && filtrirane.length > 0 && (
         <p className="mt-3 text-[10px] text-[#8a8a8a] tracking-wide" style={{ fontFamily: 'var(--font-sans)' }}>
-          {filtrirane.length} {filtrirane.length === 1 ? 'rezultat' : 'rezultata'} za „{q}"
+          {filtrirane.length} {filtrirane.length === 1 ? 'rezultat' : 'rezultata'} za „{q}“
         </p>
       )}
     </div>

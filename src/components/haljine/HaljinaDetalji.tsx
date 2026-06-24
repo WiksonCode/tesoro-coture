@@ -60,7 +60,7 @@ export default function HaljinaDetalji({ haljina }: { haljina: Haljina }) {
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const [odabranaBoja, setOdabranaBoja] = useState(initialBoja)
-  const [odabranaBojaHex, setOdabranaBojaHex] = useState(
+  const [, setOdabranaBojaHex] = useState(
     boje.find((b) => b.naziv === initialBoja)?.hex || boje[0]?.hex || ''
   )
   const [odabranaVelicina, setOdabranaVelicina] = useState(searchParams.get('velicina') ?? '')
@@ -108,7 +108,6 @@ export default function HaljinaDetalji({ haljina }: { haljina: Haljina }) {
   const cijenaAkcija = isNaAkciji && odabraniInventar?.cijena_akcija_rsd != null
     ? odabraniInventar.cijena_akcija_rsd
     : null
-  const cijena = cijenaAkcija ?? originalCijena
 
   const dostupnostInfo = useMemo(() => {
     if (isRasprodato) return null
@@ -121,7 +120,7 @@ export default function HaljinaDetalji({ haljina }: { haljina: Haljina }) {
     if (n === 0 && (odabranaBoja || odabranaVelicina)) return { tip: 'nedostupno' as const, tekst: tr.nedostupnaKomb }
     if (n === 1) return { tip: 'zadnji' as const, tekst: tr.zadnjiPrimerak }
     return { tip: 'dostupno' as const, tekst: tr.dostupno }
-  }, [dostupniInventar, odabranaBoja, odabranaVelicina, isRasprodato])
+  }, [dostupniInventar, odabranaBoja, odabranaVelicina, isRasprodato, tr.dostupno, tr.nedostupnaKomb, tr.zadnjiPrimerak])
 
   const whatsappUrl = useMemo(() => {
     if (!WHATSAPP_BROJ) return null

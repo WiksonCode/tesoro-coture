@@ -9,6 +9,9 @@ export const dynamic = 'force-dynamic'
 export const metadata: Metadata = {
   title: 'Katalog',
   description: 'Pregledajte našu ekskluzivnu kolekciju elegantnih haljina — venčane, koktel, svečane i maturske.',
+  alternates: {
+    canonical: '/katalog',
+  },
 }
 
 interface SearchParams {
