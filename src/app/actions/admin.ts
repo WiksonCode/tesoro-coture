@@ -264,3 +264,13 @@ export async function updateRedoslijed(ids: string[]) {
   revalidatePath('/katalog')
   revalidatePath('/haljina', 'layout')
 }
+
+export async function updateFeaturedRedoslijed(ids: string[]) {
+  const supabase = await adminClient()
+  const updates = ids.map((id, i) =>
+    supabase.from('haljine').update({ featured_redoslijed: (i + 1) * 10 }).eq('id', id)
+  )
+  await Promise.all(updates)
+  revalidatePath('/admin/haljine/raspored-pocetna')
+  revalidatePath('/')
+}

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { Plus, LayoutGrid } from 'lucide-react'
+import { Plus, LayoutGrid, Star } from 'lucide-react'
 import type { Haljina } from '@/types'
 import HaljineTableClient from './HaljineTableClient'
 
@@ -27,6 +27,14 @@ export default async function AdminHaljinePage() {
           </h1>
         </div>
         <div className="flex items-center gap-2">
+          <Link
+            href="/admin/haljine/raspored-pocetna"
+            className="flex items-center gap-2 border border-[#e8e0d8] text-[#1a1a1a] px-3 sm:px-5 py-2.5 text-[11px] tracking-[0.25em] uppercase hover:border-[#c9a96e] transition-all duration-300"
+            style={{ fontFamily: 'var(--font-sans)' }}
+          >
+            <Star size={13} strokeWidth={1.5} className="text-[#c9a96e]" />
+            <span className="hidden sm:inline">Raspored početna</span>
+          </Link>
           <Link
             href="/admin/haljine/raspored"
             className="flex items-center gap-2 border border-[#e8e0d8] text-[#1a1a1a] px-3 sm:px-5 py-2.5 text-[11px] tracking-[0.25em] uppercase hover:border-[#1a1a1a] transition-all duration-300"

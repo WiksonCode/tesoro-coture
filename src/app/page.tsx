@@ -16,10 +16,10 @@ export default async function HomePage() {
 
   const { data: featuredData } = await supabase
     .from('haljine')
-    .select('id, slug, naziv_sr, naziv_en, slike, video_url, featured, created_at, redoslijed, kategorija_id, kategorija:kategorije(id, slug, naziv_sr, naziv_en, redosled), inventar(id, sifra, boja_naziv, boja_hex, velicina, cijena_rsd, cijena_eur, slike, dostupna, arhivirana)')
+    .select('id, slug, naziv_sr, naziv_en, slike, video_url, featured, created_at, redoslijed, featured_redoslijed, kategorija_id, kategorija:kategorije(id, slug, naziv_sr, naziv_en, redosled), inventar(id, sifra, boja_naziv, boja_hex, velicina, cijena_rsd, cijena_eur, slike, dostupna, arhivirana)')
     .eq('arhivirana', false)
     .eq('featured', true)
-    .order('redoslijed', { ascending: false })
+    .order('featured_redoslijed', { ascending: true })
     .limit(12)
 
   let haljine = (featuredData as unknown as Haljina[]) || []

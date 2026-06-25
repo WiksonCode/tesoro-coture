@@ -25,6 +25,7 @@ export interface Haljina {
   featured: boolean
   arhivirana: boolean
   redoslijed: number
+  featured_redoslijed?: number
   created_at: string
   updated_at: string
   inventar?: InventarStavka[]

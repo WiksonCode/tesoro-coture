@@ -81,7 +81,17 @@ function DragOverlayKartica({ haljina }: { haljina: Haljina }) {
   )
 }
 
-export default function RasporedClient({ haljine: initial }: { haljine: Haljina[] }) {
+interface RasporedClientProps {
+  haljine: Haljina[]
+  saveAction?: (ids: string[]) => Promise<unknown>
+  helpText?: string
+}
+
+export default function RasporedClient({
+  haljine: initial,
+  saveAction = updateRedoslijed,
+  helpText = 'Vuci haljine da promijeniš redoslijed u katalogu. Broj u uglu pokazuje poziciju.',
+}: RasporedClientProps) {
   const [haljine, setHaljine] = useState(initial)
   const [activeId, setActiveId] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
@@ -109,7 +119,7 @@ export default function RasporedClient({ haljine: initial }: { haljine: Haljina[
 
   function handleSave() {
     startTransition(async () => {
-      await updateRedoslijed(haljine.map((h) => h.id))
+      await saveAction(haljine.map((h) => h.id))
       setSaved(true)
       setTimeout(() => setSaved(false), 2500)
     })
@@ -121,7 +131,7 @@ export default function RasporedClient({ haljine: initial }: { haljine: Haljina[
     <div>
       <div className="flex items-center justify-between mb-6">
         <p className="text-[11px] text-[#8a8a8a]" style={{ fontFamily: 'var(--font-sans)' }}>
-          Vuci haljine da promijeniš redoslijed u katalogu. Broj u uglu pokazuje poziciju.
+          {helpText}
         </p>
         <button
           onClick={handleSave}
