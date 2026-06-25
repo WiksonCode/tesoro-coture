@@ -8,6 +8,7 @@ import { useJezik } from '@/store/jezik'
 import { t } from '@/messages'
 
 const HERO_IMAGE = '/hero-bg.png'
+const HERO_IMAGE_MOBILE = '/bg-telefon.JPG'
 
 export default function HeroSection() {
   const { jezik } = useJezik()
@@ -15,13 +16,23 @@ export default function HeroSection() {
 
   return (
     <section className="relative min-h-screen flex items-end overflow-hidden">
+      {/* Mobilna verzija — uspravna slika visoke rezolucije */}
+      <Image
+        src={HERO_IMAGE_MOBILE}
+        alt="TESORO Couture — elegantna haljina"
+        fill
+        priority
+        sizes="100vw"
+        className="object-cover object-center md:hidden"
+      />
+      {/* Desktop verzija — pejzažna slika */}
       <Image
         src={HERO_IMAGE}
         alt="TESORO Couture — elegantna haljina"
         fill
         priority
         sizes="100vw"
-        className="object-cover object-center"
+        className="object-cover object-center hidden md:block"
       />
 
       <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-black/30 to-transparent" />
